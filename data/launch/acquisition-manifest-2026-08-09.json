@@ -2,6 +2,7 @@
   "schema_version": "0.1.0-candidate",
   "manifest_id": "blorenge-launch-acquisition-2026-08-09",
   "created_at": "2026-08-09T17:35:00Z",
+  "amended_at": "2026-08-09T18:47:50Z",
   "registry_id": "blorenge-launch",
   "registry_commit": null,
   "status": "validated_candidate_inputs_not_released",
@@ -142,9 +143,9 @@
     ]
   },
   "qa_events": [
-    {"severity": "hard_fail", "code": "CL18_OMITTED_BY_SOURCE", "message": "The selected NRW common-land source omits urban commons and cannot supply Blorenge Common CL18."},
+    {"severity": "information", "code": "CL18_DEFERRED_FROM_LAUNCH", "message": "The launch AOI now uses the authoritative Blorenge SSSI boundary plus 2 km. CL18 remains a post-launch enhancement and the SSSI must not be presented as the legal common boundary."},
     {"severity": "hard_fail", "code": "INCIDENT_AUTHORITY_CHRONOLOGY_MISSING", "message": "EFFIS 592404 is a strong provider candidate but cannot establish authoritative incident dates or identity."},
     {"severity": "warning", "code": "SATELLITE_ROLE_BINDING_PENDING", "message": "Candidate product IDs are exact, but pre/immediate-post/latest roles require incident matching and AOI-level visual/mask QA."},
-    {"severity": "warning", "code": "FINAL_AOI_CLIP_PENDING", "message": "Representative vector and LiDAR acquisitions use a conservative discovery envelope until CL18 is obtained."}
+    {"severity": "warning", "code": "FINAL_AOI_CLIP_PENDING", "message": "Representative vector and LiDAR acquisitions use a conservative discovery envelope until the validated SSSI geometry is buffered by exactly 2000 metres and applied as the final clip."}
   ]
 }

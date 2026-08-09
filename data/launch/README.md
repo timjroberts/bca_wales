@@ -16,11 +16,11 @@ They are inputs to the publication-toolchain and factual-release tickets. They a
 
 ## Why publication is blocked
 
-Blorenge Common is urban common `CL18`, reported by Welsh Government material as about 2,017 ha and registered by Torfaen County Borough Council. The NRW Open Access - Registered Common Land dataset explicitly omits urban commons. A bounded query returned eight nearby features, none intersected the Blorenge SSSI, and none may be substituted for `CL18`.
+The launch boundary is now the authoritative Blorenge SSSI feature `NRW_SSSI.13108`, buffered by 2 km for the area of interest. Blorenge Common `CL18` is deferred until Torfaen supplies its maintained register-map boundary and confirms reuse terms. The explorer must label the SSSI accurately and must not imply that it represents the legal common-land boundary.
 
 The EFFIS candidate is useful corroboration but does not establish the authoritative incident identity, ignition, control or end chronology. Those facts are required before satellite scenes can be bound to pre-fire, immediate-post and latest roles or before the site can name a primary July 2026 perimeter.
 
-The publication manifest therefore fails closed. Exact output checksums and release URLs belong only in a later immutable release manifest after these blockers, AOI-level scene QA, processing, accessibility checks and release-authority promotion are complete.
+The publication manifest therefore remains fail-closed only on the incident-authority chronology. Exact output checksums and release URLs belong only in a later immutable release manifest after that blocker, AOI-level scene QA, processing, accessibility checks and release-authority promotion are complete.
 
 ## Files
 

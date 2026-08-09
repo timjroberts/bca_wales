@@ -1,13 +1,13 @@
 {
   "schema_version": "0.1.0-candidate",
   "registry_id": "blorenge-launch",
-  "reviewed_at": "2026-08-09T17:30:00Z",
+  "reviewed_at": "2026-08-09T18:47:50Z",
   "release_authority": "timjroberts",
   "status": "candidate_blocked",
-  "status_reason": "The exact Blorenge Common CL18 boundary and an incident-authority chronology are not yet available under verified public-reuse terms.",
+  "status_reason": "The SSSI-only launch boundary is validated, but an incident-authority chronology is not yet available under verified public-reuse terms.",
   "area_of_interest": {
-    "intended_rule": "Geometric union of the Blorenge SSSI and Blorenge Common CL18, buffered by 2000 metres in EPSG:27700.",
-    "status": "blocked",
+    "intended_rule": "Blorenge SSSI feature NRW_SSSI.13108 buffered by 2000 metres in EPSG:27700.",
+    "status": "validated_launch_rule_build_pending",
     "validated_component": {
       "provider": "Natural Resources Wales",
       "dataset_id": "nrw-sssi",
@@ -21,19 +21,19 @@
       "bbox": [325291.23, 207559.73, 328771.19, 212952.14],
       "area_ha": 979.18
     },
-    "missing_component": {
+    "deferred_component": {
       "name": "Blorenge Common",
       "register_id": "CL18",
       "reported_area_ha": 2017,
       "registration_authority": "Torfaen County Borough Council",
       "evidence_url": "https://www.gov.wales/sites/default/files/publications/2018-01/common-land-blorenge-common-report.pdf",
-      "reason": "Blorenge Common is urban common. The NRW Open Access - Registered Common Land dataset explicitly omits urban commons and contains no feature that can stand in for CL18.",
-      "required_action": "Obtain the maintained CL18 register map or GIS boundary and written public display/derivative-reuse terms from the registration authority. Do not substitute nearby NRW_COMMON_LAND_2014 features."
+      "reason": "Blorenge Common is urban common. The NRW Open Access - Registered Common Land dataset explicitly omits urban commons and contains no feature that can stand in for CL18. HM Land Registry Local Land Charges geometry has no CL18 or Blorenge identifier. The launch therefore uses the SSSI boundary without representing it as the common boundary.",
+      "required_action": "After launch, obtain the maintained CL18 register map or GIS boundary and written public display/derivative-reuse terms from the registration authority before adding a separately labelled common-land layer. Do not substitute nearby NRW_COMMON_LAND_2014 or HMLR Local Land Charges features."
     },
     "temporary_discovery_envelopes": {
       "epsg_27700_sssi_plus_2km_bbox": [323291.23, 205559.73, 330771.19, 214952.14],
       "epsg_4326_conservative_bbox": [-3.1134, 51.744, -3.0049, 51.8285],
-      "use_limit": "Discovery and over-acquisition only. Neither envelope is a publishable AOI geometry."
+      "use_limit": "Discovery and over-acquisition only. The publishable AOI must be derived from the validated SSSI geometry buffered by exactly 2000 metres, not from either bounding box."
     }
   },
   "sources": [
@@ -218,7 +218,7 @@
         "required_fields": ["british_gr", "dtm_link", "delivery", "date", "year"]
       },
       "transformation": "Select tiles intersecting the final AOI, mosaic DTM values without DSM substitution, derive fixed hillshade and labelled contours, clip to AOI and retain the source DTM privately for reproducibility.",
-      "known_gaps": ["Capture date varies by tile.", "The provider warns the data was not produced specifically for flood modelling.", "Final tile set cannot be fixed until CL18 is obtained."],
+      "known_gaps": ["Capture date varies by tile.", "The provider warns the data was not produced specifically for flood modelling.", "The exact tile set remains to be selected against the validated SSSI-plus-2-km AOI geometry."],
       "safety": "public_safe",
       "publication": "approved_candidate_pending_aoi"
     },
@@ -435,14 +435,17 @@
   ],
   "hard_gaps": [
     {
-      "gap_id": "blorenge-common-cl18-boundary",
-      "blocks": ["final AOI", "exact LiDAR tile set", "exact vector/habitat clip", "launch-core publication"],
-      "required_evidence": "Maintained CL18 boundary plus written public display, transformation and derivative-reuse terms."
-    },
-    {
       "gap_id": "july-2026-incident-authority-record",
       "blocks": ["naming EFFIS 592404 as the event", "assigning pre/immediate-post/latest satellite roles", "publishing a primary perimeter", "public fire chronology"],
       "required_evidence": "Incident start, control/containment and end chronology; event location/identifier; any surveyed boundary; source status; and written republication terms."
+    }
+  ],
+  "deferred_enhancements": [
+    {
+      "enhancement_id": "blorenge-common-cl18-boundary",
+      "launch_impact": "none",
+      "required_evidence": "Maintained CL18 boundary plus written public display, transformation and derivative-reuse terms.",
+      "presentation_constraint": "Do not label or imply that the Blorenge SSSI boundary is the legal boundary of Blorenge Common CL18."
     }
   ]
 }
