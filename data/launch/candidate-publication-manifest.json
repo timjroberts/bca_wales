@@ -1,0 +1,34 @@
+{
+  "schema_version": "0.1.0-candidate",
+  "release_id": null,
+  "status": "blocked_not_publishable",
+  "generated_at": "2026-08-09T17:35:00Z",
+  "release_authority": "timjroberts",
+  "current_release_eligible": false,
+  "gate": {
+    "result": "fail",
+    "hard_failures": ["CL18_OMITTED_BY_SOURCE", "INCIDENT_AUTHORITY_CHRONOLOGY_MISSING"],
+    "warnings": ["SATELLITE_ROLE_BINDING_PENDING", "FINAL_AOI_CLIP_PENDING"],
+    "promotion_identity": null
+  },
+  "layers": [
+    {"layer_id": "basemap", "title": "Open basemap and place names", "source_dataset_ids": ["osm-wales-geofabrik"], "classification": "contextual_community", "output_profile": "vector_pmtiles", "status": "source_ready_build_pending"},
+    {"layer_id": "contextual-paths", "title": "Contextual paths and tracks", "source_dataset_ids": ["osm-wales-geofabrik"], "classification": "contextual_community", "output_profile": "vector_pmtiles", "claim_limit": "Not the definitive legal public-rights-of-way record.", "status": "source_ready_build_pending"},
+    {"layer_id": "blorenge-sssi", "title": "Blorenge SSSI", "source_dataset_ids": ["nrw-sssi"], "classification": "authoritative", "output_profile": "small_geojson", "status": "source_ready_build_pending"},
+    {"layer_id": "bannau-brycheiniog-national-park", "title": "Bannau Brycheiniog National Park", "source_dataset_ids": ["nrw-national-park"], "classification": "authoritative", "output_profile": "small_geojson", "status": "source_ready_build_pending"},
+    {"layer_id": "blorenge-common", "title": "Blorenge Common CL18", "source_dataset_ids": [], "classification": "authoritative_with_limitations", "output_profile": "small_geojson", "status": "blocked_missing_source_and_terms"},
+    {"layer_id": "effis-provisional-boundary", "title": "EFFIS provisional burnt-area comparison", "source_dataset_ids": ["effis-current-burnt-areas"], "source_feature_ids": ["592404"], "classification": "provisional_provider", "output_profile": "small_geojson", "status": "blocked_pending_incident_match"},
+    {"layer_id": "bca-provisional-boundary", "title": "BCA provisional satellite-derived interpretation", "source_dataset_ids": ["copernicus-sentinel-2-l2a", "usgs-landsat-c2-l2-sr"], "classification": "derived_provisional", "output_profile": "small_geojson", "status": "blocked_pending_scene_roles_processing_and_review"},
+    {"layer_id": "observed-change", "title": "Observed vegetation and surface change", "source_dataset_ids": ["copernicus-sentinel-2-l2a", "usgs-landsat-c2-l2-sr"], "classification": "derived", "output_profile": "raster_pmtiles_with_private_cogs", "indicators": ["dNBR", "NDVI", "NDMI", "valid observation mask", "evidence state"], "status": "blocked_pending_scene_roles_processing_and_review"},
+    {"layer_id": "terrain", "title": "Terrain hillshade and contours", "source_dataset_ids": ["wg-lidar-dtm-2020-2023"], "classification": "contextual", "output_profile": "raster_pmtiles_and_vector_pmtiles", "status": "blocked_pending_final_aoi_tile_set"},
+    {"layer_id": "principal-watercourses", "title": "Principal watercourses", "source_dataset_ids": ["nrw-main-rivers"], "classification": "authoritative_context", "output_profile": "small_geojson_or_vector_pmtiles", "status": "blocked_pending_final_aoi_clip"},
+    {"layer_id": "historical-phase1-habitat", "title": "Historical Phase 1 habitat survey", "source_dataset_ids": ["nrw-phase1-vegetation-voronoi"], "classification": "historical", "output_profile": "vector_pmtiles_with_accessible_summary", "claim_limit": "Historical survey; not current habitat condition or ecological recovery.", "status": "blocked_pending_final_aoi_clip_and_legend_review"}
+  ],
+  "temporal_roles": {
+    "pre_fire_baseline": null,
+    "immediate_post_fire": null,
+    "latest_suitable": null,
+    "reason_unbound": "Incident-authority dates and AOI-level cloud, smoke, shadow and registration QA are required before roles can be assigned."
+  },
+  "public_claim_ceiling": "No July 2026 fire or recovery claim may be published from this candidate manifest. After incident matching and scene QA, the maximum allowed headline remains: Satellite observations show surface and vegetation change consistent with the documented July 2026 fire."
+}

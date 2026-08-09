@@ -1,0 +1,448 @@
+{
+  "schema_version": "0.1.0-candidate",
+  "registry_id": "blorenge-launch",
+  "reviewed_at": "2026-08-09T17:30:00Z",
+  "release_authority": "timjroberts",
+  "status": "candidate_blocked",
+  "status_reason": "The exact Blorenge Common CL18 boundary and an incident-authority chronology are not yet available under verified public-reuse terms.",
+  "area_of_interest": {
+    "intended_rule": "Geometric union of the Blorenge SSSI and Blorenge Common CL18, buffered by 2000 metres in EPSG:27700.",
+    "status": "blocked",
+    "validated_component": {
+      "provider": "Natural Resources Wales",
+      "dataset_id": "nrw-sssi",
+      "feature_id": "NRW_SSSI.13108",
+      "provider_identifiers": {
+        "sssi_id": 748,
+        "sssi_code": "33WFL",
+        "name": "Blorenge"
+      },
+      "crs": "EPSG:27700",
+      "bbox": [325291.23, 207559.73, 328771.19, 212952.14],
+      "area_ha": 979.18
+    },
+    "missing_component": {
+      "name": "Blorenge Common",
+      "register_id": "CL18",
+      "reported_area_ha": 2017,
+      "registration_authority": "Torfaen County Borough Council",
+      "evidence_url": "https://www.gov.wales/sites/default/files/publications/2018-01/common-land-blorenge-common-report.pdf",
+      "reason": "Blorenge Common is urban common. The NRW Open Access - Registered Common Land dataset explicitly omits urban commons and contains no feature that can stand in for CL18.",
+      "required_action": "Obtain the maintained CL18 register map or GIS boundary and written public display/derivative-reuse terms from the registration authority. Do not substitute nearby NRW_COMMON_LAND_2014 features."
+    },
+    "temporary_discovery_envelopes": {
+      "epsg_27700_sssi_plus_2km_bbox": [323291.23, 205559.73, 330771.19, 214952.14],
+      "epsg_4326_conservative_bbox": [-3.1134, 51.744, -3.0049, 51.8285],
+      "use_limit": "Discovery and over-acquisition only. Neither envelope is a publishable AOI geometry."
+    }
+  },
+  "sources": [
+    {
+      "dataset_id": "nrw-sssi",
+      "title": "Sites of Special Scientific Interest (SSSI)",
+      "purpose": "Authoritative protected-site context and the validated launch-core component.",
+      "classification": "authoritative",
+      "provider": "Natural Resources Wales",
+      "provider_dataset_id": "inspire-nrw:NRW_SSSI",
+      "landing_url": "https://datamap.gov.wales/layers/inspire-nrw%3ANRW_SSSI/metadata_detail",
+      "acquisition": {
+        "method": "WFS 2.0 GetFeature",
+        "url": "https://datamap.gov.wales/geoserver/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=inspire-nrw%3ANRW_SSSI&outputFormat=application%2Fjson&srsName=EPSG%3A27700&CQL_FILTER=sssi_name%20ILIKE%20%27%25Blorenge%25%27",
+        "media_type": "application/geo+json",
+        "crs": "EPSG:27700",
+        "stable_selector": "sssi_code = 33WFL",
+        "expected_features": 1
+      },
+      "upstream": {
+        "publication_date": "2026-07-30",
+        "feature_last_edited": "2008-11-28",
+        "cadence": "not stated",
+        "refresh_policy": "Poll monthly; manual review on identifier, geometry, schema, attribution or metadata change."
+      },
+      "licence": {
+        "id": "OGL-3.0",
+        "url": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
+        "attribution": "Contains Natural Resources Wales information © Natural Resources Wales and Database Right. All rights Reserved. Contains Ordnance Survey Data. Ordnance Survey Licence number AC0000849444. Crown Copyright and Database Right.",
+        "reviewed_at": "2026-08-09"
+      },
+      "schema": {
+        "geometry": "MultiPolygon",
+        "required_fields": ["sssi_name", "sssi_id", "sssi_code", "first_notified", "last_notified", "last_edited", "cartesian_area_ha", "spherical_area_ha", "status", "id"]
+      },
+      "transformation": "Select 33WFL, preserve source identifiers and dates, repair no geometry, reproject only in derived outputs, and publish source geometry separately from the derived AOI union.",
+      "known_gaps": ["A designation boundary does not describe current condition or permitted operations."],
+      "safety": "public_safe",
+      "publication": "approved_candidate"
+    },
+    {
+      "dataset_id": "nrw-national-park",
+      "title": "National Parks",
+      "purpose": "Authoritative Bannau Brycheiniog National Park context.",
+      "classification": "authoritative",
+      "provider": "Natural Resources Wales",
+      "provider_dataset_id": "inspire-nrw:NRW_NATIONAL_PARK",
+      "landing_url": "https://datamap.gov.wales/layers/inspire-nrw%3ANRW_NATIONAL_PARK/metadata_detail",
+      "acquisition": {
+        "method": "WFS 2.0 GetFeature followed by AOI clip",
+        "url": "https://datamap.gov.wales/geoserver/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=inspire-nrw%3ANRW_NATIONAL_PARK&outputFormat=application%2Fjson&srsName=EPSG%3A27700",
+        "media_type": "application/geo+json",
+        "crs": "EPSG:27700",
+        "stable_selector": "isis_id = 2449",
+        "feature_id": "NRW_NATIONAL_PARK.2"
+      },
+      "upstream": {
+        "publication_date": "2025-05-29",
+        "feature_edit_date": "2015-03-01",
+        "cadence": "not stated",
+        "refresh_policy": "Poll quarterly and review any geometry, name, schema or attribution change."
+      },
+      "licence": {
+        "id": "OGL-3.0",
+        "url": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
+        "attribution": "Contains Natural Resources Wales information © Natural Resources Wales and Database Right. All rights Reserved. Contains Ordnance Survey Data. Ordnance Survey Licence number AC0000849444. Crown Copyright and Database Right.",
+        "reviewed_at": "2026-08-09"
+      },
+      "schema": {
+        "geometry": "MultiPolygon",
+        "required_fields": ["objectid", "np_name", "desig_date", "edit_date", "area_ha", "isis_id"]
+      },
+      "transformation": "Select isis_id 2449, clip for display without changing the source identity, and retain the full source boundary in private reproducibility storage.",
+      "known_gaps": ["The boundary supplies designation context, not site condition."],
+      "safety": "public_safe",
+      "publication": "approved_candidate"
+    },
+    {
+      "dataset_id": "nrw-open-registered-common",
+      "title": "Open Access - Registered Common Land",
+      "purpose": "Public-access context where coverage exists; explicitly not the legal commons register.",
+      "classification": "authoritative_with_limitations",
+      "provider": "Natural Resources Wales",
+      "provider_dataset_id": "inspire-nrw:NRW_COMMON_LAND_2014",
+      "landing_url": "https://datamap.gov.wales/layers/inspire-nrw%3ANRW_COMMON_LAND_2014/metadata_detail",
+      "acquisition": {
+        "method": "WFS 2.0 GetFeature",
+        "url": "https://datamap.gov.wales/geoserver/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=inspire-nrw%3ANRW_COMMON_LAND_2014&outputFormat=application%2Fjson&srsName=EPSG%3A27700",
+        "media_type": "application/geo+json",
+        "crs": "EPSG:27700"
+      },
+      "upstream": {
+        "publication_date": "2017-04-21",
+        "source_mapping_date": "2014",
+        "cadence": "not stated",
+        "refresh_policy": "Retain as a registered-common context source only outside CL18; review annually."
+      },
+      "licence": {
+        "id": "OGL-3.0",
+        "url": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
+        "attribution": "Contains Natural Resources Wales information © Natural Resources Wales and Database Right. All rights Reserved. Contains Ordnance Survey Data. Ordnance Survey Licence number AC0000849444. Crown Copyright and Database Right.",
+        "reviewed_at": "2026-08-09"
+      },
+      "schema": {
+        "geometry": "MultiPolygon",
+        "required_fields": ["EN_STATUS", "AREA_HA"]
+      },
+      "transformation": "No Blorenge-core transformation is authorised. Nearby records must not be relabelled as Blorenge Common.",
+      "known_gaps": ["Omits urban commons, commons with access deeds, 1899 Act commons, provisional-order commons and village greens.", "Has no register identifier or common name field.", "All eight records returned by the representative discovery envelope are outside the Blorenge SSSI; the nearest is about 99 metres away and only 0.23 ha."],
+      "safety": "public_safe",
+      "publication": "rejected_for_blorenge_core"
+    },
+    {
+      "dataset_id": "osm-wales-geofabrik",
+      "title": "OpenStreetMap Wales extract",
+      "purpose": "Community-maintained basemap, place names, roads, tracks and paths; never a definitive public-rights-of-way record.",
+      "classification": "contextual_community",
+      "provider": "OpenStreetMap contributors via Geofabrik GmbH",
+      "provider_dataset_id": "wales-260806.osm.pbf",
+      "landing_url": "https://download.geofabrik.de/europe/united-kingdom/wales.html",
+      "acquisition": {
+        "method": "Fixed dated PBF download",
+        "url": "https://download.geofabrik.de/europe/united-kingdom/wales-260806.osm.pbf",
+        "media_type": "application/vnd.openstreetmap.data+pbf",
+        "crs": "EPSG:4326",
+        "source_cutoff": "2026-08-06T20:21:21Z"
+      },
+      "upstream": {
+        "publication_date": "2026-08-07",
+        "cadence": "daily latest extract; dated snapshots retained by provider",
+        "refresh_policy": "Quarterly candidate refresh; manual review of material path/place/basemap changes."
+      },
+      "licence": {
+        "id": "ODbL-1.0",
+        "url": "https://opendatacommons.org/licenses/odbl/1-0/",
+        "attribution": "© OpenStreetMap contributors",
+        "provider_credit": "Data processed by Geofabrik GmbH",
+        "obligations": "Make the ODbL clear, comply with attribution guidance, and treat a distributed adapted database or PMTiles database as ODbL/share-alike where applicable.",
+        "reviewed_at": "2026-08-09"
+      },
+      "schema": {
+        "geometry": "OSM nodes, ways and relations",
+        "required_tags": ["name", "name:cy", "place", "highway", "access", "foot", "surface", "tracktype", "waterway", "natural", "landuse"]
+      },
+      "transformation": "Clip to the final AOI, retain OSM identifiers and relevant access/path tags, omit contributor metadata, build self-hosted PMTiles, and label all paths as contextual rather than legal rights of way.",
+      "known_gaps": ["Community completeness and currency vary.", "Path tags do not establish legal status.", "Welsh names may be incomplete."],
+      "safety": "public_safe_after_tag_allowlist",
+      "publication": "approved_candidate"
+    },
+    {
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "title": "Welsh Government LiDAR 1 m DTM",
+      "purpose": "Terrain hillshade and contours plus terrain-shadow QA.",
+      "classification": "contextual",
+      "provider": "Welsh Government",
+      "provider_dataset_id": "geonode:welsh_government_lidar_tile_catalogue_2020_2023",
+      "landing_url": "https://datamap.gov.wales/maps/lidar-data-download/",
+      "acquisition": {
+        "method": "WFS tile-catalogue query then HTTPS GeoTIFF download",
+        "catalogue_url": "https://datamap.gov.wales/geoserver/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=geonode%3Awelsh_government_lidar_tile_catalogue_2020_2023&outputFormat=application%2Fjson&srsName=EPSG%3A27700",
+        "media_type": "image/tiff",
+        "crs": "EPSG:27700",
+        "resolution_m": 1,
+        "representative_tile": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_326210_20210227dtm.tif"
+      },
+      "upstream": {
+        "capture_dates_in_discovery_snapshot": ["2021-02-27", "2022-01-12"],
+        "catalogue_publication_date": "2024-09-27",
+        "cadence": "survey programme, not a routine live feed",
+        "refresh_policy": "Annual catalogue and licence review; rebuild only for a materially better source edition."
+      },
+      "licence": {
+        "id": "OGL-3.0",
+        "url": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
+        "attribution": "Welsh Government LiDAR",
+        "terms_source": "https://datamap.gov.wales/maps/lidar-data-download/",
+        "note": "The map/download resource is OGL although the standalone tile-catalogue metadata says 'Not Specified'; retain a snapshot of the OGL map terms with every release.",
+        "reviewed_at": "2026-08-09"
+      },
+      "schema": {
+        "geometry": "1 km tile catalogue polygons and 1000 x 1000 float32 GeoTIFF tiles",
+        "required_fields": ["british_gr", "dtm_link", "delivery", "date", "year"]
+      },
+      "transformation": "Select tiles intersecting the final AOI, mosaic DTM values without DSM substitution, derive fixed hillshade and labelled contours, clip to AOI and retain the source DTM privately for reproducibility.",
+      "known_gaps": ["Capture date varies by tile.", "The provider warns the data was not produced specifically for flood modelling.", "Final tile set cannot be fixed until CL18 is obtained."],
+      "safety": "public_safe",
+      "publication": "approved_candidate_pending_aoi"
+    },
+    {
+      "dataset_id": "nrw-main-rivers",
+      "title": "Main Rivers",
+      "purpose": "Principal statutory watercourse context.",
+      "classification": "authoritative_context",
+      "provider": "Natural Resources Wales",
+      "provider_dataset_id": "inspire-nrw:NRW_MAIN_RIVERS",
+      "landing_url": "https://datamap.gov.wales/layers/inspire-nrw%3ANRW_MAIN_RIVERS/metadata_detail",
+      "acquisition": {
+        "method": "WFS 2.0 GetFeature followed by AOI clip",
+        "url": "https://datamap.gov.wales/geoserver/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=inspire-nrw%3ANRW_MAIN_RIVERS&outputFormat=application%2Fjson&srsName=EPSG%3A27700",
+        "media_type": "application/geo+json",
+        "crs": "EPSG:27700",
+        "representative_features": 17
+      },
+      "upstream": {
+        "publication_date": "2022-01-31",
+        "cadence": "not stated",
+        "refresh_policy": "Poll quarterly; manual review for schema, identifiers, geometry, attribution or material coverage change."
+      },
+      "licence": {
+        "id": "OGL-3.0",
+        "url": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
+        "attribution": "Contains Natural Resources Wales information © Natural Resources Wales and Database Right. All rights Reserved. Contains Ordnance Survey Data. Ordnance Survey Licence number AC0000849444. Crown Copyright and Database Right.",
+        "reviewed_at": "2026-08-09"
+      },
+      "schema": {
+        "geometry": "LineString",
+        "required_fields": ["OBJECTID", "WCRS_REF", "WCRS_NAME", "ALT_NAME", "LENGTH_KM", "GlobalID"]
+      },
+      "transformation": "Clip to the final AOI, trim fixed-width whitespace, preserve OBJECTID and GlobalID, and publish only as principal-watercourse context.",
+      "known_gaps": ["Does not include every mountain drain, grip, ditch or spring."],
+      "safety": "public_safe",
+      "publication": "approved_candidate_pending_aoi"
+    },
+    {
+      "dataset_id": "nrw-phase1-vegetation-voronoi",
+      "title": "Terrestrial Phase 1 Habitat Survey - Vegetation Voronoi",
+      "purpose": "Dated historical habitat context, never current post-fire condition.",
+      "classification": "historical",
+      "provider": "Natural Resources Wales",
+      "provider_dataset_id": "geonode:nrw_phase1_vegetation_voronoi",
+      "landing_url": "https://datamap.gov.wales/layergroups/geonode%3Anrw_terrestrial_phase_1_habitat_survey",
+      "acquisition": {
+        "method": "WFS 2.0 GetFeature followed by AOI clip",
+        "url": "https://datamap.gov.wales/geoserver/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=geonode%3Anrw_phase1_vegetation_voronoi&outputFormat=application%2Fjson&srsName=EPSG%3A27700",
+        "media_type": "application/geo+json",
+        "crs": "EPSG:27700",
+        "representative_features": 3301
+      },
+      "upstream": {
+        "survey_period": "mainly 1979-1997",
+        "publication_date": "2023-08-16",
+        "cadence": "update not planned",
+        "refresh_policy": "Annual metadata/licence availability check; no automatic editorial refresh."
+      },
+      "licence": {
+        "id": "OGL-3.0",
+        "url": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
+        "attribution": "Contains Natural Resources Wales information © Natural Resources Wales and Database Right. All rights Reserved. Contains Ordnance Survey Data. Ordnance Survey Licence number AC0000849444. Crown Copyright and Database Right.",
+        "reviewed_at": "2026-08-09"
+      },
+      "schema": {
+        "geometry": "MultiPolygon",
+        "required_fields": ["objectid", "label", "voronoi_uid", "phase1_code", "survey", "area_ha", "original_unique_id"]
+      },
+      "transformation": "Clip the polygon layer only; exclude target notes and other point layers from launch; preserve survey and source identifiers; present the Phase 1 code with a reviewed plain-language legend.",
+      "known_gaps": ["Historical survey only.", "Mixed/mosaic polygons need their own explanation.", "The representative envelope includes 42 Phase 1 codes and must be clipped after the final AOI exists."],
+      "safety": "public_safe_after_field_allowlist",
+      "publication": "approved_candidate_pending_aoi"
+    },
+    {
+      "dataset_id": "copernicus-sentinel-2-l2a",
+      "title": "Copernicus Sentinel-2 Collection-1 Level-2A",
+      "purpose": "Primary source observations for provisional extent and continuous dNBR, NDVI and NDMI change evidence.",
+      "classification": "source_observation",
+      "provider": "European Union Copernicus programme",
+      "provider_dataset_id": "sentinel-2-l2a / MGRS-30UVC / relative orbit 37",
+      "landing_url": "https://dataspace.copernicus.eu/data-collections/copernicus-sentinel-missions/sentinel-2",
+      "acquisition": {
+        "method": "CDSE STAC discovery followed by authenticated build-time S3 or OData asset retrieval",
+        "stac_collection": "https://stac.dataspace.copernicus.eu/v1/collections/sentinel-2-l2a",
+        "media_type": "image/jp2",
+        "crs": "EPSG:32630",
+        "required_assets": ["B04_10m", "B08_10m", "B8A_20m", "B11_20m", "B12_20m", "SCL_20m", "product_metadata", "granule_metadata", "safe_manifest"],
+        "candidate_item_ids": [
+          "S2C_MSIL2A_20250712T112141_N0511_R037_T30UVC_20250712T145316",
+          "S2B_MSIL2A_20250816T112119_N0511_R037_T30UVC_20250816T122832",
+          "S2A_MSIL2A_20260709T112131_N0512_R037_T30UVC_20260709T194109",
+          "S2B_MSIL2A_20260712T112109_N0512_R037_T30UVC_20260712T133747",
+          "S2C_MSIL2A_20260717T112111_N0512_R037_T30UVC_20260717T150015",
+          "S2A_MSIL2A_20260719T112131_N0512_R037_T30UVC_20260719T194158",
+          "S2B_MSIL2A_20260722T112119_N0512_R037_T30UVC_20260722T140035",
+          "S2C_MSIL2A_20260727T112111_N0512_R037_T30UVC_20260727T144722",
+          "S2A_MSIL2A_20260729T112131_N0512_R037_T30UVC_20260729T195715",
+          "S2B_MSIL2A_20260801T112119_N0512_R037_T30UVC_20260801T133951",
+          "S2C_MSIL2A_20260806T112111_N0512_R037_T30UVC_20260806T144614",
+          "S2A_MSIL2A_20260808T112131_N0512_R037_T30UVC_20260808T192910"
+        ]
+      },
+      "upstream": {
+        "processing_versions": ["05.11", "05.12"],
+        "cadence": "systematic acquisitions; catalogue updates continuously",
+        "refresh_policy": "Re-query weekly while evidence is active, then quarterly; check product deletion, anomaly and reprocessing notices before every promotion."
+      },
+      "licence": {
+        "id": "Copernicus-Sentinel-Data-Legal-Notice",
+        "url": "https://sentinels.copernicus.eu/documents/247904/690755/Sentinel_Data_Legal_Notice",
+        "attribution": "Contains modified Copernicus Sentinel data 2025-2026",
+        "reviewed_at": "2026-08-09"
+      },
+      "schema": {
+        "geometry": "raster",
+        "native_resolution_m": {"NDVI": 10, "NBR_NDMI": 20},
+        "nodata": "SCL and product masks; preserve explicit not-observed state"
+      },
+      "transformation": "Apply provider scale and offset, per-pixel masks and disclosed adjacency dilation; retain native analytic support; assess terrain shadow; compute continuous indicators; preserve observation date and contributing count per pixel.",
+      "known_gaps": ["No item can be assigned a final temporal role until incident chronology is verified.", "Whole-tile cloud percentage is discovery metadata, not AOI acceptance evidence.", "CDSE binary asset access requires a free authenticated build identity."],
+      "safety": "public_safe",
+      "publication": "candidate_only_pending_event_and_aoi_qa"
+    },
+    {
+      "dataset_id": "usgs-landsat-c2-l2-sr",
+      "title": "USGS Landsat 8/9 Collection 2 Level-2 Surface Reflectance Tier 1",
+      "purpose": "Independent 30 m corroboration of surface-change direction and extent.",
+      "classification": "source_observation",
+      "provider": "U.S. Geological Survey",
+      "provider_dataset_id": "landsat-c2l2-sr / WRS 203-024 and 204-024",
+      "landing_url": "https://www.usgs.gov/landsat-missions/landsat-collection-2-level-2-science-products",
+      "acquisition": {
+        "method": "USGS STAC discovery and HTTPS COG range/full retrieval",
+        "stac_collection": "https://landsatlook.usgs.gov/stac-server/collections/landsat-c2l2-sr",
+        "media_type": "image/tiff; application=geotiff; profile=cloud-optimized",
+        "crs": "item-specific UTM",
+        "required_assets": ["red", "nir08", "swir16", "swir22", "qa_aerosol", "qa_pixel", "qa_radsat", "ANG.txt", "MTL.txt"],
+        "candidate_item_ids": [
+          "LC09_L2SP_203024_20250708_20250710_02_T1_SR",
+          "LC08_L2SP_203024_20250817_20250821_02_T1_SR",
+          "LC08_L2SP_204024_20260710_20260716_02_T1_SR",
+          "LC09_L2SP_203024_20260711_20260712_02_T1_SR",
+          "LC09_L2SP_204024_20260718_20260719_02_T1_SR",
+          "LC08_L2SP_203024_20260719_20260725_02_T1_SR",
+          "LC08_L2SP_204024_20260726_20260801_02_T1_SR",
+          "LC09_L2SP_203024_20260727_20260728_02_T1_SR",
+          "LC09_L2SP_204024_20260803_20260804_02_T1_SR"
+        ]
+      },
+      "upstream": {
+        "collection": 2,
+        "tier": "T1",
+        "cadence": "eight-day combined Landsat 8/9 opportunity",
+        "refresh_policy": "Re-query weekly while evidence is active, then quarterly; check known-issues and reprocessing notices before promotion."
+      },
+      "licence": {
+        "id": "USGS-public-domain",
+        "url": "https://www.usgs.gov/faqs/are-there-any-restrictions-use-or-redistribution-landsat-data",
+        "attribution": "Landsat imagery courtesy of the U.S. Geological Survey",
+        "reviewed_at": "2026-08-09"
+      },
+      "schema": {
+        "geometry": "raster",
+        "native_resolution_m": 30,
+        "nodata": "QA_PIXEL, QA_RADSAT and SR_QA_AEROSOL"
+      },
+      "transformation": "Apply published scale/offset, mask fill/cloud/shadow/snow/saturation/terrain occlusion, clip to AOI, keep 30 m support and use as corroboration rather than a fused higher-resolution product.",
+      "known_gaps": ["No item can be assigned a final temporal role until incident chronology is verified.", "Whole-scene cloud percentage is not AOI acceptance evidence.", "Overlapping paths have different geometry and should be compared like-for-like where possible."],
+      "safety": "public_safe",
+      "publication": "candidate_only_pending_event_and_aoi_qa"
+    },
+    {
+      "dataset_id": "effis-current-burnt-areas",
+      "title": "EFFIS Rapid Damage Assessment burnt areas",
+      "purpose": "Named provisional provider boundary and chronology lead, kept separate from any BCA-derived interpretation.",
+      "classification": "provisional_provider",
+      "provider": "European Commission Joint Research Centre, EFFIS",
+      "provider_dataset_id": "ms:modis.ba.poly",
+      "landing_url": "https://forest-fire.emergency.copernicus.eu/applications/data-and-services",
+      "acquisition": {
+        "method": "WFS 1.1 SHAPEZIP snapshot followed by feature extraction",
+        "url": "https://maps.effis.emergency.copernicus.eu/effis?outputformat=SHAPEZIP&request=getfeature&service=WFS&typename=ms%3Amodis.ba.poly&version=1.1.0",
+        "media_type": "application/zip",
+        "crs": "EPSG:4326",
+        "candidate_feature_id": "592404",
+        "candidate_bbox": [-3.0549548570494522, 51.743107344572145, -3.0309432816132773, 51.76041102514011],
+        "candidate_area_ha": 155
+      },
+      "upstream": {
+        "candidate_firedate": "2026-07-20T01:05:00Z",
+        "candidate_finaldate": "2026-07-29T02:34:00Z",
+        "candidate_lastupdate": "2026-08-03T09:11:56.420451Z",
+        "candidate_class": "30DAYS",
+        "cadence": "current-season database updated in near real time",
+        "refresh_policy": "Snapshot weekly until stable, then before every evidence promotion; compare identifier, geometry, dates, area and class."
+      },
+      "licence": {
+        "id": "CC-BY-4.0",
+        "url": "https://creativecommons.org/licenses/by/4.0/",
+        "terms_source": "https://forest-fire.emergency.copernicus.eu/about-effis/data-license",
+        "attribution": "European Union, Copernicus EFFIS; changes and clipping by Blorenge Commoners Association indicated",
+        "reviewed_at": "2026-08-09"
+      },
+      "schema": {
+        "geometry": "Polygon",
+        "required_fields": ["id", "FIREDATE", "FINALDATE", "LASTUPDATE", "COUNTRY", "PROVINCE", "COMMUNE", "AREA_HA", "CLASS"]
+      },
+      "transformation": "Extract id 592404, preserve provider geometry and fields, clip only for display, and publish as a separate EFFIS provisional comparison. Never union it with a BCA-derived or authority boundary.",
+      "known_gaps": ["EFFIS dates are provider product dates, not verified ignition, control or extinction times.", "The candidate lies immediately south of the Blorenge SSSI and must be matched to an incident-authority record before being named as the July 2026 Blorenge fire.", "EFFIS does not distinguish wildfire from prescribed or environmental burning and may omit small islands or scars."],
+      "safety": "public_safe",
+      "publication": "candidate_only_pending_incident_match"
+    }
+  ],
+  "hard_gaps": [
+    {
+      "gap_id": "blorenge-common-cl18-boundary",
+      "blocks": ["final AOI", "exact LiDAR tile set", "exact vector/habitat clip", "launch-core publication"],
+      "required_evidence": "Maintained CL18 boundary plus written public display, transformation and derivative-reuse terms."
+    },
+    {
+      "gap_id": "july-2026-incident-authority-record",
+      "blocks": ["naming EFFIS 592404 as the event", "assigning pre/immediate-post/latest satellite roles", "publishing a primary perimeter", "public fire chronology"],
+      "required_evidence": "Incident start, control/containment and end chronology; event location/identifier; any surveyed boundary; source status; and written republication terms."
+    }
+  ]
+}

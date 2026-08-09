@@ -1,0 +1,150 @@
+{
+  "schema_version": "0.1.0-candidate",
+  "manifest_id": "blorenge-launch-acquisition-2026-08-09",
+  "created_at": "2026-08-09T17:35:00Z",
+  "registry_id": "blorenge-launch",
+  "registry_commit": null,
+  "status": "validated_candidate_inputs_not_released",
+  "checksum_algorithm": "sha256",
+  "inputs": [
+    {
+      "dataset_id": "nrw-sssi",
+      "retrieved_at": "2026-08-09T17:20:38.966Z",
+      "resolved_url": "https://datamap.gov.wales/geoserver/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=inspire-nrw%3ANRW_SSSI&outputFormat=application%2Fjson&srsName=EPSG%3A27700&CQL_FILTER=sssi_name%20ILIKE%20%27%25Blorenge%25%27",
+      "media_type": "application/geo+json",
+      "byte_length": 59317,
+      "sha256": "12ed68d706b2971db18a5a2784f38db89753bb37588396cf8ab20e6606f4fd2c",
+      "validation": {"feature_count": 1, "feature_id": "NRW_SSSI.13108", "sssi_code": "33WFL", "geometry_present": true, "result": "pass"}
+    },
+    {
+      "dataset_id": "nrw-sssi",
+      "role": "WGS84 discovery geometry",
+      "retrieved_at": "2026-08-09T17:27:00Z",
+      "resolved_url": "https://datamap.gov.wales/geoserver/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=inspire-nrw%3ANRW_SSSI&outputFormat=application%2Fjson&srsName=EPSG%3A4326&CQL_FILTER=sssi_name%20ILIKE%20%27%25Blorenge%25%27",
+      "media_type": "application/geo+json",
+      "byte_length": 70184,
+      "sha256": "2b1cf25fbec7f9ea81e4150bec2cfa220f9a4a3d6215e1edd08114496ca245f2",
+      "validation": {"feature_count": 1, "bbox": [-3.08445608, 51.76202123, -3.03378684, 51.81046076], "result": "pass"}
+    },
+    {
+      "dataset_id": "nrw-open-registered-common",
+      "role": "rejected discovery snapshot",
+      "retrieved_at": "2026-08-09T17:20:38.466Z",
+      "resolved_url": "https://datamap.gov.wales/geoserver/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=inspire-nrw%3ANRW_COMMON_LAND_2014&outputFormat=application%2Fjson&srsName=EPSG%3A27700&BBOX=323000,206000,331000,215000,EPSG%3A27700",
+      "media_type": "application/geo+json",
+      "byte_length": 62914,
+      "sha256": "1ba67232348cc5ed6d022f11b7a930a7f761b2813efc7fe4abd5bf4bc0121e14",
+      "validation": {"feature_count": 8, "intersects_blorenge_sssi": 0, "nearest_feature_id": "NRW_COMMON_LAND_2014.1274", "nearest_distance_m_approx": 98.97, "result": "hard_fail_for_cl18"}
+    },
+    {
+      "dataset_id": "nrw-national-park",
+      "retrieved_at": "2026-08-09T17:20:41.886Z",
+      "resolved_url": "https://datamap.gov.wales/geoserver/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=inspire-nrw%3ANRW_NATIONAL_PARK&outputFormat=application%2Fjson&srsName=EPSG%3A27700&BBOX=323000,206000,331000,215000,EPSG%3A27700",
+      "media_type": "application/geo+json",
+      "byte_length": 1278801,
+      "sha256": "8cc0188a90b0fee55c57a5863e1baee47f4560815b99cc7278e3dcc5c1bada0a",
+      "validation": {"feature_count": 1, "feature_id": "NRW_NATIONAL_PARK.2", "isis_id": 2449, "name": "Bannau Brycheiniog / Brecon Beacons", "result": "pass"}
+    },
+    {
+      "dataset_id": "nrw-main-rivers",
+      "retrieved_at": "2026-08-09T17:20:37.986Z",
+      "resolved_url": "https://datamap.gov.wales/geoserver/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=inspire-nrw%3ANRW_MAIN_RIVERS&outputFormat=application%2Fjson&srsName=EPSG%3A27700&BBOX=323000,206000,331000,215000,EPSG%3A27700",
+      "media_type": "application/geo+json",
+      "byte_length": 46528,
+      "sha256": "da4b3c7c10fd1e930fe343020f755f659a27f0e44db07111ca2ed8d37839f4c9",
+      "validation": {"feature_count": 17, "stable_global_ids_present": true, "result": "pass_pending_final_aoi_clip"}
+    },
+    {
+      "dataset_id": "nrw-phase1-vegetation-voronoi",
+      "retrieved_at": "2026-08-09T17:20:39.791Z",
+      "resolved_url": "https://datamap.gov.wales/geoserver/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=geonode%3Anrw_phase1_vegetation_voronoi&outputFormat=application%2Fjson&srsName=EPSG%3A27700&BBOX=323000,206000,331000,215000,EPSG%3A27700",
+      "media_type": "application/geo+json",
+      "byte_length": 5989837,
+      "sha256": "d8f566f9d2e96f42f0bbc3830f68bc84101af4c606531c31deeefde775ee5b8b",
+      "validation": {"feature_count": 3301, "survey_values": ["Lowland_Phase1", "Upland_Phase1", "Upland_UplandSurvey"], "distinct_phase1_codes": 42, "result": "pass_pending_final_aoi_clip"}
+    },
+    {
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "role": "tile catalogue discovery snapshot",
+      "retrieved_at": "2026-08-09T17:20:36.922Z",
+      "resolved_url": "https://datamap.gov.wales/geoserver/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=geonode%3Awelsh_government_lidar_tile_catalogue_2020_2023&outputFormat=application%2Fjson&srsName=EPSG%3A27700&BBOX=323000,206000,331000,215000,EPSG%3A27700",
+      "media_type": "application/geo+json",
+      "byte_length": 73892,
+      "sha256": "b3a4d228fcfe66fea04e8e3d5f4a373a63b328025951c39627156689cb22c51c",
+      "validation": {"feature_count": 110, "tile_range": ["SO2205", "SO3115"], "years": [2021, 2022], "result": "pass_pending_final_aoi_selection"}
+    },
+    {
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "role": "representative DTM tile",
+      "retrieved_at": "2026-08-09T17:29:00Z",
+      "resolved_url": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_326210_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "byte_length": 2371949,
+      "sha256": "deb1310a004ade46f62248d6ffdafa6e400c0245b2f88576dac14f43cfbcdbe5",
+      "response_metadata": {"etag": "0x8DB587CB86B2C7E", "content_md5_base64": "Uu/YroiB0mH6atwZQCiqNQ==", "last_modified": "2023-05-19T15:21:29Z"},
+      "validation": {"width": 1000, "height": 1000, "bits_per_sample": 32, "compression": "deflate", "result": "pass"}
+    },
+    {
+      "dataset_id": "osm-wales-geofabrik",
+      "retrieved_at": "2026-08-09T17:23:00Z",
+      "resolved_url": "https://download.geofabrik.de/europe/united-kingdom/wales-260806.osm.pbf",
+      "media_type": "application/vnd.openstreetmap.data+pbf",
+      "byte_length": 145820382,
+      "sha256": "c9981b240b5382c0e09a4f678b1098591ea29c6a765ee47260da2737c161893e",
+      "upstream_cutoff": "2026-08-06T20:21:21Z",
+      "validation": {"format_signature": "OpenStreetMap Protocolbuffer Binary Format", "result": "pass_pending_final_aoi_clip_and_tag_qa"}
+    },
+    {
+      "dataset_id": "copernicus-sentinel-2-l2a",
+      "role": "bounded catalogue snapshot through 2026-08-09",
+      "retrieved_at": "2026-08-09T17:25:00Z",
+      "resolved_url": "https://stac.dataspace.copernicus.eu/v1/collections/sentinel-2-l2a/items?bbox=-3.1134,51.7440,-3.0049,51.8285&datetime=2026-07-01T00%3A00%3A00Z%2F2026-08-09T23%3A59%3A59Z&limit=100",
+      "media_type": "application/geo+json",
+      "byte_length": 784847,
+      "sha256": "8abe69766c71c77cb61ba1d788ec6c3666e6f5fb39ba10a1015bd74a7723dcd3",
+      "validation": {"matching_tile": "T30UVC", "candidate_count": 11, "latest_candidate": "S2A_MSIL2A_20260808T112131_N0512_R037_T30UVC_20260808T192910", "result": "pass_for_discovery_only"}
+    },
+    {
+      "dataset_id": "usgs-landsat-c2-l2-sr",
+      "role": "bounded catalogue snapshot through 2026-08-09",
+      "retrieved_at": "2026-08-09T17:25:00Z",
+      "resolved_url": "https://landsatlook.usgs.gov/stac-server/collections/landsat-c2l2-sr/items?bbox=-3.1134,51.7440,-3.0049,51.8285&datetime=2026-07-01T00%3A00%3A00Z%2F2026-08-09T23%3A59%3A59Z&limit=100",
+      "media_type": "application/geo+json",
+      "byte_length": 216303,
+      "sha256": "209b338e75f69cd2dacbf6539e3971da92873af9d3bd68602f3db1bdf9637759",
+      "validation": {"matching_paths_rows": ["203/024", "204/024"], "candidate_count": 9, "latest_candidate": "LC09_L2SP_204024_20260803_20260804_02_T1_SR", "result": "pass_for_discovery_only"}
+    },
+    {
+      "dataset_id": "effis-current-burnt-areas",
+      "retrieved_at": "2026-08-09T17:26:00Z",
+      "resolved_url": "https://maps.effis.emergency.copernicus.eu/effis?outputformat=SHAPEZIP&request=getfeature&service=WFS&typename=ms%3Amodis.ba.poly&version=1.1.0",
+      "media_type": "application/zip",
+      "byte_length": 236731579,
+      "sha256": "42941054bda9e49534146d79e83046b35c7ee4ca9e3439f4cb92b470c418088b",
+      "validation": {"record_count": 103420, "candidate_feature_id": "592404", "candidate_firedate": "2026-07-20T01:05:00Z", "candidate_finaldate": "2026-07-29T02:34:00Z", "candidate_area_ha": 155, "result": "candidate_found_incident_match_required"}
+    }
+  ],
+  "satellite_item_snapshots": {
+    "sentinel_2": [
+      {"id": "S2C_MSIL2A_20250712T112141_N0511_R037_T30UVC_20250712T145316", "datetime": "2025-07-12T11:21:41.025Z", "tile_cloud_percent": 0.28184, "processing_version": "05.11", "response_bytes": 65507, "response_sha256": "fe25dece1e9f3dbf8b604f67c565854100081b314767df411d38b5d0cff71ff9"},
+      {"id": "S2B_MSIL2A_20250816T112119_N0511_R037_T30UVC_20250816T122832", "datetime": "2025-08-16T11:21:19.024Z", "tile_cloud_percent": 1.238012, "processing_version": "05.11", "response_bytes": 65523, "response_sha256": "602f8a75b523f90a8bc3d6dc4012cd47ca149d72c972874f97dbc0ec4c7023de"},
+      {"id": "S2A_MSIL2A_20260709T112131_N0512_R037_T30UVC_20260709T194109", "datetime": "2026-07-09T11:21:31.024Z", "tile_cloud_percent": 5.84, "processing_version": "05.12", "response_bytes": 71310, "response_sha256": "463806c6964bdca479b95b3fb50bf640baecfc48851f07e0ab308f76b892cdc1"},
+      {"id": "S2B_MSIL2A_20260712T112109_N0512_R037_T30UVC_20260712T133747", "datetime": "2026-07-12T11:21:09.024Z", "tile_cloud_percent": 3.93, "processing_version": "05.12", "response_bytes": 71306, "response_sha256": "de7839f6c1a6e78efd1d12a49bd5de28d22e461e6cb860cc646d5f03a55d1d38"},
+      {"id": "S2C_MSIL2A_20260717T112111_N0512_R037_T30UVC_20260717T150015", "datetime": "2026-07-17T11:21:11.025Z", "tile_cloud_percent": 32.75, "processing_version": "05.12", "response_bytes": 71296, "response_sha256": "7636fe5ddd2cc9ba1941c85f97bc0ad7de220b8284a2338173de319184160614"},
+      {"id": "S2A_MSIL2A_20260729T112131_N0512_R037_T30UVC_20260729T195715", "datetime": "2026-07-29T11:21:31.024Z", "tile_cloud_percent": 77.12, "processing_version": "05.12", "response_bytes": 71297, "response_sha256": "7c7d3f9d6087a5a89be2aeca3c888753442a0ad33d7e50b661026dd3fd17b384"}
+    ],
+    "landsat": [
+      {"id": "LC09_L2SP_203024_20250708_20250710_02_T1_SR", "datetime": "2025-07-08T11:04:28.634446Z", "scene_cloud_percent": 3.44, "response_bytes": 23965, "response_sha256": "a7cdee6e14fd8e9c2825bcbea14ef4684121770153795fa69bf2aefa27de5586"},
+      {"id": "LC08_L2SP_203024_20250817_20250821_02_T1_SR", "datetime": "2025-08-17T11:04:48.282653Z", "scene_cloud_percent": 1.58, "response_bytes": 23969, "response_sha256": "1dcf19bb2b4df0675e1e24544bc581fac618ffffee0b14a562a1a2cf6c5df930"},
+      {"id": "LC08_L2SP_204024_20260710_20260716_02_T1_SR", "datetime": "2026-07-10T11:10:20.885052Z", "scene_cloud_percent": 0.51, "response_bytes": 23957, "response_sha256": "0e6b178e02837d57c9586210c7b50915a3275a576eed82fbaca3c5c17a1be8bf"},
+      {"id": "LC09_L2SP_203024_20260711_20260712_02_T1_SR", "datetime": "2026-07-11T11:04:17.508127Z", "scene_cloud_percent": 0.01, "response_bytes": 23962, "response_sha256": "510f1ae82bb0866bade0a411fd64984c07a8700d1f73d925e384182ed6204528"},
+      {"id": "LC09_L2SP_204024_20260718_20260719_02_T1_SR", "datetime": "2026-07-18T11:10:35.017924Z", "scene_cloud_percent": 17.35, "response_bytes": 23967, "response_sha256": "6bcc7f9eaf5d7854f9c7ccadb479778d915206f4be0d43c503c11030579753e6"}
+    ]
+  },
+  "qa_events": [
+    {"severity": "hard_fail", "code": "CL18_OMITTED_BY_SOURCE", "message": "The selected NRW common-land source omits urban commons and cannot supply Blorenge Common CL18."},
+    {"severity": "hard_fail", "code": "INCIDENT_AUTHORITY_CHRONOLOGY_MISSING", "message": "EFFIS 592404 is a strong provider candidate but cannot establish authoritative incident dates or identity."},
+    {"severity": "warning", "code": "SATELLITE_ROLE_BINDING_PENDING", "message": "Candidate product IDs are exact, but pre/immediate-post/latest roles require incident matching and AOI-level visual/mask QA."},
+    {"severity": "warning", "code": "FINAL_AOI_CLIP_PENDING", "message": "Representative vector and LiDAR acquisitions use a conservative discovery envelope until CL18 is obtained."}
+  ]
+}
