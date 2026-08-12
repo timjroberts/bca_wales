@@ -1,0 +1,8 @@
+{
+  "name": "production",
+  "site_origin": "https://explore.bca.wales",
+  "asset_origin": "https://assets.bca.wales",
+  "release_manifest_url": "https://assets.bca.wales/releases/current.json",
+  "pages_project": "bca-wales-explorer",
+  "r2_bucket": "bca-wales-public-releases"
+}

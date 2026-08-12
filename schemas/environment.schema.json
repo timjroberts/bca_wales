@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.bca.wales/environment/1.0.0.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["name", "site_origin", "asset_origin", "release_manifest_url", "pages_project", "r2_bucket"],
+  "properties": {
+    "name": { "enum": ["preview", "production"] },
+    "site_origin": { "type": "string", "format": "uri" },
+    "asset_origin": { "type": "string", "format": "uri" },
+    "release_manifest_url": { "type": "string", "format": "uri" },
+    "pages_project": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "r2_bucket": { "type": "string", "pattern": "^[a-z0-9-]+$" }
+  }
+}

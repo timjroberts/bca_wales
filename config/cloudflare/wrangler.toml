@@ -1,0 +1,6 @@
+name = "bca-wales-explorer"
+compatibility_date = "2026-08-01"
+pages_build_output_dir = "../../apps/web/out"
+
+# This file describes the static site adapter only. Evidence assets are uploaded
+# separately to the environment-specific R2 buckets in ../environments/*.json.

@@ -1,0 +1,33 @@
+{
+  "name": "bca-wales",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Production foundation for the public Blorenge landscape explorer",
+  "engines": {
+    "node": ">=22.13.0 <23"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "tooling/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace @bca/web",
+    "build": "npm run validate && npm run build --workspace @bca/web",
+    "lint": "eslint apps packages tooling tests --max-warnings=0",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "node --test tests/*.test.mjs",
+    "validate": "node tooling/checks/validate-foundation.mjs",
+    "check": "npm run lint && npm run typecheck && npm test && npm run build",
+    "audit:production": "npm audit --omit=dev --audit-level=high"
+  },
+  "devDependencies": {
+    "@types/node": "22.19.19",
+    "ajv": "8.20.0",
+    "ajv-formats": "3.0.1",
+    "eslint": "9.39.4",
+    "eslint-config-next": "16.3.0",
+    "typescript": "5.9.3",
+    "wrangler": "4.121.0"
+  }
+}
