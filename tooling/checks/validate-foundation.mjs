@@ -12,6 +12,7 @@ addFormats(ajv);
 
 const validations = [
   ["schemas/release-manifest.schema.json", "fixtures/releases/release.example.json"],
+  ["schemas/explorer-interface.schema.json", "fixtures/explorer/interface.example.json"],
   ["schemas/environment.schema.json", "config/environments/preview.json"],
   ["schemas/environment.schema.json", "config/environments/production.json"]
 ];

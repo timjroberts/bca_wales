@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.bca.wales/explorer-interface/1.0.0.json",
+  "title": "BCA explorer interface fixture",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "fixture", "fixtureNotice", "map", "dates", "groups", "layers"],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "fixture": { "const": true },
+    "fixtureNotice": { "$ref": "#/$defs/bilingual" },
+    "map": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["center", "zoom", "features"],
+      "properties": {
+        "center": {
+          "type": "array",
+          "prefixItems": [{ "type": "number" }, { "type": "number" }],
+          "minItems": 2,
+          "maxItems": 2,
+          "items": false
+        },
+        "zoom": { "type": "number", "minimum": 0, "maximum": 22 },
+        "features": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "features"],
+          "properties": {
+            "type": { "const": "FeatureCollection" },
+            "features": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["type", "properties", "geometry"],
+                "properties": {
+                  "type": { "const": "Feature" },
+                  "properties": {
+                    "type": "object",
+                    "required": ["layerId"],
+                    "properties": {
+                      "layerId": { "type": "string", "minLength": 1 },
+                      "dateId": { "type": "string", "minLength": 1 }
+                    }
+                  },
+                  "geometry": {
+                    "type": "object",
+                    "required": ["type", "coordinates"],
+                    "properties": {
+                      "type": { "enum": ["Point", "LineString", "Polygon"] },
+                      "coordinates": { "type": "array", "minItems": 1 }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "dates": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "label", "displayDate"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "label": { "$ref": "#/$defs/bilingual" },
+          "displayDate": { "$ref": "#/$defs/bilingual" }
+        }
+      }
+    },
+    "groups": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "description"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "name": { "$ref": "#/$defs/bilingual" },
+          "description": { "$ref": "#/$defs/bilingual" }
+        }
+      }
+    },
+    "layers": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "groupId", "name", "description", "classification", "defaultVisible", "mapStyle", "temporal", "provider", "attribution", "evidenceStatus", "sourceDate", "licence", "method", "limitations"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "groupId": { "type": "string", "minLength": 1 },
+          "name": { "$ref": "#/$defs/progressive" },
+          "description": { "$ref": "#/$defs/progressive" },
+          "classification": { "enum": ["authoritative", "provisional", "derived", "contextual", "historical"] },
+          "defaultVisible": { "type": "boolean" },
+          "mapStyle": { "enum": ["fire", "change", "protected", "access", "water", "habitat"] },
+          "temporal": { "type": "boolean" },
+          "provider": { "type": "string", "minLength": 1 },
+          "attribution": { "type": "string", "minLength": 1 },
+          "evidenceStatus": { "$ref": "#/$defs/bilingual" },
+          "sourceDate": { "$ref": "#/$defs/bilingual" },
+          "licence": { "type": "string", "minLength": 1 },
+          "method": { "$ref": "#/$defs/progressive" },
+          "limitations": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/progressive" } }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "bilingual": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["en", "cy"],
+      "properties": { "en": { "type": "string", "minLength": 1 }, "cy": { "type": "string", "minLength": 1 } }
+    },
+    "progressive": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["en"],
+      "properties": { "en": { "type": "string", "minLength": 1 }, "cy": { "type": "string", "minLength": 1 } }
+    }
+  }
+}

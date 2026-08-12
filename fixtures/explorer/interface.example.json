@@ -1,0 +1,91 @@
+{
+  "schemaVersion": "1.0.0",
+  "fixture": true,
+  "fixtureNotice": {
+    "en": "Interface fixture — synthetic shapes and placeholder dates are not public evidence.",
+    "cy": "Gosodiad rhyngwyneb — nid yw’r siapiau synthetig na’r dyddiadau dros dro yn dystiolaeth gyhoeddus."
+  },
+  "map": {
+    "center": [-3.061, 51.793],
+    "zoom": 12,
+    "features": {
+      "type": "FeatureCollection",
+      "features": [
+        { "type": "Feature", "properties": { "layerId": "protected" }, "geometry": { "type": "Polygon", "coordinates": [[[-3.085,51.779],[-3.073,51.813],[-3.037,51.81],[-3.027,51.787],[-3.052,51.771],[-3.085,51.779]]] } },
+        { "type": "Feature", "properties": { "layerId": "fire" }, "geometry": { "type": "Polygon", "coordinates": [[[-3.068,51.782],[-3.065,51.802],[-3.046,51.804],[-3.041,51.791],[-3.052,51.778],[-3.068,51.782]]] } },
+        { "type": "Feature", "properties": { "layerId": "change", "dateId": "baseline" }, "geometry": { "type": "Point", "coordinates": [-3.057,51.793] } },
+        { "type": "Feature", "properties": { "layerId": "change", "dateId": "after" }, "geometry": { "type": "Point", "coordinates": [-3.052,51.795] } },
+        { "type": "Feature", "properties": { "layerId": "change", "dateId": "latest" }, "geometry": { "type": "Point", "coordinates": [-3.047,51.797] } },
+        { "type": "Feature", "properties": { "layerId": "access" }, "geometry": { "type": "LineString", "coordinates": [[-3.089,51.787],[-3.064,51.791],[-3.035,51.801]] } },
+        { "type": "Feature", "properties": { "layerId": "water" }, "geometry": { "type": "LineString", "coordinates": [[-3.078,51.814],[-3.067,51.797],[-3.063,51.777]] } },
+        { "type": "Feature", "properties": { "layerId": "habitat" }, "geometry": { "type": "Polygon", "coordinates": [[[-3.081,51.8],[-3.071,51.811],[-3.056,51.807],[-3.06,51.795],[-3.081,51.8]]] } }
+      ]
+    }
+  },
+  "dates": [
+    { "id": "baseline", "label": { "en": "Before event", "cy": "Cyn y digwyddiad" }, "displayDate": { "en": "Fixture date A", "cy": "Dyddiad gosod A" } },
+    { "id": "after", "label": { "en": "After event", "cy": "Ar ôl y digwyddiad" }, "displayDate": { "en": "Fixture date B", "cy": "Dyddiad gosod B" } },
+    { "id": "latest", "label": { "en": "Latest", "cy": "Diweddaraf" }, "displayDate": { "en": "Fixture date C", "cy": "Dyddiad gosod C" } }
+  ],
+  "groups": [
+    { "id": "evidence", "name": { "en": "Fire and change", "cy": "Tân a newid" }, "description": { "en": "The launch theme and observed indicators", "cy": "Thema’r lansiad a dangosyddion a welwyd" } },
+    { "id": "landscape", "name": { "en": "Landscape context", "cy": "Cyd-destun y dirwedd" }, "description": { "en": "Protection, access, terrain and water", "cy": "Gwarchodaeth, mynediad, tirwedd a dŵr" } },
+    { "id": "historical", "name": { "en": "Historical context", "cy": "Cyd-destun hanesyddol" }, "description": { "en": "Dated sources that are not current condition", "cy": "Ffynonellau â dyddiad nad ydynt yn gyflwr presennol" } }
+  ],
+  "layers": [
+    {
+      "id": "fire", "groupId": "evidence", "name": { "en": "July 2026 fire extent", "cy": "Maint tân Gorffennaf 2026" },
+      "description": { "en": "A slot for the incident-authority or explicitly provisional boundary selected by the publication gate.", "cy": "Lle ar gyfer ffin yr awdurdod digwyddiad neu ffin dros dro benodol a ddewisir gan y porth cyhoeddi." },
+      "classification": "provisional", "defaultVisible": true, "mapStyle": "fire", "temporal": false,
+      "provider": "Publication fixture", "attribution": "BCA interface fixture", "evidenceStatus": { "en": "Not published — interface fixture", "cy": "Heb ei gyhoeddi — gosodiad rhyngwyneb" },
+      "sourceDate": { "en": "Awaiting factual release", "cy": "Yn aros am ryddhad ffeithiol" }, "licence": "No evidence asset is attached to this fixture",
+      "method": { "en": "The publication toolchain will replace this fixture only after evidence and provenance gates pass.", "cy": "Bydd y gadwyn offer cyhoeddi yn disodli’r gosodiad hwn dim ond ar ôl pasio’r pyrth tystiolaeth a tharddiad." },
+      "limitations": [{ "en": "The synthetic shape is not a fire perimeter and must not be measured or reused.", "cy": "Nid perimedr tân yw’r siâp synthetig ac ni ddylid ei fesur na’i ailddefnyddio." }]
+    },
+    {
+      "id": "change", "groupId": "evidence", "name": { "en": "Observed vegetation change", "cy": "Newid llystyfiant a welwyd" },
+      "description": { "en": "A slot for versioned continuous satellite-derived change. It will not be presented as proof of ecological recovery.", "cy": "Lle ar gyfer newid parhaus o loeren sydd â fersiwn. Ni chaiff ei gyflwyno fel prawf o adferiad ecolegol." },
+      "classification": "derived", "defaultVisible": true, "mapStyle": "change", "temporal": true,
+      "provider": "Publication fixture", "attribution": "BCA interface fixture", "evidenceStatus": { "en": "Not published — interface fixture", "cy": "Heb ei gyhoeddi — gosodiad rhyngwyneb" },
+      "sourceDate": { "en": "Placeholder observation sequence", "cy": "Dilyniant arsylwi dros dro" }, "licence": "No evidence asset is attached to this fixture",
+      "method": { "en": "Selected observations and processing lineage will be supplied by the factual release.", "cy": "Bydd yr arsylwadau a ddewiswyd a llinach y prosesu yn cael eu darparu gan y rhyddhad ffeithiol." },
+      "limitations": [{ "en": "The points only exercise date and comparison controls; they contain no observed values.", "cy": "Dim ond profi’r rheolyddion dyddiad a chymharu y mae’r pwyntiau; nid ydynt yn cynnwys gwerthoedd a welwyd." }]
+    },
+    {
+      "id": "protected", "groupId": "landscape", "name": { "en": "Protected landscape" },
+      "description": { "en": "A publication slot for authoritative protected-site context." },
+      "classification": "authoritative", "defaultVisible": true, "mapStyle": "protected", "temporal": false,
+      "provider": "Natural Resources Wales (source contract only)", "attribution": "Natural Resources Wales", "evidenceStatus": { "en": "Fixture geometry — source contract prepared", "cy": "Geometreg gosod — contract ffynhonnell wedi’i baratoi" },
+      "sourceDate": { "en": "Set by factual release", "cy": "I’w bennu gan y rhyddhad ffeithiol" }, "licence": "Open Government Licence candidate; exact snapshot pinned at publication",
+      "method": { "en": "The factual release will use the authoritative source snapshot." },
+      "limitations": [{ "en": "The synthetic outline is not a legal or protected-site boundary." }]
+    },
+    {
+      "id": "access", "groupId": "landscape", "name": { "en": "Access and paths", "cy": "Mynediad a llwybrau" },
+      "description": { "en": "Contextual access information with explicit legal limitations.", "cy": "Gwybodaeth gyd-destunol am fynediad gyda chyfyngiadau cyfreithiol penodol." },
+      "classification": "contextual", "defaultVisible": false, "mapStyle": "access", "temporal": false,
+      "provider": "Publication fixture", "attribution": "BCA interface fixture", "evidenceStatus": { "en": "Not published — interface fixture", "cy": "Heb ei gyhoeddi — gosodiad rhyngwyneb" },
+      "sourceDate": { "en": "Awaiting factual release", "cy": "Yn aros am ryddhad ffeithiol" }, "licence": "No evidence asset is attached to this fixture",
+      "method": { "en": "A validated source snapshot will replace the synthetic line." },
+      "limitations": [{ "en": "Not a definitive legal rights-of-way record.", "cy": "Nid cofnod cyfreithiol diffiniol o hawliau tramwy mohono." }]
+    },
+    {
+      "id": "water", "groupId": "landscape", "name": { "en": "Terrain and water", "cy": "Tirwedd a dŵr" },
+      "description": { "en": "Orientation context for the upland landscape.", "cy": "Cyd-destun cyfeiriadedd ar gyfer y dirwedd ucheldirol." },
+      "classification": "contextual", "defaultVisible": true, "mapStyle": "water", "temporal": false,
+      "provider": "Publication fixture", "attribution": "BCA interface fixture", "evidenceStatus": { "en": "Not published — interface fixture", "cy": "Heb ei gyhoeddi — gosodiad rhyngwyneb" },
+      "sourceDate": { "en": "Awaiting factual release", "cy": "Yn aros am ryddhad ffeithiol" }, "licence": "No evidence asset is attached to this fixture",
+      "method": { "en": "Local publication assets will replace the synthetic line." },
+      "limitations": [{ "en": "The fixture does not identify a watercourse or represent terrain height." }]
+    },
+    {
+      "id": "habitat", "groupId": "historical", "name": { "en": "Historical habitat survey", "cy": "Arolwg cynefinoedd hanesyddol" },
+      "description": { "en": "A dated context layer that must not be read as current habitat condition.", "cy": "Haen gyd-destunol â dyddiad na ddylid ei darllen fel cyflwr cynefinoedd presennol." },
+      "classification": "historical", "defaultVisible": false, "mapStyle": "habitat", "temporal": false,
+      "provider": "Publication fixture", "attribution": "BCA interface fixture", "evidenceStatus": { "en": "Not published — interface fixture", "cy": "Heb ei gyhoeddi — gosodiad rhyngwyneb" },
+      "sourceDate": { "en": "Awaiting factual release", "cy": "Yn aros am ryddhad ffeithiol" }, "licence": "No evidence asset is attached to this fixture",
+      "method": { "en": "A dated, validated survey snapshot will replace the synthetic polygon." },
+      "limitations": [{ "en": "The fixture does not describe habitat type, extent or present condition." }]
+    }
+  ]
+}

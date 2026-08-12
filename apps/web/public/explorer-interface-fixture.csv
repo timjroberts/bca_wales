@@ -1,0 +1,7 @@
+layer_id,classification,evidence_status,public_evidence
+fire,provisional,interface fixture,false
+change,derived,interface fixture,false
+protected,authoritative,interface fixture,false
+access,contextual,interface fixture,false
+water,contextual,interface fixture,false
+habitat,historical,interface fixture,false
