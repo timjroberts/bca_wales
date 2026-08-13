@@ -89,6 +89,11 @@ objects, then replaces `releases/current.json`. A failed upload or verification
 leaves the current pointer untouched. R2's single-object replacement makes that
 small final pointer change atomic for readers.
 
+Cloudflare applies special R2 Data Catalog handling to object keys ending in
+`.csv`. Accessible CSV assets therefore use a non-`.csv` terminal suffix while
+retaining the `text/csv` media type and an explicit CSV description in the
+release manifest.
+
 Automatic mode is accepted only when there are no warnings and every used
 source is explicitly registered as a routine candidate. The launch registry is
 manual by default.
