@@ -1,5 +1,5 @@
 {
-  "schema_version": "0.1.0-candidate",
+  "schema_version": "1.0.0",
   "registry_id": "blorenge-launch",
   "reviewed_at": "2026-08-09T18:47:50Z",
   "release_authority": "timjroberts",
@@ -72,7 +72,17 @@
       "transformation": "Select 33WFL, preserve source identifiers and dates, repair no geometry, reproject only in derived outputs, and publish source geometry separately from the derived AOI union.",
       "known_gaps": ["A designation boundary does not describe current condition or permitted operations."],
       "safety": "public_safe",
-      "publication": "approved_candidate"
+      "publication": "approved_candidate",
+      "contract": {
+        "owner": "timjroberts",
+        "temporal_role": "current designation context",
+        "licence_terms": { "snapshot_path": null, "sha256": null },
+        "recipe": { "id": "nrw-sssi", "version": "1.0.0" },
+        "output_profiles": ["geojson", "accessible_json"],
+        "refresh": { "mode": "manual", "maximum_age_days": 31, "approved_change_bounds": {} },
+        "retention": "Retain every exact input used by a published release until disposal is explicitly approved.",
+        "withdrawal": "Withdraw the public release pointer without deleting the immutable audit archive."
+      }
     },
     {
       "dataset_id": "nrw-national-park",
@@ -109,7 +119,17 @@
       "transformation": "Select isis_id 2449, clip for display without changing the source identity, and retain the full source boundary in private reproducibility storage.",
       "known_gaps": ["The boundary supplies designation context, not site condition."],
       "safety": "public_safe",
-      "publication": "approved_candidate"
+      "publication": "approved_candidate",
+      "contract": {
+        "owner": "timjroberts",
+        "temporal_role": "current designation context",
+        "licence_terms": { "snapshot_path": null, "sha256": null },
+        "recipe": { "id": "nrw-national-park", "version": "1.0.0" },
+        "output_profiles": ["geojson", "accessible_json"],
+        "refresh": { "mode": "manual", "maximum_age_days": 93, "approved_change_bounds": {} },
+        "retention": "Retain every exact input used by a published release until disposal is explicitly approved.",
+        "withdrawal": "Withdraw the public release pointer without deleting the immutable audit archive."
+      }
     },
     {
       "dataset_id": "nrw-open-registered-common",
@@ -144,7 +164,17 @@
       "transformation": "No Blorenge-core transformation is authorised. Nearby records must not be relabelled as Blorenge Common.",
       "known_gaps": ["Omits urban commons, commons with access deeds, 1899 Act commons, provisional-order commons and village greens.", "Has no register identifier or common name field.", "All eight records returned by the representative discovery envelope are outside the Blorenge SSSI; the nearest is about 99 metres away and only 0.23 ha."],
       "safety": "public_safe",
-      "publication": "rejected_for_blorenge_core"
+      "publication": "rejected_for_blorenge_core",
+      "contract": {
+        "owner": "timjroberts",
+        "temporal_role": "deferred contextual source",
+        "licence_terms": { "snapshot_path": null, "sha256": null },
+        "recipe": { "id": "nrw-open-registered-common", "version": "1.0.0" },
+        "output_profiles": ["geojson", "accessible_json"],
+        "refresh": { "mode": "manual", "maximum_age_days": 366, "approved_change_bounds": {} },
+        "retention": "Rejected candidates need not enter the publication archive.",
+        "withdrawal": "This source is not eligible for the Blorenge-core release."
+      }
     },
     {
       "dataset_id": "osm-wales-geofabrik",
@@ -181,7 +211,17 @@
       "transformation": "Clip to the final AOI, retain OSM identifiers and relevant access/path tags, omit contributor metadata, build self-hosted PMTiles, and label all paths as contextual rather than legal rights of way.",
       "known_gaps": ["Community completeness and currency vary.", "Path tags do not establish legal status.", "Welsh names may be incomplete."],
       "safety": "public_safe_after_tag_allowlist",
-      "publication": "approved_candidate"
+      "publication": "approved_candidate",
+      "contract": {
+        "owner": "timjroberts",
+        "temporal_role": "dated contextual snapshot",
+        "licence_terms": { "snapshot_path": null, "sha256": null },
+        "recipe": { "id": "osm-wales-geofabrik", "version": "1.0.0" },
+        "output_profiles": ["vector_pmtiles", "accessible_json"],
+        "refresh": { "mode": "manual", "maximum_age_days": 93, "approved_change_bounds": {} },
+        "retention": "Retain the exact PBF used by every published derivative under its applicable terms.",
+        "withdrawal": "Withdraw affected derivatives and preserve their manifests and retained source where lawful."
+      }
     },
     {
       "dataset_id": "wg-lidar-dtm-2020-2023",
@@ -220,7 +260,17 @@
       "transformation": "Select tiles intersecting the final AOI, mosaic DTM values without DSM substitution, derive fixed hillshade and labelled contours, clip to AOI and retain the source DTM privately for reproducibility.",
       "known_gaps": ["Capture date varies by tile.", "The provider warns the data was not produced specifically for flood modelling.", "The exact tile set remains to be selected against the validated SSSI-plus-2-km AOI geometry."],
       "safety": "public_safe",
-      "publication": "approved_candidate_pending_aoi"
+      "publication": "approved_candidate_pending_aoi",
+      "contract": {
+        "owner": "timjroberts",
+        "temporal_role": "dated terrain context",
+        "licence_terms": { "snapshot_path": null, "sha256": null },
+        "recipe": { "id": "wg-lidar-dtm-2020-2023", "version": "1.0.0" },
+        "output_profiles": ["cog", "raster_pmtiles", "vector_pmtiles", "accessible_json"],
+        "refresh": { "mode": "manual", "maximum_age_days": null, "approved_change_bounds": {} },
+        "retention": "Retain source tiles and private COGs used to reproduce every published terrain release.",
+        "withdrawal": "Withdraw public tiles while retaining reproducibility products privately where lawful."
+      }
     },
     {
       "dataset_id": "nrw-main-rivers",
@@ -255,7 +305,17 @@
       "transformation": "Clip to the final AOI, trim fixed-width whitespace, preserve OBJECTID and GlobalID, and publish only as principal-watercourse context.",
       "known_gaps": ["Does not include every mountain drain, grip, ditch or spring."],
       "safety": "public_safe",
-      "publication": "approved_candidate_pending_aoi"
+      "publication": "approved_candidate_pending_aoi",
+      "contract": {
+        "owner": "timjroberts",
+        "temporal_role": "current authoritative context",
+        "licence_terms": { "snapshot_path": null, "sha256": null },
+        "recipe": { "id": "nrw-main-rivers", "version": "1.0.0" },
+        "output_profiles": ["geojson", "vector_pmtiles", "accessible_json"],
+        "refresh": { "mode": "manual", "maximum_age_days": 93, "approved_change_bounds": {} },
+        "retention": "Retain every exact input used by a published release until disposal is explicitly approved.",
+        "withdrawal": "Withdraw the public release pointer without deleting the immutable audit archive."
+      }
     },
     {
       "dataset_id": "nrw-phase1-vegetation-voronoi",
@@ -291,7 +351,17 @@
       "transformation": "Clip the polygon layer only; exclude target notes and other point layers from launch; preserve survey and source identifiers; present the Phase 1 code with a reviewed plain-language legend.",
       "known_gaps": ["Historical survey only.", "Mixed/mosaic polygons need their own explanation.", "The representative envelope includes 42 Phase 1 codes and must be clipped after the final AOI exists."],
       "safety": "public_safe_after_field_allowlist",
-      "publication": "approved_candidate_pending_aoi"
+      "publication": "approved_candidate_pending_aoi",
+      "contract": {
+        "owner": "timjroberts",
+        "temporal_role": "historical survey context",
+        "licence_terms": { "snapshot_path": null, "sha256": null },
+        "recipe": { "id": "nrw-phase1-vegetation-voronoi", "version": "1.0.0" },
+        "output_profiles": ["vector_pmtiles", "accessible_csv"],
+        "refresh": { "mode": "manual", "maximum_age_days": null, "approved_change_bounds": {} },
+        "retention": "Retain every exact historical input used by a published release.",
+        "withdrawal": "Withdraw public derivatives while retaining the dated source and lineage where lawful."
+      }
     },
     {
       "dataset_id": "copernicus-sentinel-2-l2a",
@@ -341,7 +411,17 @@
       "transformation": "Apply provider scale and offset, per-pixel masks and disclosed adjacency dilation; retain native analytic support; assess terrain shadow; compute continuous indicators; preserve observation date and contributing count per pixel.",
       "known_gaps": ["No item can be assigned a final temporal role until incident chronology is verified.", "Whole-tile cloud percentage is discovery metadata, not AOI acceptance evidence.", "CDSE binary asset access requires a free authenticated build identity."],
       "safety": "public_safe",
-      "publication": "candidate_only_pending_event_and_aoi_qa"
+      "publication": "candidate_only_pending_event_and_aoi_qa",
+      "contract": {
+        "owner": "timjroberts",
+        "temporal_role": "pre-fire, immediate-post and latest suitable observations",
+        "licence_terms": { "snapshot_path": null, "sha256": null },
+        "recipe": { "id": "copernicus-sentinel-2-l2a", "version": "1.0.0" },
+        "output_profiles": ["cog", "raster_pmtiles", "geojson", "accessible_csv"],
+        "refresh": { "mode": "manual", "maximum_age_days": 31, "approved_change_bounds": {} },
+        "retention": "Retain exact item metadata, contributing bands, masks and private COGs for each published evidence release.",
+        "withdrawal": "Withdraw public evidence without silently substituting observations; preserve lineage where lawful."
+      }
     },
     {
       "dataset_id": "usgs-landsat-c2-l2-sr",
@@ -389,7 +469,17 @@
       "transformation": "Apply published scale/offset, mask fill/cloud/shadow/snow/saturation/terrain occlusion, clip to AOI, keep 30 m support and use as corroboration rather than a fused higher-resolution product.",
       "known_gaps": ["No item can be assigned a final temporal role until incident chronology is verified.", "Whole-scene cloud percentage is not AOI acceptance evidence.", "Overlapping paths have different geometry and should be compared like-for-like where possible."],
       "safety": "public_safe",
-      "publication": "candidate_only_pending_event_and_aoi_qa"
+      "publication": "candidate_only_pending_event_and_aoi_qa",
+      "contract": {
+        "owner": "timjroberts",
+        "temporal_role": "independent corroborating observations",
+        "licence_terms": { "snapshot_path": null, "sha256": null },
+        "recipe": { "id": "usgs-landsat-c2-l2-sr", "version": "1.0.0" },
+        "output_profiles": ["cog", "raster_pmtiles", "geojson", "accessible_csv"],
+        "refresh": { "mode": "manual", "maximum_age_days": 31, "approved_change_bounds": {} },
+        "retention": "Retain exact item metadata, contributing bands, masks and private COGs for each published evidence release.",
+        "withdrawal": "Withdraw public evidence without silently substituting observations; preserve lineage where lawful."
+      }
     },
     {
       "dataset_id": "effis-current-burnt-areas",
@@ -430,7 +520,17 @@
       "transformation": "Extract id 592404, preserve provider geometry and fields, clip only for display, and publish as a separate EFFIS provisional comparison. Never union it with a BCA-derived or authority boundary.",
       "known_gaps": ["EFFIS dates are provider product dates, not verified ignition, control or extinction times.", "The candidate lies immediately south of the Blorenge SSSI and must be matched to an incident-authority record before being named as the July 2026 Blorenge fire.", "EFFIS does not distinguish wildfire from prescribed or environmental burning and may omit small islands or scars."],
       "safety": "public_safe",
-      "publication": "candidate_only_pending_incident_match"
+      "publication": "candidate_only_pending_incident_match",
+      "contract": {
+        "owner": "timjroberts",
+        "temporal_role": "provisional provider comparison",
+        "licence_terms": { "snapshot_path": null, "sha256": null },
+        "recipe": { "id": "effis-current-burnt-areas", "version": "1.0.0" },
+        "output_profiles": ["geojson", "accessible_json"],
+        "refresh": { "mode": "manual", "maximum_age_days": 31, "approved_change_bounds": {} },
+        "retention": "Retain the exact provider snapshot used by each published provisional comparison.",
+        "withdrawal": "Withdraw or supersede the provisional layer without relabelling another boundary as equivalent."
+      }
     }
   ],
   "hard_gaps": [

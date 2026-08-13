@@ -12,6 +12,8 @@ addFormats(ajv);
 
 const validations = [
   ["schemas/release-manifest.schema.json", "fixtures/releases/release.example.json"],
+  ["schemas/source-registry.schema.json", "data/launch/source-registry.json"],
+  ["schemas/publication-recipe.schema.json", "config/publication/recipe.example.json"],
   ["schemas/explorer-interface.schema.json", "fixtures/explorer/interface.example.json"],
   ["schemas/environment.schema.json", "config/environments/preview.json"],
   ["schemas/environment.schema.json", "config/environments/production.json"]
@@ -54,5 +56,9 @@ assert.deepEqual(cors.rules[0].allowed.origins.sort(), [
   "https://explore.bca.wales"
 ].sort());
 assert.equal("AllowedOrigins" in cors.rules[0], false, "R2 CORS must use Cloudflare API shape");
+
+const toolchain = await readJson("config/publication/toolchain.lock.json");
+const pmtilesWrapper = await readFile(new URL("tooling/geodata/pmtiles-wrapper.sh", root), "utf8");
+assert.match(pmtilesWrapper, new RegExp(`pmtiles ${toolchain.tools.pmtiles.replaceAll(".", "\\.")}`));
 
 process.stdout.write("Foundation contracts and security policy are valid.\n");

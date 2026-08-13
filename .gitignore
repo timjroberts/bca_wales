@@ -3,6 +3,7 @@ node_modules/
 out/
 dist/
 .wrangler/
+.geodata-work/
 .env
 .env.*
 !.env.example

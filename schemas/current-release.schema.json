@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.bca.wales/current-release/1.0.0.json",
+  "title": "BCA current public evidence pointer",
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "status", "release_id", "manifest_url", "manifest_sha256", "published_at"],
+      "properties": {
+        "schema_version": { "const": "1.0.0" },
+        "status": { "const": "current" },
+        "release_id": { "type": "string", "minLength": 1 },
+        "manifest_url": { "type": "string", "format": "uri" },
+        "manifest_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "published_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "status", "withdrawn_release_id", "withdrawn_at", "reason", "replacement"],
+      "properties": {
+        "schema_version": { "const": "1.0.0" },
+        "status": { "const": "withdrawn" },
+        "withdrawn_release_id": { "type": "string", "minLength": 1 },
+        "withdrawn_at": { "type": "string", "format": "date-time" },
+        "reason": { "type": "string", "minLength": 1 },
+        "replacement": { "type": ["object", "null"] }
+      }
+    }
+  ]
+}

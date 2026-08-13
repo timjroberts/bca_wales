@@ -22,8 +22,9 @@ or repository secrets, never in source, builds, logs or R2.
 - `CLOUDFLARE_PAGES_PRODUCTION_TOKEN`: edit only the production Pages project;
   expose it only through the protected `production` GitHub environment.
 - Evidence-publication credentials are deliberately absent from the site
-  workflows. The publication toolchain will use a separate token restricted to
-  the correct R2 bucket.
+  workflows. The separate evidence workflow uses a token restricted to the
+  correct R2 bucket, as detailed in the
+  [evidence publication runbook](evidence-publication.md).
 - `CLOUDFLARE_ACCOUNT_ID` is an identifier, not a secret, but keep its workflow
   configuration alongside the scoped tokens.
 
@@ -68,7 +69,7 @@ telemetry is enabled.
 ## Deferred launch operations
 
 Domain provisioning, Cloudflare project and bucket creation, synthetic checks,
-production smoke tests, immutable release upload/promotion, billing alerts and
-the launch rollback rehearsal remain with the dedicated publication and final
-integration tickets. This ticket establishes their least-privilege path; it
-does not silently provision or publish them.
+production smoke tests, billing alerts and the launch rollback rehearsal remain
+with the final integration ticket. The repository now contains the immutable
+release upload, verification, promotion and withdrawal path, but it does not
+provision Cloudflare resources or publish a placeholder release.

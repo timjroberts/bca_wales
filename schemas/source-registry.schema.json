@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.bca.wales/source-registry/1.0.0.json",
+  "title": "BCA source registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "registry_id", "reviewed_at", "release_authority", "status", "status_reason", "area_of_interest", "sources", "hard_gaps", "deferred_enhancements"],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "registry_id": { "$ref": "#/$defs/id" },
+    "reviewed_at": { "type": "string", "format": "date-time" },
+    "release_authority": { "type": "string", "minLength": 1 },
+    "status": { "enum": ["candidate_blocked", "approved", "withdrawn"] },
+    "status_reason": { "type": "string", "minLength": 1 },
+    "area_of_interest": { "type": "object" },
+    "hard_gaps": { "type": "array", "items": { "type": "object" } },
+    "deferred_enhancements": { "type": "array", "items": { "type": "object" } },
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["dataset_id", "title", "purpose", "classification", "provider", "provider_dataset_id", "landing_url", "acquisition", "upstream", "licence", "schema", "transformation", "known_gaps", "safety", "publication", "contract"],
+        "properties": {
+          "dataset_id": { "$ref": "#/$defs/id" },
+          "title": { "type": "string", "minLength": 1 },
+          "purpose": { "type": "string", "minLength": 1 },
+          "classification": { "type": "string", "minLength": 1 },
+          "provider": { "type": "string", "minLength": 1 },
+          "provider_dataset_id": { "type": "string", "minLength": 1 },
+          "landing_url": { "type": "string", "format": "uri" },
+          "acquisition": { "type": "object", "minProperties": 3 },
+          "upstream": { "type": "object", "minProperties": 2 },
+          "licence": {
+            "type": "object",
+            "required": ["id", "url", "attribution", "reviewed_at"],
+            "properties": {
+              "id": { "type": "string", "minLength": 1 },
+              "url": { "type": "string", "format": "uri" },
+              "attribution": { "type": "string", "minLength": 1 },
+              "reviewed_at": { "type": "string", "format": "date" }
+            }
+          },
+          "schema": { "type": "object", "minProperties": 2 },
+          "transformation": { "type": "string", "minLength": 1 },
+          "known_gaps": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+          "safety": { "type": "string", "pattern": "^public_safe" },
+          "publication": { "type": "string", "minLength": 1 },
+          "contract": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["owner", "temporal_role", "licence_terms", "recipe", "output_profiles", "refresh", "retention", "withdrawal"],
+            "properties": {
+              "owner": { "type": "string", "minLength": 1 },
+              "temporal_role": { "type": "string", "minLength": 1 },
+              "licence_terms": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["snapshot_path", "sha256"],
+                "properties": {
+                  "snapshot_path": { "type": ["string", "null"] },
+                  "sha256": { "anyOf": [{ "$ref": "#/$defs/sha256" }, { "type": "null" }] }
+                }
+              },
+              "recipe": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["id", "version"],
+                "properties": {
+                  "id": { "$ref": "#/$defs/id" },
+                  "version": { "type": "string", "minLength": 1 }
+                }
+              },
+              "output_profiles": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": { "$ref": "#/$defs/output_profile" }
+              },
+              "refresh": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["mode", "maximum_age_days", "approved_change_bounds"],
+                "properties": {
+                  "mode": { "enum": ["manual", "routine_candidate"] },
+                  "maximum_age_days": { "type": ["integer", "null"], "minimum": 1 },
+                  "approved_change_bounds": { "type": "object" }
+                }
+              },
+              "retention": { "type": "string", "minLength": 1 },
+              "withdrawal": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]+$" },
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "output_profile": { "enum": ["geojson", "vector_pmtiles", "raster_pmtiles", "cog", "accessible_csv", "accessible_json"] }
+  }
+}

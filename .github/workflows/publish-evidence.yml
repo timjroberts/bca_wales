@@ -1,0 +1,68 @@
+name: Publish evidence release
+
+on:
+  workflow_dispatch:
+    inputs:
+      recipe:
+        description: Checked-in publication recipe path
+        required: true
+        type: string
+      mode:
+        description: Promotion mode
+        required: true
+        default: manual
+        type: choice
+        options: [manual, automatic]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-evidence-pointer
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    environment: production
+    env:
+      RECIPE_PATH: ${{ inputs.recipe }}
+      PROMOTION_MODE: ${{ inputs.mode }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_R2_PUBLICATION_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - name: Validate requested checked-in recipe
+        run: npm run geodata -- validate --registry data/launch/source-registry.json --recipe "$RECIPE_PATH"
+      - name: Resolve immutable release path
+        id: recipe
+        run: node -e 'const fs=require("node:fs"); const path=require("node:path"); const recipe=JSON.parse(fs.readFileSync(process.env.RECIPE_PATH)); if (!/^release-[a-z0-9][a-z0-9._-]+$/.test(recipe.release_id)) throw new Error("unsafe release id"); fs.appendFileSync(process.env.GITHUB_OUTPUT, `release_id=${recipe.release_id}\nrelease_root=.geodata-work/${recipe.release_id}\n`);'
+      - name: Build pinned geodata image
+        run: docker build --file tooling/geodata/Containerfile --tag bca/geodata-toolchain:1.0.0 .
+      - name: Acquire exact source snapshots
+        run: npm run geodata -- acquire --registry data/launch/source-registry.json --recipe "$RECIPE_PATH" --workspace .geodata-work --commit "$GITHUB_SHA" --allow-network
+      - name: Transform and gate candidate offline
+        run: npm run geodata -- build --release-root "${{ steps.recipe.outputs.release_root }}"
+      - name: Reproduce exact outputs before promotion
+        run: npm run geodata -- reproduce --archive "${{ steps.recipe.outputs.release_root }}" --workspace .geodata-reproduction
+      - name: Upload, verify and atomically promote
+        run: npm run geodata -- publish --release-root "${{ steps.recipe.outputs.release_root }}" --bucket bca-wales-evidence-production --identity timjroberts --mode "$PROMOTION_MODE"
+      - name: Retain release audit artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidence-${{ steps.recipe.outputs.release_id }}
+          path: |
+            ${{ steps.recipe.outputs.release_root }}/manifests/
+            ${{ steps.recipe.outputs.release_root }}/reports/
+          if-no-files-found: error
+          retention-days: 90

@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.bca.wales/build-lineage-manifest/1.0.0.json",
+  "title": "BCA build and lineage manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "release_id", "created_at", "toolchain", "registry_snapshot", "recipe_snapshot", "acquisition_manifest", "licence_snapshots", "steps", "outputs", "qa"],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "release_id": { "type": "string", "minLength": 1 },
+    "created_at": { "type": "string", "format": "date-time" },
+    "toolchain": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["lock_path", "sha256", "container_image", "versions", "verification"],
+      "properties": {
+        "lock_path": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "container_image": { "type": "string", "minLength": 1 },
+        "versions": { "type": "object", "minProperties": 1 },
+        "verification": {
+          "type": "array",
+          "minItems": 4,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["tool", "expected", "reported"],
+            "properties": {
+              "tool": { "type": "string", "minLength": 1 },
+              "expected": { "type": "string", "minLength": 1 },
+              "reported": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    },
+    "registry_snapshot": { "$ref": "#/$defs/snapshot" },
+    "recipe_snapshot": { "$ref": "#/$defs/snapshot" },
+    "acquisition_manifest": { "$ref": "#/$defs/snapshot" },
+    "licence_snapshots": { "type": "array", "items": { "$ref": "#/$defs/artifact" } },
+    "steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["step_id", "tool", "tool_version", "argv", "started_at", "finished_at", "inputs", "outputs"],
+        "properties": {
+          "step_id": { "type": "string", "minLength": 1 },
+          "tool": { "type": "string", "minLength": 1 },
+          "tool_version": { "type": "string", "minLength": 1 },
+          "argv": { "type": "array", "items": { "type": "string" } },
+          "started_at": { "type": "string", "format": "date-time" },
+          "finished_at": { "type": "string", "format": "date-time" },
+          "inputs": { "type": "array", "items": { "$ref": "#/$defs/artifact" } },
+          "outputs": { "type": "array", "items": { "$ref": "#/$defs/artifact" } }
+        }
+      }
+    },
+    "outputs": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/artifact" } },
+    "qa": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["result", "checked_at", "checks", "hard_failures", "warnings"],
+      "properties": {
+        "result": { "enum": ["pass", "fail"] },
+        "checked_at": { "type": "string", "format": "date-time" },
+        "checks": { "type": "array", "items": { "type": "object" } },
+        "hard_failures": { "type": "array", "items": { "type": "string" } },
+        "warnings": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "snapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": { "path": { "type": "string", "minLength": 1 }, "sha256": { "$ref": "#/$defs/sha256" } }
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["id", "path", "bytes", "sha256"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "path": { "type": "string", "minLength": 1 },
+        "bytes": { "type": "integer", "minimum": 1 },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      }
+    }
+  }
+}

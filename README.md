@@ -24,10 +24,14 @@ Requires Node.js 22.13 or newer in the Node 22 line.
 npm install
 npm run dev
 npm run check
+npm run geodata:validate
 ```
 
 The [deployment foundation runbook](docs/runbooks/deployment-foundation.md)
 records environment, credential, preview, production and rollback boundaries.
+The [evidence publication runbook](docs/runbooks/evidence-publication.md)
+documents immutable acquisition, offline transformation, QA, reproduction,
+promotion and withdrawal.
 
 ## Reviewed prototype
 

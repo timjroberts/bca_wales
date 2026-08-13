@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0.0",
+  "container_image": "bca/geodata-toolchain:1.0.0",
+  "base_image": "ghcr.io/osgeo/gdal:ubuntu-small-3.13.2",
+  "containerfile": "tooling/geodata/Containerfile",
+  "tools": {
+    "gdal": "3.13.2",
+    "tippecanoe": "2.62.2",
+    "pmtiles": "1.30.0",
+    "python": "3.14"
+  },
+  "network_during_transform": false,
+  "platforms": ["linux/amd64", "linux/arm64"]
+}

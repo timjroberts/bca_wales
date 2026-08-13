@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.bca.wales/publication-recipe/1.0.0.json",
+  "title": "BCA immutable publication recipe",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "recipe_id", "recipe_version", "release_id", "dataset_version", "registry_id", "public_asset_origin", "inputs", "intermediates", "steps", "outputs", "datasets", "cross_release_qa"],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "recipe_id": { "$ref": "#/$defs/id" },
+    "recipe_version": { "type": "string", "minLength": 1 },
+    "release_id": { "type": "string", "pattern": "^release-[a-z0-9][a-z0-9._-]+$" },
+    "dataset_version": { "type": "string", "minLength": 1 },
+    "registry_id": { "$ref": "#/$defs/id" },
+    "public_asset_origin": { "type": "string", "format": "uri" },
+    "supersedes": { "type": ["string", "null"] },
+    "inputs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["input_id", "dataset_id", "source", "destination", "media_type", "maximum_bytes"],
+        "properties": {
+          "input_id": { "$ref": "#/$defs/id" },
+          "dataset_id": { "$ref": "#/$defs/id" },
+          "source": { "type": "string", "minLength": 1 },
+          "destination": { "$ref": "#/$defs/relative_path" },
+          "media_type": { "type": "string", "minLength": 1 },
+          "maximum_bytes": { "type": "integer", "minimum": 1 },
+          "expected_sha256": { "anyOf": [{ "$ref": "#/$defs/sha256" }, { "type": "null" }] }
+        }
+      }
+    },
+    "intermediates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["artifact_id", "path"],
+        "properties": {
+          "artifact_id": { "$ref": "#/$defs/id" },
+          "path": { "$ref": "#/$defs/relative_path" }
+        }
+      }
+    },
+    "steps": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["step_id", "tool", "argv", "inputs", "outputs"],
+        "properties": {
+          "step_id": { "$ref": "#/$defs/id" },
+          "tool": { "enum": ["ogr2ogr", "gdal_translate", "gdalwarp", "gdaldem", "tippecanoe", "pmtiles", "python3", "node"] },
+          "argv": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+          "inputs": { "type": "array", "items": { "$ref": "#/$defs/id" } },
+          "outputs": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/id" } }
+        }
+      }
+    },
+    "outputs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["asset_id", "dataset_id", "path", "profile", "media_type", "visibility", "accessible_description", "qa"],
+        "properties": {
+          "asset_id": { "$ref": "#/$defs/id" },
+          "dataset_id": { "$ref": "#/$defs/id" },
+          "path": { "$ref": "#/$defs/relative_path" },
+          "profile": { "$ref": "#/$defs/output_profile" },
+          "media_type": { "type": "string", "minLength": 1 },
+          "visibility": { "enum": ["public", "private"] },
+          "accessible_description": { "type": "string", "minLength": 1 },
+          "qa": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["minimum_bytes"],
+            "properties": {
+              "minimum_bytes": { "type": "integer", "minimum": 1 },
+              "minimum_features": { "type": "integer", "minimum": 0 },
+              "required_fields": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+              "minimum_rows": { "type": "integer", "minimum": 0 }
+            }
+          }
+        }
+      }
+    },
+    "datasets": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["dataset_id", "source_dataset_ids", "evidence_version", "title", "provider", "licence", "attribution", "classification", "observation_dates", "method", "uncertainty", "limitations"],
+        "properties": {
+          "dataset_id": { "$ref": "#/$defs/id" },
+          "source_dataset_ids": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
+          "evidence_version": { "type": "string", "minLength": 1 },
+          "title": { "type": "string", "minLength": 1 },
+          "provider": { "type": "string", "minLength": 1 },
+          "licence": { "type": "string", "minLength": 1 },
+          "attribution": { "type": "string", "minLength": 1 },
+          "classification": { "enum": ["authoritative", "provisional", "derived", "contextual", "historical"] },
+          "observation_dates": { "type": "array", "minItems": 1, "items": { "type": "string", "format": "date" } },
+          "method": { "type": "string", "minLength": 1 },
+          "uncertainty": { "type": "string", "minLength": 1 },
+          "limitations": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
+        }
+      }
+    },
+    "cross_release_qa": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["baseline_manifest", "maximum_asset_growth_ratio", "maximum_feature_change_ratio"],
+      "properties": {
+        "baseline_manifest": { "type": ["string", "null"] },
+        "maximum_asset_growth_ratio": { "type": "number", "minimum": 1 },
+        "maximum_feature_change_ratio": { "type": "number", "minimum": 0 }
+      }
+    }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]+$" },
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "relative_path": { "type": "string", "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[a-zA-Z0-9._/-]+$" },
+    "output_profile": { "enum": ["geojson", "vector_pmtiles", "raster_pmtiles", "cog", "accessible_csv", "accessible_json"] }
+  }
+}

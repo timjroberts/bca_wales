@@ -28,4 +28,10 @@ The publication manifest therefore remains fail-closed only on the incident-auth
 - `acquisition-manifest-2026-08-09.json` records the exact representative responses and binary snapshots checked during acquisition, including byte lengths and SHA-256 values.
 - `candidate-publication-manifest.json` maps launch layers to sources and makes the hard publication failures machine-visible.
 
-The candidate schema version is intentionally marked `0.1.0-candidate`. The reproducible publication-toolchain work must replace it with the validated schema without weakening these fail-closed meanings.
+The source registry now uses the validated `1.0.0` contract and includes the
+processing, refresh, retention and withdrawal policy fields consumed by the
+publication toolchain. Its licence-term snapshot checksums remain deliberately
+unset, so it cannot pass the publication gate prematurely. The representative
+acquisition and blocked publication manifests remain `0.1.0-candidate`
+historical inputs; the toolchain generates new `1.0.0` acquisition, lineage,
+QA and release manifests from exact snapshots during a real release build.

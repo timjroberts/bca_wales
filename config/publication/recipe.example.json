@@ -1,0 +1,81 @@
+{
+  "schema_version": "1.0.0",
+  "recipe_id": "blorenge-sssi-contract-example",
+  "recipe_version": "1.0.0",
+  "release_id": "release-contract-example-001",
+  "dataset_version": "example-001",
+  "registry_id": "blorenge-launch",
+  "public_asset_origin": "https://example.invalid",
+  "supersedes": null,
+  "inputs": [
+    {
+      "input_id": "nrw-sssi-source",
+      "dataset_id": "nrw-sssi",
+      "source": "registry:acquisition.url",
+      "destination": "quarantine/nrw-sssi.geojson",
+      "media_type": "application/geo+json",
+      "maximum_bytes": 104857600,
+      "expected_sha256": null
+    }
+  ],
+  "intermediates": [],
+  "steps": [
+    {
+      "step_id": "normalise-sssi",
+      "tool": "ogr2ogr",
+      "argv": ["-f", "GeoJSON", "{artifact:blorenge-sssi-geojson}", "{artifact:nrw-sssi-source}", "-t_srs", "EPSG:4326", "-where", "sssi_code = '33WFL'"],
+      "inputs": ["nrw-sssi-source"],
+      "outputs": ["blorenge-sssi-geojson"]
+    },
+    {
+      "step_id": "write-accessible-table",
+      "tool": "python3",
+      "argv": ["/repo/tooling/geodata/recipes/geojson_to_csv.py", "{artifact:blorenge-sssi-geojson}", "{artifact:blorenge-sssi-csv}", "sssi_name", "sssi_code", "first_notified", "last_notified"],
+      "inputs": ["blorenge-sssi-geojson"],
+      "outputs": ["blorenge-sssi-csv"]
+    }
+  ],
+  "outputs": [
+    {
+      "asset_id": "blorenge-sssi-geojson",
+      "dataset_id": "nrw-sssi",
+      "path": "outputs/blorenge-sssi.geojson",
+      "profile": "geojson",
+      "media_type": "application/geo+json",
+      "visibility": "public",
+      "accessible_description": "Machine-readable Blorenge SSSI boundary with source identifiers.",
+      "qa": { "minimum_bytes": 100, "minimum_features": 1, "required_fields": ["sssi_name", "sssi_code"] }
+    },
+    {
+      "asset_id": "blorenge-sssi-csv",
+      "dataset_id": "nrw-sssi",
+      "path": "outputs/blorenge-sssi.csv",
+      "profile": "accessible_csv",
+      "media_type": "text/csv",
+      "visibility": "public",
+      "accessible_description": "Non-map table of the Blorenge SSSI source record.",
+      "qa": { "minimum_bytes": 20, "minimum_rows": 1, "required_fields": ["sssi_name", "sssi_code"] }
+    }
+  ],
+  "datasets": [
+    {
+      "dataset_id": "nrw-sssi",
+      "source_dataset_ids": ["nrw-sssi"],
+      "evidence_version": "example-001",
+      "title": "Contract fixture — not public evidence",
+      "provider": "Natural Resources Wales",
+      "licence": "OGL-3.0 contract fixture only",
+      "attribution": "Fixture only — must not be published",
+      "classification": "authoritative",
+      "observation_dates": ["2008-11-28"],
+      "method": "Contract example only; select the stable SSSI code and reproject without geometry repair.",
+      "uncertainty": "This fixture is not a publication candidate.",
+      "limitations": ["Must never be promoted or presented as current evidence."]
+    }
+  ],
+  "cross_release_qa": {
+    "baseline_manifest": null,
+    "maximum_asset_growth_ratio": 2,
+    "maximum_feature_change_ratio": 0
+  }
+}

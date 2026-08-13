@@ -1,0 +1,30 @@
+ARG GDAL_IMAGE=ghcr.io/osgeo/gdal:ubuntu-small-3.13.2
+
+FROM golang:1.25.1-bookworm AS pmtiles-builder
+ARG PMTILES_VERSION=v1.30.0
+RUN CGO_ENABLED=0 go install github.com/protomaps/go-pmtiles@${PMTILES_VERSION}
+
+FROM ubuntu:24.04 AS tippecanoe-builder
+ARG TIPPECANOE_VERSION=2.62.2
+RUN apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install --yes --no-install-recommends \
+      build-essential ca-certificates curl libsqlite3-dev zlib1g-dev \
+    && curl --fail --location --silent --show-error \
+      "https://github.com/felt/tippecanoe/archive/refs/tags/${TIPPECANOE_VERSION}.tar.gz" \
+      --output /tmp/tippecanoe.tar.gz \
+    && mkdir /src \
+    && tar --extract --gzip --file /tmp/tippecanoe.tar.gz --directory /src --strip-components=1 \
+    && make --directory /src -j2 \
+    && make --directory /src install PREFIX=/opt/tippecanoe
+
+FROM ${GDAL_IMAGE}
+COPY --from=pmtiles-builder /go/bin/go-pmtiles /usr/local/libexec/pmtiles
+COPY tooling/geodata/pmtiles-wrapper.sh /usr/local/bin/pmtiles
+COPY --from=tippecanoe-builder /opt/tippecanoe/bin/ /usr/local/bin/
+RUN chmod 0755 /usr/local/bin/pmtiles /usr/local/libexec/pmtiles \
+    && gdalinfo --version \
+    && tippecanoe --version \
+    && pmtiles version \
+    && python3 --version
+WORKDIR /work
+ENTRYPOINT []
