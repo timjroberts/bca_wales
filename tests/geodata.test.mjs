@@ -14,7 +14,7 @@ import {
   reuseAcquisition,
   verifyArchive
 } from "../tooling/geodata/src/pipeline.mjs";
-import { publishRelease, withdrawRelease } from "../tooling/geodata/src/r2.mjs";
+import { publishRelease, stageRelease, withdrawRelease } from "../tooling/geodata/src/r2.mjs";
 import { readJson } from "../tooling/geodata/src/runtime.mjs";
 
 const repositoryRoot = path.resolve(new URL("../", import.meta.url).pathname);
@@ -386,6 +386,40 @@ test("publication changes the current pointer only after verified immutable uplo
   assert.equal(withdrawn.pointer.status, "withdrawn");
   assert.equal(store.objects.has("releases/release-test-001/assets/public.geojson"), true, "withdrawal preserves immutable assets");
   assert.equal(JSON.parse(store.objects.get("releases/current.json").toString()).status, "withdrawn");
+});
+
+test("staging publishes immutable release assets without changing the current pointer", async (context) => {
+  const root = await mkdtemp(path.join(tmpdir(), "bca-stage-test-"));
+  context.after(() => rm(root, { recursive: true }));
+  const contracts = await fixture(root);
+  const acquired = await acquireRelease({
+    ...contracts,
+    workspaceRoot: path.join(root, "work"),
+    codeCommit: commit,
+    clock
+  });
+  await buildRelease({ releaseRoot: acquired.releaseRoot, clock, runner: localRunner(acquired.releaseRoot) });
+  const store = new MemoryStore();
+  const staged = await stageRelease({
+    releaseRoot: acquired.releaseRoot,
+    store,
+    identity: "timjroberts",
+    clock
+  });
+  assert.equal(staged.release.published_at, fixedDate.toISOString());
+  assert.equal(store.objects.has("releases/release-test-001/manifest.json"), true);
+  assert.equal(store.objects.has("releases/release-test-001/assets/public.geojson"), true);
+  assert.equal(store.objects.has("releases/current.json"), false);
+
+  const published = await publishRelease({
+    releaseRoot: acquired.releaseRoot,
+    store,
+    identity: "timjroberts",
+    mode: "manual",
+    clock
+  });
+  assert.equal(published.uploads.every((upload) => upload.uploaded === false), true);
+  assert.equal(store.objects.has("releases/current.json"), true);
 });
 
 test("a failed gate cannot upload or promote anything", async (context) => {

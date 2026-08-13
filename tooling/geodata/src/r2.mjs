@@ -143,6 +143,82 @@ async function writePointer(store, pointer) {
   }
 }
 
+export async function stageRelease({
+  releaseRoot,
+  store,
+  identity,
+  clock
+}) {
+  const [candidate, recipe, registry, lineage] = await Promise.all([
+    readJson(path.join(releaseRoot, "manifests/candidate-release.json")),
+    readJson(path.join(releaseRoot, "snapshots/publication-recipe.json")),
+    readJson(path.join(releaseRoot, "snapshots/source-registry.json")),
+    readJson(path.join(releaseRoot, "manifests/lineage.json"))
+  ]);
+  await Promise.all([
+    validateDocument("release", candidate, "candidate release manifest"),
+    validateDocument("lineage", lineage, "lineage manifest")
+  ]);
+  if (candidate.gate.result !== "pass" || candidate.gate.hard_failures.length > 0) {
+    throw new Error("A failing candidate cannot be staged");
+  }
+  if (identity !== registry.release_authority) {
+    throw new Error(`Only release authority ${registry.release_authority} may stage a release`);
+  }
+
+  const releaseFile = path.join(releaseRoot, "manifests/release.json");
+  let release;
+  try {
+    release = await readJson(releaseFile);
+    await validateDocument("release", release, "existing final release manifest");
+  } catch (error) {
+    if (error.code !== "ENOENT") throw error;
+    const publishedAt = isoNow(clock);
+    release = {
+      ...candidate,
+      published_at: publishedAt,
+      promotion: { mode: "manual", identity },
+      datasets: candidate.datasets.map((dataset) => ({ ...dataset, published_at: publishedAt }))
+    };
+    await validateDocument("release", release, "staged final release manifest");
+    await writeCanonical(releaseFile, release, { exclusive: true });
+  }
+  const expected = {
+    ...candidate,
+    published_at: release.published_at,
+    promotion: { mode: "manual", identity },
+    datasets: candidate.datasets.map((dataset) => ({ ...dataset, published_at: release.published_at }))
+  };
+  if (canonicalJson(release) !== canonicalJson(expected)) {
+    throw new Error("Existing immutable release manifest differs from this staged release");
+  }
+
+  const outputContracts = new Map(recipe.outputs.map((output) => [output.asset_id, output]));
+  const uploads = [];
+  for (const asset of release.assets) {
+    const contract = outputContracts.get(asset.asset_id);
+    if (!contract || contract.visibility !== "public") throw new Error(`${asset.asset_id}: missing public output contract`);
+    const localFile = resolveInside(releaseRoot, contract.path);
+    const details = await stat(localFile);
+    if (details.size !== asset.bytes || await sha256File(localFile) !== asset.sha256) {
+      throw new Error(`${asset.asset_id}: local asset no longer matches the release manifest`);
+    }
+    uploads.push(await ensureImmutableUpload(
+      store,
+      `releases/${release.release_id}/assets/${path.basename(contract.path)}`,
+      localFile,
+      asset.media_type
+    ));
+  }
+  uploads.push(await ensureImmutableUpload(
+    store,
+    `releases/${release.release_id}/manifest.json`,
+    releaseFile,
+    "application/json"
+  ));
+  return { release, uploads };
+}
+
 export async function publishRelease({
   releaseRoot,
   store,

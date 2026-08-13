@@ -12,7 +12,7 @@ import {
   reuseAcquisition,
   verifyArchive
 } from "../src/pipeline.mjs";
-import { publishRelease, withdrawRelease, WranglerR2Store } from "../src/r2.mjs";
+import { publishRelease, stageRelease, withdrawRelease, WranglerR2Store } from "../src/r2.mjs";
 import { readJson } from "../src/runtime.mjs";
 
 const execFileAsync = promisify(execFile);
@@ -26,6 +26,7 @@ Usage:
   bca-geodata build --release-root DIR
   bca-geodata reproduce --archive DIR --workspace DIR
   bca-geodata verify-archive --release-root DIR
+  bca-geodata stage --release-root DIR --bucket NAME --identity LOGIN
   bca-geodata publish --release-root DIR --bucket NAME --identity LOGIN [--mode manual|automatic]
   bca-geodata withdraw --release-root DIR --bucket NAME --release-id ID --identity LOGIN --reason TEXT [--replacement FILE]
 
@@ -121,6 +122,14 @@ async function main() {
     result = { release_root: reproduced.releaseRoot, verified_outputs: reproduced.outputs.length };
   } else if (command === "verify-archive") {
     result = await verifyArchive(absolute(required(options, "release-root")));
+  } else if (command === "stage") {
+    const store = new WranglerR2Store({ bucket: required(options, "bucket") });
+    const staged = await stageRelease({
+      releaseRoot: absolute(required(options, "release-root")),
+      store,
+      identity: required(options, "identity")
+    });
+    result = { release_id: staged.release.release_id, uploads: staged.uploads };
   } else if (command === "publish") {
     const store = new WranglerR2Store({ bucket: required(options, "bucket") });
     const published = await publishRelease({

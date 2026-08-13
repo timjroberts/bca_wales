@@ -40,3 +40,7 @@ When a recipe or transformation is corrected without changing provider inputs,
 `reuse-acquisition` creates a new release workspace only after re-hashing every
 retained byte against the new recipe. Original retrieval metadata is preserved;
 the new manifest records the retained-input operation explicitly.
+
+`stage` uploads and verifies only versioned assets and their final immutable
+manifest. It never reads or writes `releases/current.json`; a later manual
+`publish` re-verifies the same bytes before changing that pointer.

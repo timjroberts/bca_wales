@@ -68,7 +68,7 @@ Reproduction copies only the recorded snapshots, acquisition manifest and exact
 quarantined inputs, reruns the pinned offline graph, and fails unless every
 output checksum equals the archived lineage. No live upstream source is used.
 
-## Publish and promote
+## Stage, then promote
 
 Use a dedicated `CLOUDFLARE_API_TOKEN` restricted to object read/write on the
 target evidence bucket and `CLOUDFLARE_ACCOUNT_ID`. Site-deployment tokens must
@@ -77,15 +77,17 @@ environment and the workflow concurrency group prevents two pointer changes at
 once.
 
 ```bash
+npm run geodata -- stage --release-root PRIVATE_ARCHIVE/RELEASE_ID --bucket bca-wales-evidence-production --identity timjroberts
 npm run geodata -- publish --release-root PRIVATE_ARCHIVE/RELEASE_ID --bucket bca-wales-evidence-production --identity timjroberts --mode manual
 ```
 
-The command checks the current release against `supersedes`, uploads only
-versioned keys, refuses a different object already present at an immutable key,
-downloads every uploaded object and verifies its checksum, uploads and verifies
-the final release manifest, then replaces `releases/current.json`. A failed
-upload or verification leaves the current pointer untouched. R2's single-object
-replacement makes that small final pointer change atomic for readers.
+`stage` uploads only versioned keys, refuses a different object already present
+at an immutable key, and downloads every object to verify its checksum. It does
+not read or write `releases/current.json`. After launch acceptance, `publish`
+checks the current release against `supersedes`, re-verifies the immutable
+objects, then replaces `releases/current.json`. A failed upload or verification
+leaves the current pointer untouched. R2's single-object replacement makes that
+small final pointer change atomic for readers.
 
 Automatic mode is accepted only when there are no warnings and every used
 source is explicitly registered as a routine candidate. The launch registry is
