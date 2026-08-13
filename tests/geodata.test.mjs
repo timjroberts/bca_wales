@@ -35,6 +35,42 @@ test("Planetary Computer acquisition signs only the reviewed Landsat mirror and 
   assert.equal(target.fetchUrl, `${asset}?sig=temporary`);
 });
 
+test("binary mirror media types are validated by their file contracts instead of generic transport headers", async (context) => {
+  const root = await mkdtemp(path.join(tmpdir(), "bca-octet-stream-test-"));
+  context.after(() => rm(root, { recursive: true }));
+  const source = path.join(root, "source.tif");
+  await writeFile(source, Buffer.from([0x49, 0x49, 0x2a, 0x00, 0, 0, 0, 0]));
+  const contracts = await fixture(root);
+  const registry = await readJson(contracts.registryPath);
+  registry.sources[0].acquisition.media_type = "image/tiff";
+  registry.sources[0].schema = { geometry: "raster", nodata: "none" };
+  registry.sources[0].contract.output_profiles = ["cog", "accessible_csv"];
+  const recipe = await readJson(contracts.recipePath);
+  recipe.inputs[0].media_type = "image/tiff";
+  recipe.inputs[0].source = "https://example.invalid/source.tif";
+  recipe.inputs[0].destination = "quarantine/source.tif";
+  await Promise.all([
+    writeFile(contracts.registryPath, JSON.stringify(registry)),
+    writeFile(contracts.recipePath, JSON.stringify(recipe))
+  ]);
+  const acquired = await acquireRelease({
+    ...contracts,
+    workspaceRoot: path.join(root, "work"),
+    codeCommit: commit,
+    clock,
+    allowNetwork: true,
+    fetchImpl: async () => {
+      const response = new Response(await readFile(source), {
+        status: 200,
+        headers: { "content-type": "application/octet-stream" }
+      });
+      Object.defineProperty(response, "url", { value: "https://example.invalid/source.tif" });
+      return response;
+    }
+  });
+  assert.equal(acquired.manifest.qa_events.some((event) => event.code === "SOURCE_MEDIA_TYPE_CHANGED"), false);
+});
+
 class MemoryStore {
   objects = new Map();
 

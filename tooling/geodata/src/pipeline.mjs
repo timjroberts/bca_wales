@@ -174,6 +174,11 @@ function mediaTypeCompatible(expected, actual) {
   const wanted = expected.split(";", 1)[0].trim().toLowerCase();
   if (normalised === wanted) return true;
   if (wanted === "application/geo+json" && normalised === "application/json") return true;
+  if (normalised === "application/octet-stream" && [
+    "application/vnd.openstreetmap.data+pbf",
+    "image/tiff",
+    "image/tiff; application=geotiff; profile=cloud-optimized"
+  ].includes(expected.toLowerCase())) return true;
   return false;
 }
 

@@ -2,8 +2,8 @@
   "schema_version": "1.0.0",
   "recipe_id": "blorenge-factual-launch",
   "recipe_version": "1.0.0",
-  "release_id": "release-blorenge-2026-08-13.2",
-  "dataset_version": "2026-08-13.2",
+  "release_id": "release-blorenge-2026-08-13.3",
+  "dataset_version": "2026-08-13.3",
   "registry_id": "blorenge-launch",
   "public_asset_origin": "https://evidence.bca.wales",
   "supersedes": null,
@@ -15,7 +15,7 @@
       "destination": "quarantine/nrw/sssi.geojson",
       "media_type": "application/geo+json",
       "maximum_bytes": 200000,
-      "expected_sha256": null
+      "expected_sha256": "cfd7bd26fe071afb7937daa80ec20a8aec453b46ccdf87e9db015e179bba3da3"
     },
     {
       "input_id": "nrw-national-park",
@@ -24,7 +24,7 @@
       "destination": "quarantine/nrw/national-park.geojson",
       "media_type": "application/geo+json",
       "maximum_bytes": 3000000,
-      "expected_sha256": null
+      "expected_sha256": "40508bcc298fcdd3fbb56ada073f1591aac68303e15ce16bebbbd4af2902f176"
     },
     {
       "input_id": "nrw-main-rivers",
@@ -33,7 +33,7 @@
       "destination": "quarantine/nrw/main-rivers.geojson",
       "media_type": "application/geo+json",
       "maximum_bytes": 2000000,
-      "expected_sha256": null
+      "expected_sha256": "8b5e012f9238f3d3bcf1e8e38f567b33c365349a25aaee713f7b503c6b2964cd"
     },
     {
       "input_id": "nrw-phase1-habitat",
@@ -42,7 +42,7 @@
       "destination": "quarantine/nrw/phase1-habitat.geojson",
       "media_type": "application/geo+json",
       "maximum_bytes": 12000000,
-      "expected_sha256": null
+      "expected_sha256": "87417d3c96a9209d091342f5483c30984cfbf4254c70d0838467903e6cfa4b5b"
     },
     {
       "input_id": "osm-wales",
@@ -51,7 +51,7 @@
       "destination": "quarantine/osm/wales-260812.osm.pbf",
       "media_type": "application/vnd.openstreetmap.data+pbf",
       "maximum_bytes": 200000000,
-      "expected_sha256": null
+      "expected_sha256": "c98afb597889786c4423eab7d9723bb6d4576d76ef811052a9ef5bd6238446d8"
     },
     {
       "input_id": "lidar-10-323208",
@@ -60,7 +60,7 @@
       "destination": "quarantine/lidar/wg_del_10_323208_20210227dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "e89d2a880606398ac5fa858b9d3090b17b6f697ee182918bfc507676ab4479af"
     },
     {
       "input_id": "lidar-10-323209",
@@ -69,7 +69,7 @@
       "destination": "quarantine/lidar/wg_del_10_323209_20210227dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "52b899d7d947027b1250da21f767702c7fccd2f6b68870a9fa44ee2b61761709"
     },
     {
       "input_id": "lidar-10-323210",
@@ -78,7 +78,7 @@
       "destination": "quarantine/lidar/wg_del_10_323210_20210227dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "6ab0083df155cd91b0f17791f66e09fe2889aeac539030d67cb260fe5527122c"
     },
     {
       "input_id": "lidar-10-324207",
@@ -87,7 +87,7 @@
       "destination": "quarantine/lidar/wg_del_10_324207_20210227dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "20e0d216d5ddf9da062f63fba3202d9504e4b78f75862d2ca32a7fb8f28091a4"
     },
     {
       "input_id": "lidar-10-324208",
@@ -96,7 +96,7 @@
       "destination": "quarantine/lidar/wg_del_10_324208_20210227dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "032f4448988f4712950086bfad339aa1faf6bc6ef31ab477499bc9074f6ee586"
     },
     {
       "input_id": "lidar-10-324209",
@@ -105,7 +105,7 @@
       "destination": "quarantine/lidar/wg_del_10_324209_20210227dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "b01066cb1819969fead5afc26599d90d4c8f5e2bbb56cfc5e76d5e4f8aa4cd3a"
     },
     {
       "input_id": "lidar-10-324210",
@@ -114,7 +114,7 @@
       "destination": "quarantine/lidar/wg_del_10_324210_20210227dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "b0e0fb8702e475e612efc3f7926d700683f6aabfa5a5f1268d073f6f47e80df1"
     },
     {
       "input_id": "lidar-10-325206",
@@ -123,7 +123,7 @@
       "destination": "quarantine/lidar/wg_del_10_325206_20210227dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "00b7fb620ad91c20c6f914e88a49bfaacb112df6148d86abad17b7961a48dabd"
     },
     {
       "input_id": "lidar-10-325207",
@@ -132,7 +132,7 @@
       "destination": "quarantine/lidar/wg_del_10_325207_20210227dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "d66c274546c9b2974ca40a5c4d8d5e509977cb5595e2867bc1f7c69b3392b848"
     },
     {
       "input_id": "lidar-10-325208",
@@ -141,7 +141,7 @@
       "destination": "quarantine/lidar/wg_del_10_325208_20210227dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "04a48458cd86f301012df3cd0afe7dc311fabbb9ae19242f232dc4cb40b1dbe2"
     },
     {
       "input_id": "lidar-10-325209",
@@ -150,7 +150,7 @@
       "destination": "quarantine/lidar/wg_del_10_325209_20210227dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "5d40cba248f76453be7114fde4efacc5f6241683f1df322c4bbfc568b502867e"
     },
     {
       "input_id": "lidar-10-325210",
@@ -159,7 +159,7 @@
       "destination": "quarantine/lidar/wg_del_10_325210_20210227dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "7f8b214285bf494f66b40ef3f8083dc77679fef1f4e1baf6c242e3c487e2dda6"
     },
     {
       "input_id": "lidar-10-326205",
@@ -168,7 +168,7 @@
       "destination": "quarantine/lidar/wg_del_10_326205_20210227dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "2ec78a3b0af21538618b26facd13ec684c3ddd49ada88a344bac84b3e60b2ac4"
     },
     {
       "input_id": "lidar-10-326206",
@@ -177,7 +177,7 @@
       "destination": "quarantine/lidar/wg_del_10_326206_20210227dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "e45a1215f0dc9525506e3ce0d3b214f9af1d9d11a215a478c32a2c22b71741fb"
     },
     {
       "input_id": "lidar-10-326207",
@@ -186,7 +186,7 @@
       "destination": "quarantine/lidar/wg_del_10_326207_20210227dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "5a0b84d93baef2d5c58761358c28baca0ba67ac651d9cd91e68533934ba8bc7e"
     },
     {
       "input_id": "lidar-10-326208",
@@ -195,7 +195,7 @@
       "destination": "quarantine/lidar/wg_del_10_326208_20210227dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "a04864fd1f985e5b8173812f2bf756f5e6580d3a481e1080393b022ac6b6e9a0"
     },
     {
       "input_id": "lidar-10-326209",
@@ -204,7 +204,7 @@
       "destination": "quarantine/lidar/wg_del_10_326209_20210227dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "959b8aa6fc57007308f39f7048aed7c7862cd9317ab92a05d52b6454c264f219"
     },
     {
       "input_id": "lidar-10-326210",
@@ -213,7 +213,7 @@
       "destination": "quarantine/lidar/wg_del_10_326210_20210227dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "deb1310a004ade46f62248d6ffdafa6e400c0245b2f88576dac14f43cfbcdbe5"
     },
     {
       "input_id": "lidar-10-327205",
@@ -222,7 +222,7 @@
       "destination": "quarantine/lidar/wg_del_10_327205_20210227dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "5d9d0fbaf7631987ef5912a8d9538eda47d112a741b7ff5249656bc5c72f4f08"
     },
     {
       "input_id": "lidar-10-327206",
@@ -231,7 +231,7 @@
       "destination": "quarantine/lidar/wg_del_10_327206_20210227dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "c7655edbf869a5fd2ac12403f2355ce1b77b4b59367961c1ef92ea36c0314c99"
     },
     {
       "input_id": "lidar-10-327207",
@@ -240,7 +240,7 @@
       "destination": "quarantine/lidar/wg_del_10_327207_20210227dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "05dbd27c0dbf4196eb8d77568d629adb73ca4a2a864fde56c7ee7d10bbc38aa6"
     },
     {
       "input_id": "lidar-10-327208",
@@ -249,7 +249,7 @@
       "destination": "quarantine/lidar/wg_del_10_327208_20210227dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "2db56ab5e00f3202bf66f313d049d0fd0c1a26186f3793aa4c11859e2554fe36"
     },
     {
       "input_id": "lidar-10-327209",
@@ -258,7 +258,7 @@
       "destination": "quarantine/lidar/wg_del_10_327209_20210227dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "49fefe7e93a50495d741eea6e91a3987294b9001099067569de4206a1fe88b99"
     },
     {
       "input_id": "lidar-10-327210",
@@ -267,7 +267,7 @@
       "destination": "quarantine/lidar/wg_del_10_327210_20210227dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "ecf7420e04244f9f14aac64830c2391027f362944e2792f09735b2429501cf22"
     },
     {
       "input_id": "lidar-10-328205",
@@ -276,7 +276,7 @@
       "destination": "quarantine/lidar/wg_del_10_328205_20210227dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "a70ef8cf4073800f947862667a6d41f140e8ca9f4eb23abc0adac2d9bfc04b34"
     },
     {
       "input_id": "lidar-10-328206",
@@ -285,7 +285,7 @@
       "destination": "quarantine/lidar/wg_del_10_328206_20210227dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "5ff05babe421515f4a142d16b13d8aef691390e3ce420fb16423e5813224d2e5"
     },
     {
       "input_id": "lidar-10-328207",
@@ -294,7 +294,7 @@
       "destination": "quarantine/lidar/wg_del_10_328207_20210227dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "e93005558aa475c7ffe60c82b3cf101cf0fb7754eff731b8efa7f59834d1088a"
     },
     {
       "input_id": "lidar-10-328208",
@@ -303,7 +303,7 @@
       "destination": "quarantine/lidar/wg_del_10_328208_20210227dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "90b606e4785eac25d589c6f2c3201afb7d05e6a2aeab13b34af37ce72bdc0955"
     },
     {
       "input_id": "lidar-10-328209",
@@ -312,7 +312,7 @@
       "destination": "quarantine/lidar/wg_del_10_328209_20210227dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "d5fd786e4e267fb1518b71bd89c0eef3844aaea3f119fabe9a7bbfdbaab2d08e"
     },
     {
       "input_id": "lidar-10-328210",
@@ -321,7 +321,7 @@
       "destination": "quarantine/lidar/wg_del_10_328210_20210227dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "043d6a61f521bb29fefc383d405efde59d9b480bdf51e2615d668e5cef85d1bc"
     },
     {
       "input_id": "lidar-10-329206",
@@ -330,7 +330,7 @@
       "destination": "quarantine/lidar/wg_del_10_329206_20210227dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "fbf46c35db61f2fb48e98fbd8faa7443dbc6bf3ad008c5ab3d5ce8197175db12"
     },
     {
       "input_id": "lidar-10-329207",
@@ -339,7 +339,7 @@
       "destination": "quarantine/lidar/wg_del_10_329207_20210227dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "cea17bf528175f9f87ee7e3592f702701772a054ca8ef4228d743c648ab0441d"
     },
     {
       "input_id": "lidar-10-329208",
@@ -348,7 +348,7 @@
       "destination": "quarantine/lidar/wg_del_10_329208_20210227dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "edf3dfae577375b09daa8a8591280d8f74351358cd2d4523145e885047f05f13"
     },
     {
       "input_id": "lidar-10-329209",
@@ -357,7 +357,7 @@
       "destination": "quarantine/lidar/wg_del_10_329209_20210227dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "99a38a0ad568372a840f0b8179a8f3555e63c9960907c45e0962ac78e2d6e70a"
     },
     {
       "input_id": "lidar-10-329210",
@@ -366,7 +366,7 @@
       "destination": "quarantine/lidar/wg_del_10_329210_20210227dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "8c441412b3b50f0ab1e278f11d6fbc92a84cb4250db7e08974c0bbd907a15e44"
     },
     {
       "input_id": "lidar-10-330207",
@@ -375,7 +375,7 @@
       "destination": "quarantine/lidar/wg_del_10_330207_20210227dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "abf93cd34be695c76f925946f674dc3476ed88bed5f0cc273d320e8b53220c22"
     },
     {
       "input_id": "lidar-10-330208",
@@ -384,7 +384,7 @@
       "destination": "quarantine/lidar/wg_del_10_330208_20210227dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "0f759bce67930202447188e9771f8fabe1e11dbd16231476a7b1bbcd582e6582"
     },
     {
       "input_id": "lidar-10-330209",
@@ -393,7 +393,7 @@
       "destination": "quarantine/lidar/wg_del_10_330209_20210227dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "fac09a7049b3bcec8d67d66ec26a97cc786a53d71dc5a6566fa2bc1ec5b69330"
     },
     {
       "input_id": "lidar-10-330210",
@@ -402,7 +402,7 @@
       "destination": "quarantine/lidar/wg_del_10_330210_20210227dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "58fa0182e69ba1945b58e3f629bfb63cc09b5585126586eb91bc53fc34f8e53c"
     },
     {
       "input_id": "lidar-20-323211",
@@ -411,7 +411,7 @@
       "destination": "quarantine/lidar/wg_del_20_323211_20220112dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "01fc0376a4a58c0938283d74e7dcce359272f1e1871b886e1850f75d5ed006de"
     },
     {
       "input_id": "lidar-20-323212",
@@ -420,7 +420,7 @@
       "destination": "quarantine/lidar/wg_del_20_323212_20220112dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "f2aedcae1fdd7c2274287b189b0be7da9456fe281a0e0e202158752268309d4e"
     },
     {
       "input_id": "lidar-20-324211",
@@ -429,7 +429,7 @@
       "destination": "quarantine/lidar/wg_del_20_324211_20220112dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "b9833b0063aea7f5f6a6d543ce781f0d8feb246c78c074f07cb61568e424a914"
     },
     {
       "input_id": "lidar-20-324212",
@@ -438,7 +438,7 @@
       "destination": "quarantine/lidar/wg_del_20_324212_20220112dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "bde7be890e98e9f6d9ca22e161f6cd5507f8efe3eeac04eee1e1497aba3a85d5"
     },
     {
       "input_id": "lidar-20-324213",
@@ -447,7 +447,7 @@
       "destination": "quarantine/lidar/wg_del_20_324213_20220112dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "25da0203aa363be6c973a6860131500416ae5e451a048935622331ce96fb727c"
     },
     {
       "input_id": "lidar-20-324214",
@@ -456,7 +456,7 @@
       "destination": "quarantine/lidar/wg_del_20_324214_20220112dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "f76922d1008cfccced260170a6a4324c04e89b12b40b7cb3afa8386d310c7cc5"
     },
     {
       "input_id": "lidar-20-325211",
@@ -465,7 +465,7 @@
       "destination": "quarantine/lidar/wg_del_20_325211_20220112dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "86614c91b7782a0d890c9bcf4f215e5c9b8b8807dd9ac435e8b245359718d32c"
     },
     {
       "input_id": "lidar-20-325212",
@@ -474,7 +474,7 @@
       "destination": "quarantine/lidar/wg_del_20_325212_20220112dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "b20f68edab688d538c2868810bc9a94b907b34e30f09ea56b4386fcbb3bb0f54"
     },
     {
       "input_id": "lidar-20-325213",
@@ -483,7 +483,7 @@
       "destination": "quarantine/lidar/wg_del_20_325213_20220112dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "388a3c9af96d5757ed3413a194820dea618c39204e25622f83d8c8fe82fa65a1"
     },
     {
       "input_id": "lidar-20-325214",
@@ -492,7 +492,7 @@
       "destination": "quarantine/lidar/wg_del_20_325214_20220112dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "68c2d80e76b1aea99bdee4aa4a3beb8e0827fe11e7710bb44bcb829ebe6be16b"
     },
     {
       "input_id": "lidar-20-326211",
@@ -501,7 +501,7 @@
       "destination": "quarantine/lidar/wg_del_20_326211_20220112dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "c75d634d2cf2ec26be8020893d0546afe2d8a8fd00f30f59285851e89f703923"
     },
     {
       "input_id": "lidar-20-326212",
@@ -510,7 +510,7 @@
       "destination": "quarantine/lidar/wg_del_20_326212_20220112dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "94fbfc788030b60daf003007714ed699735e78be2f4cbeac16bb2b007e0c7d21"
     },
     {
       "input_id": "lidar-20-326213",
@@ -519,7 +519,7 @@
       "destination": "quarantine/lidar/wg_del_20_326213_20220112dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "4621ca74a3a32af2d7e4c2db834133e2cfcd7b1dd35a4b5b2378de9b0c3a85f4"
     },
     {
       "input_id": "lidar-20-326214",
@@ -528,7 +528,7 @@
       "destination": "quarantine/lidar/wg_del_20_326214_20220112dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "e25edfe6fc0f4f3573da00709af4e8c3c70ef6d3c1cf1a9822563a2b48a86fcd"
     },
     {
       "input_id": "lidar-20-327211",
@@ -537,7 +537,7 @@
       "destination": "quarantine/lidar/wg_del_20_327211_20220112dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "3b3326bf1f5bbc8fde96bbba9b142e39526ca18867656f25e13668583d0de6c0"
     },
     {
       "input_id": "lidar-20-327212",
@@ -546,7 +546,7 @@
       "destination": "quarantine/lidar/wg_del_20_327212_20220112dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "0700169709e20bc01834f52f4869d56298fce6981006d214528a563dba683044"
     },
     {
       "input_id": "lidar-20-327213",
@@ -555,7 +555,7 @@
       "destination": "quarantine/lidar/wg_del_20_327213_20220112dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "f5c7213b631f36895d15d1d23e6246c0a9f8253726a47621f29b0e714e7cf6ec"
     },
     {
       "input_id": "lidar-20-327214",
@@ -564,7 +564,7 @@
       "destination": "quarantine/lidar/wg_del_20_327214_20220112dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "15bce918ff3dc962e6ee6bf4dc05f8e2bf9bb48538bc5b9faeb8fc4a729c7665"
     },
     {
       "input_id": "lidar-20-328211",
@@ -573,7 +573,7 @@
       "destination": "quarantine/lidar/wg_del_20_328211_20220112dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "ce77aa7931f11c9f5e4a2c5307065032988779578e32f629c658e5b03707a49b"
     },
     {
       "input_id": "lidar-20-328212",
@@ -582,7 +582,7 @@
       "destination": "quarantine/lidar/wg_del_20_328212_20220112dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "322ad9bb62f36e37526275cd8510b7b8b3e0008ddd947b907a08de5a5d309814"
     },
     {
       "input_id": "lidar-20-328213",
@@ -591,7 +591,7 @@
       "destination": "quarantine/lidar/wg_del_20_328213_20220112dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "1a89e74001ca7e4f82e2060120244fdb3a935ad29be1eaa0d3f0afc672ac4045"
     },
     {
       "input_id": "lidar-20-328214",
@@ -600,7 +600,7 @@
       "destination": "quarantine/lidar/wg_del_20_328214_20220112dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "2ad23567915711f2a18a27a5cb8b779644696387117c2ab02bf142a9ffd42ce2"
     },
     {
       "input_id": "lidar-20-329211",
@@ -609,7 +609,7 @@
       "destination": "quarantine/lidar/wg_del_20_329211_20220112dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "48bfc5479ad77d54b105b92604b54c3759b42fef372494b6ea92a47ffbc722c3"
     },
     {
       "input_id": "lidar-20-329212",
@@ -618,7 +618,7 @@
       "destination": "quarantine/lidar/wg_del_20_329212_20220112dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "3a3470d992878e557d36ba52a17dc0b13e94004f9bd82caa43156c99c5b63869"
     },
     {
       "input_id": "lidar-20-329213",
@@ -627,7 +627,7 @@
       "destination": "quarantine/lidar/wg_del_20_329213_20220112dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "0737bf207c9121b3186ea8e64b7aa6ffdcc9a84b9fa4404690afedaa519291ea"
     },
     {
       "input_id": "lidar-20-329214",
@@ -636,7 +636,7 @@
       "destination": "quarantine/lidar/wg_del_20_329214_20220112dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "745e145abb708034ae3b4895ecea8e7e2516b5e995909c8892fff1b534b37cc0"
     },
     {
       "input_id": "lidar-20-330211",
@@ -645,7 +645,7 @@
       "destination": "quarantine/lidar/wg_del_20_330211_20220112dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "724feb1fbb33f6be4561ddcbb9393b53c0443b7855caf70b89d9fe4da2e9155c"
     },
     {
       "input_id": "lidar-20-330212",
@@ -654,7 +654,7 @@
       "destination": "quarantine/lidar/wg_del_20_330212_20220112dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "7665f6c7b8e2e78df896e961ae7362d6263b5452606eda7409bf66c522fb4ea5"
     },
     {
       "input_id": "lidar-20-330213",
@@ -663,7 +663,7 @@
       "destination": "quarantine/lidar/wg_del_20_330213_20220112dtm.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 5000000,
-      "expected_sha256": null
+      "expected_sha256": "ef0c6e3efe4ca5885fafba3e57c3543b763ce091a0c13f56d3ad6f82a9b5b6b1"
     },
     {
       "input_id": "s2-baseline-red",
@@ -672,7 +672,7 @@
       "destination": "quarantine/sentinel/s2-baseline/B04.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 260000000,
-      "expected_sha256": null
+      "expected_sha256": "12f9ce808052f014bc7f2ef7c92e01fc7f6a1884ea56c7f2bbc79d0e9e4b1aba"
     },
     {
       "input_id": "s2-baseline-nir",
@@ -681,7 +681,7 @@
       "destination": "quarantine/sentinel/s2-baseline/B08.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 260000000,
-      "expected_sha256": null
+      "expected_sha256": "6c91a2b1da08c8dc059bb6d0298cacfdae91003b8dfc8d4ab3cf14eab6265a8b"
     },
     {
       "input_id": "s2-baseline-swir1",
@@ -690,7 +690,7 @@
       "destination": "quarantine/sentinel/s2-baseline/B11.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 260000000,
-      "expected_sha256": null
+      "expected_sha256": "d1d749c26fc89926d750d7c106ec0128de599b5732234edb764a13afcf4dcd77"
     },
     {
       "input_id": "s2-baseline-swir2",
@@ -699,7 +699,7 @@
       "destination": "quarantine/sentinel/s2-baseline/B12.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 260000000,
-      "expected_sha256": null
+      "expected_sha256": "857318b2b342321179255415cb6246a418b8cd2e8b876e9414f8458600c8e88d"
     },
     {
       "input_id": "s2-baseline-scl",
@@ -708,7 +708,7 @@
       "destination": "quarantine/sentinel/s2-baseline/SCL.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 260000000,
-      "expected_sha256": null
+      "expected_sha256": "16c7af1b9f23404843e27b41340ec5c1f8a2e8a692d379cacb31a57181c50160"
     },
     {
       "input_id": "s2-prefire-red",
@@ -717,7 +717,7 @@
       "destination": "quarantine/sentinel/s2-prefire/B04.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 260000000,
-      "expected_sha256": null
+      "expected_sha256": "8a6f1cc800eb41fb97857311bea79b3ce2981b32c4be1a374275c11763ccfedb"
     },
     {
       "input_id": "s2-prefire-nir",
@@ -726,7 +726,7 @@
       "destination": "quarantine/sentinel/s2-prefire/B08.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 260000000,
-      "expected_sha256": null
+      "expected_sha256": "ede4f363fa57e22fee6f01589ae96badd27332be2a4b1af51f20753a01aff5ba"
     },
     {
       "input_id": "s2-prefire-swir1",
@@ -735,7 +735,7 @@
       "destination": "quarantine/sentinel/s2-prefire/B11.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 260000000,
-      "expected_sha256": null
+      "expected_sha256": "c31dd8b86553a82fe124805d8bba6b47572e1a34e58578dbda213b791f6cf78f"
     },
     {
       "input_id": "s2-prefire-swir2",
@@ -744,7 +744,7 @@
       "destination": "quarantine/sentinel/s2-prefire/B12.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 260000000,
-      "expected_sha256": null
+      "expected_sha256": "5a90a501e58caa2164874c1c1f0dc009f98828d19431a43c568650cbdf976685"
     },
     {
       "input_id": "s2-prefire-scl",
@@ -753,7 +753,7 @@
       "destination": "quarantine/sentinel/s2-prefire/SCL.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 260000000,
-      "expected_sha256": null
+      "expected_sha256": "4f1e3fc0950f76a3c428f0bf2dfcb0a13f307fd53108a815b3a7be9b83a357e7"
     },
     {
       "input_id": "s2-post-red",
@@ -762,7 +762,7 @@
       "destination": "quarantine/sentinel/s2-post/B04.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 260000000,
-      "expected_sha256": null
+      "expected_sha256": "9be588fc6a4d9cb91782224d35ba5514ef7258e2c01e672969ef9bfbbc4fb90e"
     },
     {
       "input_id": "s2-post-nir",
@@ -771,7 +771,7 @@
       "destination": "quarantine/sentinel/s2-post/B08.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 260000000,
-      "expected_sha256": null
+      "expected_sha256": "ffbd44a350782bbd30e3a9eff1a18832873ca6b328e8b818f9faeb3c247e5916"
     },
     {
       "input_id": "s2-post-swir1",
@@ -780,7 +780,7 @@
       "destination": "quarantine/sentinel/s2-post/B11.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 260000000,
-      "expected_sha256": null
+      "expected_sha256": "2dec43eee86f00ef9603588745641bfd4c65d1908ce87e7eb07484c4e994899b"
     },
     {
       "input_id": "s2-post-swir2",
@@ -789,7 +789,7 @@
       "destination": "quarantine/sentinel/s2-post/B12.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 260000000,
-      "expected_sha256": null
+      "expected_sha256": "9600f116bab6abe0491808a73428c91fa5328582ea856774cc0b1fb5f8961f9d"
     },
     {
       "input_id": "s2-post-scl",
@@ -798,7 +798,7 @@
       "destination": "quarantine/sentinel/s2-post/SCL.tif",
       "media_type": "image/tiff",
       "maximum_bytes": 260000000,
-      "expected_sha256": null
+      "expected_sha256": "6b0e087dde7182d38cde38eef10da49a20223ee080b952a07a6e3d1be856b640"
     },
     {
       "input_id": "landsat-baseline-red",
@@ -807,7 +807,7 @@
       "destination": "quarantine/landsat/landsat-baseline/LC09_L2SP_203024_20250708_20250710_02_T1_SR_B4.TIF",
       "media_type": "image/tiff",
       "maximum_bytes": 250000000,
-      "expected_sha256": null
+      "expected_sha256": "bc1937375259ebbd1fb9f4e340e7c59880d60785a3147612e22724f170b6b5ba"
     },
     {
       "input_id": "landsat-baseline-nir",
@@ -816,7 +816,7 @@
       "destination": "quarantine/landsat/landsat-baseline/LC09_L2SP_203024_20250708_20250710_02_T1_SR_B5.TIF",
       "media_type": "image/tiff",
       "maximum_bytes": 250000000,
-      "expected_sha256": null
+      "expected_sha256": "1e62baff3559a783b8c675907d278aa512db01b00c255dbf83911515bc7a4b1b"
     },
     {
       "input_id": "landsat-baseline-swir1",
@@ -825,7 +825,7 @@
       "destination": "quarantine/landsat/landsat-baseline/LC09_L2SP_203024_20250708_20250710_02_T1_SR_B6.TIF",
       "media_type": "image/tiff",
       "maximum_bytes": 250000000,
-      "expected_sha256": null
+      "expected_sha256": "e2f12c63528a673f3d0e49fc3bccded7839bd99d2aad3049fc5e0c4df1572d09"
     },
     {
       "input_id": "landsat-baseline-swir2",
@@ -834,7 +834,7 @@
       "destination": "quarantine/landsat/landsat-baseline/LC09_L2SP_203024_20250708_20250710_02_T1_SR_B7.TIF",
       "media_type": "image/tiff",
       "maximum_bytes": 250000000,
-      "expected_sha256": null
+      "expected_sha256": "d2c73427f17dcb493ac0254cf32e4f93baa9b0391eb83e85f688a4b6f67b4d6d"
     },
     {
       "input_id": "landsat-baseline-qa",
@@ -843,7 +843,7 @@
       "destination": "quarantine/landsat/landsat-baseline/LC09_L2SP_203024_20250708_20250710_02_T1_QA_PIXEL.TIF",
       "media_type": "image/tiff",
       "maximum_bytes": 250000000,
-      "expected_sha256": null
+      "expected_sha256": "4decd322e20a99cf07a4dfec87469b89f55b2df572a9a7c5942551dbba8859fa"
     },
     {
       "input_id": "landsat-post-red",
@@ -852,7 +852,7 @@
       "destination": "quarantine/landsat/landsat-post/LC09_L2SP_203024_20260727_20260728_02_T1_SR_B4.TIF",
       "media_type": "image/tiff",
       "maximum_bytes": 250000000,
-      "expected_sha256": null
+      "expected_sha256": "15f3ce948f860f3327b5a712d1c57eb84f10871166271ff3c1ebb0f4745d5d55"
     },
     {
       "input_id": "landsat-post-nir",
@@ -861,7 +861,7 @@
       "destination": "quarantine/landsat/landsat-post/LC09_L2SP_203024_20260727_20260728_02_T1_SR_B5.TIF",
       "media_type": "image/tiff",
       "maximum_bytes": 250000000,
-      "expected_sha256": null
+      "expected_sha256": "def5d2ede0cce26d39fa8e05a1f3233748ee2bc19289d8c65550c5388e15de00"
     },
     {
       "input_id": "landsat-post-swir1",
@@ -870,7 +870,7 @@
       "destination": "quarantine/landsat/landsat-post/LC09_L2SP_203024_20260727_20260728_02_T1_SR_B6.TIF",
       "media_type": "image/tiff",
       "maximum_bytes": 250000000,
-      "expected_sha256": null
+      "expected_sha256": "142af0c8f89b2b6bc1d7ca682bf74d5da48fc4444505154894cc8bc146ba46d0"
     },
     {
       "input_id": "landsat-post-swir2",
@@ -879,7 +879,7 @@
       "destination": "quarantine/landsat/landsat-post/LC09_L2SP_203024_20260727_20260728_02_T1_SR_B7.TIF",
       "media_type": "image/tiff",
       "maximum_bytes": 250000000,
-      "expected_sha256": null
+      "expected_sha256": "af102cd405137d226a634bbc25376553a5770318b3a96726012665971c251a70"
     },
     {
       "input_id": "landsat-post-qa",
@@ -888,7 +888,7 @@
       "destination": "quarantine/landsat/landsat-post/LC09_L2SP_203024_20260727_20260728_02_T1_QA_PIXEL.TIF",
       "media_type": "image/tiff",
       "maximum_bytes": 250000000,
-      "expected_sha256": null
+      "expected_sha256": "6b820dbb30143c02b544686fc90e3cbb78d53dc89ad7f8cc26fa28b5b0a99c0a"
     },
     {
       "input_id": "effis-bounded",
@@ -897,7 +897,7 @@
       "destination": "quarantine/effis/blorenge.geojson",
       "media_type": "application/geo+json",
       "maximum_bytes": 1000000,
-      "expected_sha256": null
+      "expected_sha256": "651b441769bd485c5f45e48fefb777084c08b059be4eee61c9ecf122e03c3e6a"
     }
   ],
   "intermediates": [
@@ -1494,7 +1494,7 @@
         "nrw-main-rivers",
         "nrw-phase1-vegetation-voronoi"
       ],
-      "evidence_version": "2026-08-13.2",
+      "evidence_version": "2026-08-13.3",
       "title": "Blorenge launch landscape context",
       "provider": "Natural Resources Wales, OpenStreetMap contributors and Geofabrik",
       "licence": "OGL 3.0 and ODbL 1.0 by source",
@@ -1517,7 +1517,7 @@
       "source_dataset_ids": [
         "wg-lidar-dtm-2020-2023"
       ],
-      "evidence_version": "2026-08-13.2",
+      "evidence_version": "2026-08-13.3",
       "title": "Blorenge launch terrain context",
       "provider": "Welsh Government",
       "licence": "Open Government Licence 3.0",
@@ -1541,7 +1541,7 @@
         "usgs-landsat-c2-l2-sr",
         "effis-current-burnt-areas"
       ],
-      "evidence_version": "2026-08-13.2",
+      "evidence_version": "2026-08-13.3",
       "title": "July 2026 Blaenavon wildfire and observed change",
       "provider": "European Union Copernicus programme, USGS and EFFIS; BCA processing",
       "licence": "Copernicus Sentinel data legal notice, USGS public domain and CC BY 4.0",
