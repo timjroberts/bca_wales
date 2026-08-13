@@ -77,8 +77,8 @@ environment and the workflow concurrency group prevents two pointer changes at
 once.
 
 ```bash
-npm run geodata -- stage --release-root PRIVATE_ARCHIVE/RELEASE_ID --bucket bca-wales-evidence-production --identity timjroberts
-npm run geodata -- publish --release-root PRIVATE_ARCHIVE/RELEASE_ID --bucket bca-wales-evidence-production --identity timjroberts --mode manual
+npm run geodata -- stage --release-root PRIVATE_ARCHIVE/RELEASE_ID --bucket bca-wales-public-releases --identity timjroberts
+npm run geodata -- publish --release-root PRIVATE_ARCHIVE/RELEASE_ID --bucket bca-wales-public-releases --identity timjroberts --mode manual
 ```
 
 `stage` uploads only versioned keys, refuses a different object already present
