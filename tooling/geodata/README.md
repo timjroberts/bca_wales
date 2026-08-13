@@ -35,3 +35,8 @@ reproducibility archive but are omitted from the public release manifest.
 Run `npm run geodata -- --help` for the command surface. The complete release
 procedure and recovery rules are in
 `docs/runbooks/evidence-publication.md`.
+
+When a recipe or transformation is corrected without changing provider inputs,
+`reuse-acquisition` creates a new release workspace only after re-hashing every
+retained byte against the new recipe. Original retrieval metadata is preserved;
+the new manifest records the retained-input operation explicitly.

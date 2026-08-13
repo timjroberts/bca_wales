@@ -202,6 +202,8 @@ def main():
     effis_geometry, effis_srs, effis_properties = load_effis(args.effis)
     wgs84 = osr.SpatialReference()
     wgs84.ImportFromEPSG(4326)
+    wgs84.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
+    effis_srs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
     if not effis_srs.IsSame(wgs84):
         effis_geometry.Transform(osr.CoordinateTransformation(effis_srs, wgs84))
     effis_feature = {

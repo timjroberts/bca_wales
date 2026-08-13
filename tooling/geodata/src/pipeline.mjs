@@ -378,6 +378,122 @@ export async function acquireRelease({
   return { releaseRoot, manifest };
 }
 
+export async function reuseAcquisition({
+  archiveRoot,
+  registryPath,
+  recipePath,
+  workspaceRoot,
+  codeCommit,
+  clock
+}) {
+  const [{ registry, recipe }, archived] = await Promise.all([
+    loadContracts({ registryPath, recipePath }),
+    readJson(path.join(archiveRoot, "manifests/acquisition.json"))
+  ]);
+  await validateDocument("acquisition", archived, "retained acquisition manifest");
+  if (!/^[0-9a-f]{40}$/.test(codeCommit)) throw new Error("codeCommit must be a full 40-character commit");
+  if (archived.registry_id !== registry.registry_id) {
+    throw new Error(`Retained inputs use registry ${archived.registry_id}, not ${registry.registry_id}`);
+  }
+
+  await mkdir(workspaceRoot, { recursive: true });
+  const releaseRoot = path.join(workspaceRoot, recipe.release_id);
+  await mkdir(releaseRoot);
+  for (const directory of ["quarantine", "outputs", "private", "reports", "manifests", "snapshots"]) {
+    await mkdir(path.join(releaseRoot, directory));
+  }
+
+  const registrySnapshot = path.join(releaseRoot, "snapshots/source-registry.json");
+  const recipeSnapshot = path.join(releaseRoot, "snapshots/publication-recipe.json");
+  await Promise.all([
+    writeCanonical(registrySnapshot, registry, { exclusive: true }),
+    writeCanonical(recipeSnapshot, recipe, { exclusive: true })
+  ]);
+
+  const sources = new Map(registry.sources.map((source) => [source.dataset_id, source]));
+  const archivedInputs = new Map(archived.inputs.map((input) => [input.input_id, input]));
+  const inputs = [];
+  const qaEvents = [];
+  for (const input of recipe.inputs) {
+    const retained = archivedInputs.get(input.input_id);
+    if (!retained) throw new Error(`${input.input_id}: retained input is absent`);
+    if (retained.dataset_id !== input.dataset_id || retained.media_type !== input.media_type) {
+      throw new Error(`${input.input_id}: retained input contract changed`);
+    }
+    if (!input.expected_sha256 || input.expected_sha256 !== retained.sha256) {
+      throw new Error(`${input.input_id}: retained bytes do not match the reviewed recipe checksum`);
+    }
+    const sourceFile = resolveInside(archiveRoot, retained.path);
+    const sourceDetails = await stat(sourceFile);
+    if (!sourceDetails.isFile() || sourceDetails.size !== retained.byte_length || sourceDetails.size > input.maximum_bytes) {
+      throw new Error(`${input.input_id}: retained input size is invalid`);
+    }
+    if (await sha256File(sourceFile) !== retained.sha256) {
+      throw new Error(`${input.input_id}: retained input checksum no longer matches its archive`);
+    }
+    const destination = resolveInside(releaseRoot, input.destination);
+    await mkdir(path.dirname(destination), { recursive: true });
+    await copyFile(sourceFile, destination);
+    qaEvents.push(...await validateAcquiredSource(
+      sources.get(input.dataset_id), input, destination, retained.response
+    ));
+    inputs.push({
+      ...retained,
+      path: path.relative(releaseRoot, destination).split(path.sep).join("/"),
+      expected_sha256: input.expected_sha256,
+      checksum_status: "matched"
+    });
+  }
+
+  const usedSourceIds = new Set(recipe.datasets.flatMap((dataset) => dataset.source_dataset_ids));
+  const licenceSnapshots = [];
+  for (const datasetId of usedSourceIds) {
+    const terms = sources.get(datasetId).contract.licence_terms;
+    if (!terms.snapshot_path || !terms.sha256) {
+      throw new Error(`${datasetId}: reviewed licence terms snapshot and checksum are required`);
+    }
+    const sourceFile = resolveInside(path.dirname(registryPath), terms.snapshot_path);
+    const extension = path.extname(sourceFile) || ".txt";
+    const destination = path.join(releaseRoot, "snapshots/licences", `${datasetId}${extension}`);
+    await mkdir(path.dirname(destination), { recursive: true });
+    await copyFile(sourceFile, destination);
+    const details = await stat(destination);
+    const actualSha = await sha256File(destination);
+    if (actualSha !== terms.sha256) throw new Error(`${datasetId}: reviewed licence terms snapshot checksum changed`);
+    licenceSnapshots.push({
+      dataset_id: datasetId,
+      source_path: terms.snapshot_path,
+      path: path.relative(releaseRoot, destination).split(path.sep).join("/"),
+      byte_length: details.size,
+      sha256: actualSha,
+      checksum_status: "matched"
+    });
+  }
+
+  qaEvents.push({
+    severity: "information",
+    code: "RETAINED_INPUTS_REUSED",
+    message: `${inputs.length} exact, checksum-verified provider inputs were retained from ${archived.release_id}; original retrieval metadata is preserved.`
+  });
+  const manifest = {
+    schema_version: "1.0.0",
+    manifest_id: `acquisition-${recipe.release_id}`,
+    release_id: recipe.release_id,
+    registry_id: registry.registry_id,
+    registry_sha256: await sha256File(registrySnapshot),
+    recipe_sha256: await sha256File(recipeSnapshot),
+    code_commit: codeCommit,
+    created_at: isoNow(clock),
+    checksum_algorithm: "sha256",
+    inputs,
+    licence_snapshots: licenceSnapshots,
+    qa_events: qaEvents
+  };
+  await validateDocument("acquisition", manifest, "generated retained acquisition manifest");
+  await writeCanonical(path.join(releaseRoot, "manifests/acquisition.json"), manifest, { exclusive: true });
+  return { releaseRoot, manifest };
+}
+
 function runProcess(command, argv, options = {}) {
   return new Promise((resolve, reject) => {
     const child = spawn(command, argv, {

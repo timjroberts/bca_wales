@@ -9,6 +9,7 @@ import {
   buildRelease,
   loadContracts,
   reproduceRelease,
+  reuseAcquisition,
   verifyArchive
 } from "../src/pipeline.mjs";
 import { publishRelease, withdrawRelease, WranglerR2Store } from "../src/r2.mjs";
@@ -21,6 +22,7 @@ const help = `BCA immutable geodata publication toolchain
 Usage:
   bca-geodata validate --registry FILE --recipe FILE
   bca-geodata acquire --registry FILE --recipe FILE --workspace DIR [--commit SHA] [--allow-network]
+  bca-geodata reuse-acquisition --archive DIR --registry FILE --recipe FILE --workspace DIR [--commit SHA]
   bca-geodata build --release-root DIR
   bca-geodata reproduce --archive DIR --workspace DIR
   bca-geodata verify-archive --release-root DIR
@@ -91,6 +93,15 @@ async function main() {
       workspaceRoot: absolute(required(options, "workspace")),
       codeCommit: options.commit ?? await gitCommit(),
       allowNetwork: options["allow-network"] === true
+    });
+    result = { release_root: result.releaseRoot, inputs: result.manifest.inputs.length };
+  } else if (command === "reuse-acquisition") {
+    result = await reuseAcquisition({
+      archiveRoot: absolute(required(options, "archive")),
+      registryPath: absolute(required(options, "registry")),
+      recipePath: absolute(required(options, "recipe")),
+      workspaceRoot: absolute(required(options, "workspace")),
+      codeCommit: options.commit ?? await gitCommit()
     });
     result = { release_root: result.releaseRoot, inputs: result.manifest.inputs.length };
   } else if (command === "build") {

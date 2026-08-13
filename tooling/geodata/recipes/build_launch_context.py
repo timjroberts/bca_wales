@@ -2,6 +2,7 @@
 
 import argparse
 import json
+import re
 from collections import Counter
 from osgeo import ogr, osr
 
@@ -18,9 +19,28 @@ def clean(value):
     return value.strip() if isinstance(value, str) else value
 
 
+def traditional_gis(srs):
+    result = srs.Clone()
+    result.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
+    return result
+
+
+def osm_tags(feature):
+    """Parse GDAL's OSM `other_tags` hstore without exposing unreviewed keys."""
+    raw = field(feature, "other_tags") or ""
+    pairs = re.findall(r'"((?:[^"\\]|\\.)*)"=>"((?:[^"\\]|\\.)*)"', raw)
+
+    def unescape(value):
+        return re.sub(r"\\(.)", r"\1", value)
+
+    return {unescape(key): unescape(value) for key, value in pairs}
+
+
 def transform_geometry(geometry, source_srs, target_srs):
     result = geometry.Clone()
-    result.Transform(osr.CoordinateTransformation(source_srs, target_srs))
+    result.Transform(osr.CoordinateTransformation(
+        traditional_gis(source_srs), traditional_gis(target_srs)
+    ))
     return result
 
 
@@ -30,6 +50,15 @@ def feature_json(geometry, properties):
         "properties": {key: clean(value) for key, value in properties.items() if value not in (None, "")},
         "geometry": json.loads(geometry.ExportToJson()),
     }
+
+
+def intersection(geometry, clip):
+    try:
+        left = geometry if geometry.IsValid() else geometry.MakeValid()
+        right = clip if clip.IsValid() else clip.MakeValid()
+        return left.Intersection(right)
+    except RuntimeError:
+        return None
 
 
 def first_geometry(path):
@@ -50,9 +79,9 @@ def clipped_features(path, aoi, aoi_srs, target_srs, layer_id, source, allowlist
         if selector and not selector(item):
             continue
         geometry = item.GetGeometryRef()
-        if geometry is None or not geometry.Intersects(clip):
+        if geometry is None:
             continue
-        clipped = geometry.Intersection(clip)
+        clipped = intersection(geometry, clip)
         if clipped is None or clipped.IsEmpty():
             continue
         properties = {name: field(item, name) for name in allowlist}
@@ -71,18 +100,20 @@ def osm_features(path, aoi, aoi_srs, target_srs):
     if points:
         points.SetSpatialFilter(spatial_filter)
         for item in points:
+            tags = osm_tags(item)
             place = clean(field(item, "place"))
             name = clean(field(item, "name"))
             if not place or not name:
                 continue
             geometry = item.GetGeometryRef()
-            if geometry and geometry.Intersects(spatial_filter):
+            clipped = intersection(geometry, spatial_filter) if geometry else None
+            if clipped is not None and not clipped.IsEmpty():
                 results.append(feature_json(geometry, {
                     "layer_id": "place-names",
                     "source": "OpenStreetMap",
                     "source_id": field(item, "osm_id"),
                     "name": name,
-                    "name_cy": field(item, "name:cy"),
+                    "name_cy": tags.get("name:cy"),
                     "place": place,
                 }))
 
@@ -90,25 +121,28 @@ def osm_features(path, aoi, aoi_srs, target_srs):
     if lines:
         lines.SetSpatialFilter(spatial_filter)
         for item in lines:
+            tags = osm_tags(item)
             highway = clean(field(item, "highway"))
             if not highway:
                 continue
             geometry = item.GetGeometryRef()
-            if geometry is None or not geometry.Intersects(spatial_filter):
+            if geometry is None:
                 continue
-            clipped = geometry.Intersection(spatial_filter)
+            clipped = intersection(geometry, spatial_filter)
+            if clipped is None or clipped.IsEmpty():
+                continue
             path_types[highway] += 1
             results.append(feature_json(clipped, {
                 "layer_id": "contextual-paths",
                 "source": "OpenStreetMap",
                 "source_id": field(item, "osm_id"),
                 "name": field(item, "name"),
-                "name_cy": field(item, "name:cy"),
+                "name_cy": tags.get("name:cy"),
                 "highway": highway,
-                "access": field(item, "access"),
-                "foot": field(item, "foot"),
-                "surface": field(item, "surface"),
-                "tracktype": field(item, "tracktype"),
+                "access": tags.get("access"),
+                "foot": tags.get("foot"),
+                "surface": tags.get("surface"),
+                "tracktype": tags.get("tracktype"),
                 "limitation": "Context only; not the definitive legal public-rights-of-way record.",
             }))
 
@@ -116,20 +150,23 @@ def osm_features(path, aoi, aoi_srs, target_srs):
     if multipolygons:
         multipolygons.SetSpatialFilter(spatial_filter)
         for item in multipolygons:
+            tags = osm_tags(item)
             natural = clean(field(item, "natural"))
             landuse = clean(field(item, "landuse"))
             if not natural and not landuse:
                 continue
             geometry = item.GetGeometryRef()
-            if geometry is None or not geometry.Intersects(spatial_filter):
+            if geometry is None:
                 continue
-            clipped = geometry.Intersection(spatial_filter)
+            clipped = intersection(geometry, spatial_filter)
+            if clipped is None or clipped.IsEmpty():
+                continue
             results.append(feature_json(clipped, {
                 "layer_id": "basemap-land",
                 "source": "OpenStreetMap",
                 "source_id": field(item, "osm_id"),
                 "name": field(item, "name"),
-                "name_cy": field(item, "name:cy"),
+                "name_cy": tags.get("name:cy"),
                 "natural": natural,
                 "landuse": landuse,
             }))
@@ -151,6 +188,7 @@ def main():
     aoi = sssi_geometry.Buffer(2000)
     target_srs = osr.SpatialReference()
     target_srs.ImportFromEPSG(4326)
+    target_srs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
 
     features = []
     features.extend(clipped_features(
@@ -177,10 +215,27 @@ def main():
     osm, path_types = osm_features(args.osm, aoi, source_srs, target_srs)
     features.extend(osm)
 
+    counts = Counter(item["properties"]["layer_id"] for item in features)
+    required_counts = {
+        "blorenge-sssi": 1,
+        "bannau-brycheiniog-national-park": 1,
+        "principal-watercourses": 1,
+        "historical-phase1-habitat": 1,
+        "place-names": 1,
+        "contextual-paths": 1,
+        "basemap-land": 1,
+    }
+    missing = [
+        f"{layer_id} (expected at least {minimum}, found {counts[layer_id]})"
+        for layer_id, minimum in required_counts.items()
+        if counts[layer_id] < minimum
+    ]
+    if missing:
+        raise RuntimeError("Required factual context is absent: " + "; ".join(missing))
+
     with open(args.geojson, "x", encoding="utf-8") as handle:
         json.dump({"type": "FeatureCollection", "features": features}, handle, separators=(",", ":"))
 
-    counts = Counter(item["properties"]["layer_id"] for item in features)
     habitat_codes = Counter(item["properties"].get("phase1_code", "unknown") for item in habitat)
     summary = {
         "area_of_interest": "Blorenge SSSI NRW_SSSI.13108 buffered by exactly 2000 metres in EPSG:27700",

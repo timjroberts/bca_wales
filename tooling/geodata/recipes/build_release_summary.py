@@ -21,8 +21,8 @@ def main():
     terrain = load(args.terrain)
     fire = load(args.fire)
     release = {
-        "release_id": "release-blorenge-2026-08-13.3",
-        "dataset_version": "2026-08-13.3",
+        "release_id": "release-blorenge-2026-08-13.4",
+        "dataset_version": "2026-08-13.4",
         "status": "immutable_candidate_not_current",
         "area_of_interest": context["area_of_interest"],
         "visitor_questions": [

@@ -11,6 +11,7 @@ import {
   loadContracts,
   reproduceRelease,
   resolveAcquisitionTarget,
+  reuseAcquisition,
   verifyArchive
 } from "../tooling/geodata/src/pipeline.mjs";
 import { publishRelease, withdrawRelease } from "../tooling/geodata/src/r2.mjs";
@@ -296,6 +297,35 @@ test("acquisition, build, archive verification and reproduction preserve exact l
     reproduced.outputs.map((output) => output.sha256),
     built.lineage.outputs.map((output) => output.sha256)
   );
+});
+
+test("reviewed retained inputs can seed a superseding recipe without a second network acquisition", async (context) => {
+  const root = await mkdtemp(path.join(tmpdir(), "bca-retained-input-test-"));
+  context.after(() => rm(root, { recursive: true }));
+  const contracts = await fixture(root);
+  const acquired = await acquireRelease({
+    ...contracts,
+    workspaceRoot: path.join(root, "work"),
+    codeCommit: commit,
+    clock
+  });
+  const recipe = await readJson(contracts.recipePath);
+  recipe.release_id = "release-test-002";
+  recipe.dataset_version = "2026-08-13.2";
+  recipe.inputs[0].expected_sha256 = acquired.manifest.inputs[0].sha256;
+  await writeFile(contracts.recipePath, JSON.stringify(recipe));
+
+  const reused = await reuseAcquisition({
+    archiveRoot: acquired.releaseRoot,
+    ...contracts,
+    workspaceRoot: path.join(root, "retained"),
+    codeCommit: commit,
+    clock
+  });
+  assert.equal(reused.manifest.release_id, "release-test-002");
+  assert.equal(reused.manifest.inputs[0].retrieved_at, acquired.manifest.inputs[0].retrieved_at);
+  assert.equal(reused.manifest.inputs[0].checksum_status, "matched");
+  assert.equal(reused.manifest.qa_events.at(-1).code, "RETAINED_INPUTS_REUSED");
 });
 
 test("PMTiles v3 and COG output checks use package-aware verification", async (context) => {

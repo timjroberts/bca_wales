@@ -70,6 +70,8 @@ def main():
     source_srs.ImportFromWkt(dtm.GetProjection())
     target_srs = osr.SpatialReference()
     target_srs.ImportFromEPSG(4326)
+    source_srs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
+    target_srs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
     transform = osr.CoordinateTransformation(source_srs, target_srs)
     memory = ogr.GetDriverByName("Memory").CreateDataSource("")
     layer = memory.CreateLayer("contours", source_srs, geom_type=ogr.wkbLineString)

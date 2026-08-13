@@ -2,8 +2,8 @@
   "schema_version": "1.0.0",
   "recipe_id": "blorenge-factual-launch",
   "recipe_version": "1.0.0",
-  "release_id": "release-blorenge-2026-08-13.3",
-  "dataset_version": "2026-08-13.3",
+  "release_id": "release-blorenge-2026-08-13.4",
+  "dataset_version": "2026-08-13.4",
   "registry_id": "blorenge-launch",
   "public_asset_origin": "https://evidence.bca.wales",
   "supersedes": null,
@@ -15,7 +15,7 @@
       "destination": "quarantine/nrw/sssi.geojson",
       "media_type": "application/geo+json",
       "maximum_bytes": 200000,
-      "expected_sha256": "cfd7bd26fe071afb7937daa80ec20a8aec453b46ccdf87e9db015e179bba3da3"
+      "expected_sha256": "5f5651b1cdb747bee3bb60d077391ba3d065854f27f0ab4f11786b48849df8b9"
     },
     {
       "input_id": "nrw-national-park",
@@ -24,7 +24,7 @@
       "destination": "quarantine/nrw/national-park.geojson",
       "media_type": "application/geo+json",
       "maximum_bytes": 3000000,
-      "expected_sha256": "40508bcc298fcdd3fbb56ada073f1591aac68303e15ce16bebbbd4af2902f176"
+      "expected_sha256": "c577a9ed538e89f1df2ec1334ac1ca98d3163296c3dbb474570fbac02346fe11"
     },
     {
       "input_id": "nrw-main-rivers",
@@ -33,7 +33,7 @@
       "destination": "quarantine/nrw/main-rivers.geojson",
       "media_type": "application/geo+json",
       "maximum_bytes": 2000000,
-      "expected_sha256": "8b5e012f9238f3d3bcf1e8e38f567b33c365349a25aaee713f7b503c6b2964cd"
+      "expected_sha256": "749c79d7338b8c08184169913559b766e1eb5cb0f0a9db10909c2b9ce0b1d0e6"
     },
     {
       "input_id": "nrw-phase1-habitat",
@@ -42,7 +42,7 @@
       "destination": "quarantine/nrw/phase1-habitat.geojson",
       "media_type": "application/geo+json",
       "maximum_bytes": 12000000,
-      "expected_sha256": "87417d3c96a9209d091342f5483c30984cfbf4254c70d0838467903e6cfa4b5b"
+      "expected_sha256": "90fe50fbbc941e865c8485d94cb3c95aabeaf8f7abe1c30af8749b408bfbbcc3"
     },
     {
       "input_id": "osm-wales",
@@ -1494,7 +1494,7 @@
         "nrw-main-rivers",
         "nrw-phase1-vegetation-voronoi"
       ],
-      "evidence_version": "2026-08-13.3",
+      "evidence_version": "2026-08-13.4",
       "title": "Blorenge launch landscape context",
       "provider": "Natural Resources Wales, OpenStreetMap contributors and Geofabrik",
       "licence": "OGL 3.0 and ODbL 1.0 by source",
@@ -1517,7 +1517,7 @@
       "source_dataset_ids": [
         "wg-lidar-dtm-2020-2023"
       ],
-      "evidence_version": "2026-08-13.3",
+      "evidence_version": "2026-08-13.4",
       "title": "Blorenge launch terrain context",
       "provider": "Welsh Government",
       "licence": "Open Government Licence 3.0",
@@ -1541,7 +1541,7 @@
         "usgs-landsat-c2-l2-sr",
         "effis-current-burnt-areas"
       ],
-      "evidence_version": "2026-08-13.3",
+      "evidence_version": "2026-08-13.4",
       "title": "July 2026 Blaenavon wildfire and observed change",
       "provider": "European Union Copernicus programme, USGS and EFFIS; BCA processing",
       "licence": "Copernicus Sentinel data legal notice, USGS public domain and CC BY 4.0",
