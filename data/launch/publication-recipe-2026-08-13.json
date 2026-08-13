@@ -2,10 +2,10 @@
   "schema_version": "1.0.0",
   "recipe_id": "blorenge-factual-launch",
   "recipe_version": "1.0.0",
-  "release_id": "release-blorenge-2026-08-13.5",
-  "dataset_version": "2026-08-13.5",
+  "release_id": "release-blorenge-2026-08-13.6",
+  "dataset_version": "2026-08-13.6",
   "registry_id": "blorenge-launch",
-  "public_asset_origin": "https://evidence.bca.wales",
+  "public_asset_origin": "https://assets.bca.wales",
   "supersedes": null,
   "inputs": [
     {
@@ -1494,7 +1494,7 @@
         "nrw-main-rivers",
         "nrw-phase1-vegetation-voronoi"
       ],
-      "evidence_version": "2026-08-13.5",
+      "evidence_version": "2026-08-13.6",
       "title": "Blorenge launch landscape context",
       "provider": "Natural Resources Wales, OpenStreetMap contributors and Geofabrik",
       "licence": "OGL 3.0 and ODbL 1.0 by source",
@@ -1517,7 +1517,7 @@
       "source_dataset_ids": [
         "wg-lidar-dtm-2020-2023"
       ],
-      "evidence_version": "2026-08-13.5",
+      "evidence_version": "2026-08-13.6",
       "title": "Blorenge launch terrain context",
       "provider": "Welsh Government",
       "licence": "Open Government Licence 3.0",
@@ -1541,7 +1541,7 @@
         "usgs-landsat-c2-l2-sr",
         "effis-current-burnt-areas"
       ],
-      "evidence_version": "2026-08-13.5",
+      "evidence_version": "2026-08-13.6",
       "title": "July 2026 Blaenavon wildfire and observed change",
       "provider": "European Union Copernicus programme, USGS and EFFIS; BCA processing",
       "licence": "Copernicus Sentinel data legal notice, USGS public domain and CC BY 4.0",
