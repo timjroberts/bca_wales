@@ -14,7 +14,7 @@ import {
   reuseAcquisition,
   verifyArchive
 } from "../tooling/geodata/src/pipeline.mjs";
-import { publishRelease, stageRelease, withdrawRelease, WranglerR2Store } from "../tooling/geodata/src/r2.mjs";
+import { isMissingObjectError, publishRelease, stageRelease, withdrawRelease, WranglerR2Store } from "../tooling/geodata/src/r2.mjs";
 import { readJson } from "../tooling/geodata/src/runtime.mjs";
 
 const repositoryRoot = path.resolve(new URL("../", import.meta.url).pathname);
@@ -28,6 +28,11 @@ test("Wrangler R2 stores accept only explicit supported jurisdictions", () => {
     () => new WranglerR2Store({ bucket: "test", jurisdiction: "unknown" }),
     /Unsupported R2 jurisdiction/
   );
+});
+
+test("Wrangler's jurisdictional missing-key response is treated as an absent optional object", () => {
+  assert.equal(isMissingObjectError(new Error("The specified key does not exist.")), true);
+  assert.equal(isMissingObjectError(new Error("Access denied")), false);
 });
 
 test("Planetary Computer acquisition signs only the reviewed Landsat mirror and records no SAS query", async () => {

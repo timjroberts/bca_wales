@@ -12,6 +12,10 @@ import {
   writeCanonical
 } from "./runtime.mjs";
 
+export function isMissingObjectError(error) {
+  return /404|not found|NoSuchKey|specified key does not exist/i.test(error.message);
+}
+
 function runWrangler(argv, env = process.env) {
   return new Promise((resolve, reject) => {
     const child = spawn("npx", ["--no-install", "wrangler", ...argv], {
@@ -79,7 +83,7 @@ export class WranglerR2Store {
       await this.getFile(key, destination);
       return true;
     } catch (error) {
-      if (/404|not found|NoSuchKey/i.test(error.message)) return false;
+      if (isMissingObjectError(error)) return false;
       throw error;
     }
   }
