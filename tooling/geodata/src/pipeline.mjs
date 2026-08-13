@@ -134,6 +134,25 @@ async function streamHttp(url, destination, maximumBytes, fetchImpl) {
   };
 }
 
+export async function resolveAcquisitionTarget(url, fetchImpl = globalThis.fetch) {
+  if (!url.startsWith("planetary:")) return { fetchUrl: url, recordUrl: url };
+  const recordUrl = url.slice("planetary:".length);
+  const parsed = new URL(recordUrl);
+  if (parsed.protocol !== "https:" || parsed.hostname !== "landsateuwest.blob.core.windows.net") {
+    throw new Error(`${recordUrl}: Planetary Computer assets must use the reviewed Landsat mirror host`);
+  }
+  const signer = new URL("https://planetarycomputer.microsoft.com/api/sas/v1/sign");
+  signer.searchParams.set("href", recordUrl);
+  const response = await fetchImpl(signer, { redirect: "follow" });
+  if (!response.ok) throw new Error(`${signer}: HTTP ${response.status}`);
+  const document = await response.json();
+  const fetchUrl = new URL(document.href);
+  if (fetchUrl.protocol !== "https:" || fetchUrl.hostname !== parsed.hostname || fetchUrl.pathname !== parsed.pathname) {
+    throw new Error(`${recordUrl}: Planetary Computer signer returned an unexpected asset`);
+  }
+  return { fetchUrl: fetchUrl.href, recordUrl };
+}
+
 async function copyLocal(url, destination, maximumBytes) {
   const source = url.startsWith("file:") ? new URL(url) : path.resolve(url);
   const sourcePath = source instanceof URL ? source : source;
@@ -295,13 +314,18 @@ export async function acquireRelease({
     const url = sourceUrl(input, source);
     const destination = resolveInside(releaseRoot, input.destination);
     await mkdir(path.dirname(destination), { recursive: true });
-    const remote = /^https:\/\//.test(url);
+    const remote = /^(?:https:\/\/|planetary:https:\/\/)/.test(url);
     if (remote && !allowNetwork) {
       throw new Error(`${input.input_id}: remote acquisition requires explicit network approval`);
     }
-    const acquired = remote
-      ? await streamHttp(url, destination, input.maximum_bytes, fetchImpl)
-      : await copyLocal(url, destination, input.maximum_bytes);
+    let acquired;
+    if (remote) {
+      const target = await resolveAcquisitionTarget(url, fetchImpl);
+      acquired = await streamHttp(target.fetchUrl, destination, input.maximum_bytes, fetchImpl);
+      acquired.resolvedUrl = target.recordUrl;
+    } else {
+      acquired = await copyLocal(url, destination, input.maximum_bytes);
+    }
     const checksumStatus = input.expected_sha256 === null || input.expected_sha256 === undefined
       ? "unreviewed"
       : input.expected_sha256 === acquired.sha256

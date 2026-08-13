@@ -1,13 +1,13 @@
 {
   "schema_version": "1.0.0",
   "registry_id": "blorenge-launch",
-  "reviewed_at": "2026-08-09T18:47:50Z",
+  "reviewed_at": "2026-08-13T18:45:00Z",
   "release_authority": "timjroberts",
-  "status": "candidate_blocked",
-  "status_reason": "The SSSI-only launch boundary is validated, but an incident-authority chronology is not yet available under verified public-reuse terms.",
+  "status": "approved",
+  "status_reason": "The SSSI-only launch boundary, bounded incident chronology, EFFIS event match, selected observations, licence snapshots and AOI-level scene QA are approved for a conservative manual factual release.",
   "area_of_interest": {
     "intended_rule": "Blorenge SSSI feature NRW_SSSI.13108 buffered by 2000 metres in EPSG:27700.",
-    "status": "validated_launch_rule_build_pending",
+    "status": "validated_launch_rule",
     "validated_component": {
       "provider": "Natural Resources Wales",
       "dataset_id": "nrw-sssi",
@@ -76,7 +76,7 @@
       "contract": {
         "owner": "timjroberts",
         "temporal_role": "current designation context",
-        "licence_terms": { "snapshot_path": null, "sha256": null },
+        "licence_terms": { "snapshot_path": "licences/ogl-3.0.md", "sha256": "5a19f85959896038ec055fc6acc6333a7a6339f9271c388c61bd1653e51185ec" },
         "recipe": { "id": "nrw-sssi", "version": "1.0.0" },
         "output_profiles": ["geojson", "accessible_json"],
         "refresh": { "mode": "manual", "maximum_age_days": 31, "approved_change_bounds": {} },
@@ -123,7 +123,7 @@
       "contract": {
         "owner": "timjroberts",
         "temporal_role": "current designation context",
-        "licence_terms": { "snapshot_path": null, "sha256": null },
+        "licence_terms": { "snapshot_path": "licences/ogl-3.0.md", "sha256": "5a19f85959896038ec055fc6acc6333a7a6339f9271c388c61bd1653e51185ec" },
         "recipe": { "id": "nrw-national-park", "version": "1.0.0" },
         "output_profiles": ["geojson", "accessible_json"],
         "refresh": { "mode": "manual", "maximum_age_days": 93, "approved_change_bounds": {} },
@@ -168,7 +168,7 @@
       "contract": {
         "owner": "timjroberts",
         "temporal_role": "deferred contextual source",
-        "licence_terms": { "snapshot_path": null, "sha256": null },
+        "licence_terms": { "snapshot_path": "licences/ogl-3.0.md", "sha256": "5a19f85959896038ec055fc6acc6333a7a6339f9271c388c61bd1653e51185ec" },
         "recipe": { "id": "nrw-open-registered-common", "version": "1.0.0" },
         "output_profiles": ["geojson", "accessible_json"],
         "refresh": { "mode": "manual", "maximum_age_days": 366, "approved_change_bounds": {} },
@@ -215,7 +215,7 @@
       "contract": {
         "owner": "timjroberts",
         "temporal_role": "dated contextual snapshot",
-        "licence_terms": { "snapshot_path": null, "sha256": null },
+        "licence_terms": { "snapshot_path": "licences/odbl-1.0.md", "sha256": "aaeb34c19d86ae12ad2514df5704aa7b0daa90a04e5a58a734d1ea3e80516675" },
         "recipe": { "id": "osm-wales-geofabrik", "version": "1.0.0" },
         "output_profiles": ["vector_pmtiles", "accessible_json"],
         "refresh": { "mode": "manual", "maximum_age_days": 93, "approved_change_bounds": {} },
@@ -258,13 +258,13 @@
         "required_fields": ["british_gr", "dtm_link", "delivery", "date", "year"]
       },
       "transformation": "Select tiles intersecting the final AOI, mosaic DTM values without DSM substitution, derive fixed hillshade and labelled contours, clip to AOI and retain the source DTM privately for reproducibility.",
-      "known_gaps": ["Capture date varies by tile.", "The provider warns the data was not produced specifically for flood modelling.", "The exact tile set remains to be selected against the validated SSSI-plus-2-km AOI geometry."],
+      "known_gaps": ["Capture date varies by tile.", "The provider warns the data was not produced specifically for flood modelling.", "The release recipe pins only catalogue tiles intersecting the exact SSSI-plus-2-km AOI geometry."],
       "safety": "public_safe",
-      "publication": "approved_candidate_pending_aoi",
+      "publication": "approved_candidate",
       "contract": {
         "owner": "timjroberts",
         "temporal_role": "dated terrain context",
-        "licence_terms": { "snapshot_path": null, "sha256": null },
+        "licence_terms": { "snapshot_path": "licences/ogl-3.0.md", "sha256": "5a19f85959896038ec055fc6acc6333a7a6339f9271c388c61bd1653e51185ec" },
         "recipe": { "id": "wg-lidar-dtm-2020-2023", "version": "1.0.0" },
         "output_profiles": ["cog", "raster_pmtiles", "vector_pmtiles", "accessible_json"],
         "refresh": { "mode": "manual", "maximum_age_days": null, "approved_change_bounds": {} },
@@ -305,11 +305,11 @@
       "transformation": "Clip to the final AOI, trim fixed-width whitespace, preserve OBJECTID and GlobalID, and publish only as principal-watercourse context.",
       "known_gaps": ["Does not include every mountain drain, grip, ditch or spring."],
       "safety": "public_safe",
-      "publication": "approved_candidate_pending_aoi",
+      "publication": "approved_candidate",
       "contract": {
         "owner": "timjroberts",
         "temporal_role": "current authoritative context",
-        "licence_terms": { "snapshot_path": null, "sha256": null },
+        "licence_terms": { "snapshot_path": "licences/ogl-3.0.md", "sha256": "5a19f85959896038ec055fc6acc6333a7a6339f9271c388c61bd1653e51185ec" },
         "recipe": { "id": "nrw-main-rivers", "version": "1.0.0" },
         "output_profiles": ["geojson", "vector_pmtiles", "accessible_json"],
         "refresh": { "mode": "manual", "maximum_age_days": 93, "approved_change_bounds": {} },
@@ -351,11 +351,11 @@
       "transformation": "Clip the polygon layer only; exclude target notes and other point layers from launch; preserve survey and source identifiers; present the Phase 1 code with a reviewed plain-language legend.",
       "known_gaps": ["Historical survey only.", "Mixed/mosaic polygons need their own explanation.", "The representative envelope includes 42 Phase 1 codes and must be clipped after the final AOI exists."],
       "safety": "public_safe_after_field_allowlist",
-      "publication": "approved_candidate_pending_aoi",
+      "publication": "approved_candidate",
       "contract": {
         "owner": "timjroberts",
         "temporal_role": "historical survey context",
-        "licence_terms": { "snapshot_path": null, "sha256": null },
+        "licence_terms": { "snapshot_path": "licences/ogl-3.0.md", "sha256": "5a19f85959896038ec055fc6acc6333a7a6339f9271c388c61bd1653e51185ec" },
         "recipe": { "id": "nrw-phase1-vegetation-voronoi", "version": "1.0.0" },
         "output_profiles": ["vector_pmtiles", "accessible_csv"],
         "refresh": { "mode": "manual", "maximum_age_days": null, "approved_change_bounds": {} },
@@ -372,11 +372,24 @@
       "provider_dataset_id": "sentinel-2-l2a / MGRS-30UVC / relative orbit 37",
       "landing_url": "https://dataspace.copernicus.eu/data-collections/copernicus-sentinel-missions/sentinel-2",
       "acquisition": {
-        "method": "CDSE STAC discovery followed by authenticated build-time S3 or OData asset retrieval",
+        "method": "CDSE STAC identity verification followed by anonymous Earth Search Collection-1 COG retrieval with both identities and exact checksums retained",
         "stac_collection": "https://stac.dataspace.copernicus.eu/v1/collections/sentinel-2-l2a",
-        "media_type": "image/jp2",
+        "asset_mirror": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a",
+        "media_type": "image/tiff; application=geotiff; profile=cloud-optimized",
         "crs": "EPSG:32630",
-        "required_assets": ["B04_10m", "B08_10m", "B8A_20m", "B11_20m", "B12_20m", "SCL_20m", "product_metadata", "granule_metadata", "safe_manifest"],
+        "required_assets": ["B04", "B08", "B11", "B12", "SCL"],
+        "selected_item_ids": [
+          "S2C_MSIL2A_20250712T112141_N0511_R037_T30UVC_20250712T145316 / S2C_T30UVC_20250712T112136_L2A",
+          "S2B_MSIL2A_20260712T112109_N0512_R037_T30UVC_20260712T133747 / S2B_T30UVC_20260712T112112_L2A",
+          "S2B_MSIL2A_20260811T112109_N0512_R037_T30UVC_20260811T134112 / S2B_T30UVC_20260811T112205_L2A"
+        ],
+        "scene_qa": {
+          "mask": "SCL classes 0,1,2,3,8,9,10,11 invalid with one 20 m adjacency pixel",
+          "baseline_2025_07_12_valid_percent": {"sssi_core": 100.0, "aoi": 99.805},
+          "prefire_2026_07_12_valid_percent": {"sssi_core": 100.0, "aoi": 99.435},
+          "postreport_2026_08_11_valid_percent": {"sssi_core": 98.717, "aoi": 98.510},
+          "postreport_role": "Earliest observation passing the 95% core-and-comparison gate and latest suitable observation available at release time; it is not labelled after the fire ended."
+        },
         "candidate_item_ids": [
           "S2C_MSIL2A_20250712T112141_N0511_R037_T30UVC_20250712T145316",
           "S2B_MSIL2A_20250816T112119_N0511_R037_T30UVC_20250816T122832",
@@ -389,7 +402,8 @@
           "S2A_MSIL2A_20260729T112131_N0512_R037_T30UVC_20260729T195715",
           "S2B_MSIL2A_20260801T112119_N0512_R037_T30UVC_20260801T133951",
           "S2C_MSIL2A_20260806T112111_N0512_R037_T30UVC_20260806T144614",
-          "S2A_MSIL2A_20260808T112131_N0512_R037_T30UVC_20260808T192910"
+          "S2A_MSIL2A_20260808T112131_N0512_R037_T30UVC_20260808T192910",
+          "S2B_MSIL2A_20260811T112109_N0512_R037_T30UVC_20260811T134112"
         ]
       },
       "upstream": {
@@ -409,13 +423,13 @@
         "nodata": "SCL and product masks; preserve explicit not-observed state"
       },
       "transformation": "Apply provider scale and offset, per-pixel masks and disclosed adjacency dilation; retain native analytic support; assess terrain shadow; compute continuous indicators; preserve observation date and contributing count per pixel.",
-      "known_gaps": ["No item can be assigned a final temporal role until incident chronology is verified.", "Whole-tile cloud percentage is discovery metadata, not AOI acceptance evidence.", "CDSE binary asset access requires a free authenticated build identity."],
+      "known_gaps": ["The first passing post-report observation is 11 August 2026, 22 days after the first report; earlier candidates remain not observed rather than cloud-filled.", "The 11 August observation is both the earliest passing post-report scene and the latest suitable scene available at release time.", "Whole-tile cloud percentage is discovery metadata, not AOI acceptance evidence."],
       "safety": "public_safe",
-      "publication": "candidate_only_pending_event_and_aoi_qa",
+      "publication": "approved_candidate",
       "contract": {
         "owner": "timjroberts",
         "temporal_role": "pre-fire, immediate-post and latest suitable observations",
-        "licence_terms": { "snapshot_path": null, "sha256": null },
+        "licence_terms": { "snapshot_path": "licences/copernicus-sentinel-data.md", "sha256": "b9e25a863da6d830f5074deae7fa063fcb23e53043064bb2c12c8f4c1a1f988d" },
         "recipe": { "id": "copernicus-sentinel-2-l2a", "version": "1.0.0" },
         "output_profiles": ["cog", "raster_pmtiles", "geojson", "accessible_csv"],
         "refresh": { "mode": "manual", "maximum_age_days": 31, "approved_change_bounds": {} },
@@ -467,13 +481,13 @@
         "nodata": "QA_PIXEL, QA_RADSAT and SR_QA_AEROSOL"
       },
       "transformation": "Apply published scale/offset, mask fill/cloud/shadow/snow/saturation/terrain occlusion, clip to AOI, keep 30 m support and use as corroboration rather than a fused higher-resolution product.",
-      "known_gaps": ["No item can be assigned a final temporal role until incident chronology is verified.", "Whole-scene cloud percentage is not AOI acceptance evidence.", "Overlapping paths have different geometry and should be compared like-for-like where possible."],
+      "known_gaps": ["The 27 July 2026 path 203 corroboration has 66.978% valid SSSI-core coverage after QA_PIXEL masking and is used only where observed; the rest remains not observed.", "Whole-scene cloud percentage is not AOI acceptance evidence.", "Overlapping paths have different geometry and should be compared like-for-like where possible."],
       "safety": "public_safe",
-      "publication": "candidate_only_pending_event_and_aoi_qa",
+      "publication": "approved_candidate",
       "contract": {
         "owner": "timjroberts",
         "temporal_role": "independent corroborating observations",
-        "licence_terms": { "snapshot_path": null, "sha256": null },
+        "licence_terms": { "snapshot_path": "licences/usgs-landsat-public-domain.md", "sha256": "341fe02718a9660e7f7e38c1f57a0873d5d8dc8d52007c8a5907f2f655b3db83" },
         "recipe": { "id": "usgs-landsat-c2-l2-sr", "version": "1.0.0" },
         "output_profiles": ["cog", "raster_pmtiles", "geojson", "accessible_csv"],
         "refresh": { "mode": "manual", "maximum_age_days": 31, "approved_change_bounds": {} },
@@ -490,13 +504,13 @@
       "provider_dataset_id": "ms:modis.ba.poly",
       "landing_url": "https://forest-fire.emergency.copernicus.eu/applications/data-and-services",
       "acquisition": {
-        "method": "WFS 1.1 SHAPEZIP snapshot followed by feature extraction",
-        "url": "https://maps.effis.emergency.copernicus.eu/effis?outputformat=SHAPEZIP&request=getfeature&service=WFS&typename=ms%3Amodis.ba.poly&version=1.1.0",
-        "media_type": "application/zip",
+        "method": "Bounded WFS 1.1 GeoJSON snapshot using native axis order followed by stable id extraction",
+        "url": "https://maps.effis.emergency.copernicus.eu/effis?service=WFS&version=1.1.0&request=getfeature&typename=ms%3Amodis.ba.poly&outputformat=geojson&srsName=EPSG%3A4326&bbox=51.74,-3.06,51.77,-3.02,EPSG%3A4326",
+        "media_type": "application/geo+json",
         "crs": "EPSG:4326",
         "candidate_feature_id": "592404",
         "candidate_bbox": [-3.0549548570494522, 51.743107344572145, -3.0309432816132773, 51.76041102514011],
-        "candidate_area_ha": 155
+        "candidate_area_ha": 156
       },
       "upstream": {
         "candidate_firedate": "2026-07-20T01:05:00Z",
@@ -518,13 +532,13 @@
         "required_fields": ["id", "FIREDATE", "FINALDATE", "LASTUPDATE", "COUNTRY", "PROVINCE", "COMMUNE", "AREA_HA", "CLASS"]
       },
       "transformation": "Extract id 592404, preserve provider geometry and fields, clip only for display, and publish as a separate EFFIS provisional comparison. Never union it with a BCA-derived or authority boundary.",
-      "known_gaps": ["EFFIS dates are provider product dates, not verified ignition, control or extinction times.", "The candidate lies immediately south of the Blorenge SSSI and must be matched to an incident-authority record before being named as the July 2026 Blorenge fire.", "EFFIS does not distinguish wildfire from prescribed or environmental burning and may omit small islands or scars."],
+      "known_gaps": ["EFFIS dates are provider product dates, not verified ignition, control or extinction times.", "The feature is a high-confidence match to the documented July 2026 Blaenavon wildfire but remains a separate provisional provider interpretation.", "The current WFS reports 156 ha while the 9 August snapshot reported 155 ha; the release retains the exact current geometry and checksum and exposes the change.", "EFFIS does not distinguish wildfire from prescribed or environmental burning and may omit small islands or scars."],
       "safety": "public_safe",
-      "publication": "candidate_only_pending_incident_match",
+      "publication": "approved_candidate",
       "contract": {
         "owner": "timjroberts",
         "temporal_role": "provisional provider comparison",
-        "licence_terms": { "snapshot_path": null, "sha256": null },
+        "licence_terms": { "snapshot_path": "licences/effis-cc-by-4.0.md", "sha256": "ca690df1d44e30dffaf8ed1074c34fc7583d1b8b299ccf37bbe33fc9d6419c6b" },
         "recipe": { "id": "effis-current-burnt-areas", "version": "1.0.0" },
         "output_profiles": ["geojson", "accessible_json"],
         "refresh": { "mode": "manual", "maximum_age_days": 31, "approved_change_bounds": {} },
@@ -533,19 +547,19 @@
       }
     }
   ],
-  "hard_gaps": [
-    {
-      "gap_id": "july-2026-incident-authority-record",
-      "blocks": ["naming EFFIS 592404 as the event", "assigning pre/immediate-post/latest satellite roles", "publishing a primary perimeter", "public fire chronology"],
-      "required_evidence": "Incident start, control/containment and end chronology; event location/identifier; any surveyed boundary; source status; and written republication terms."
-    }
-  ],
+  "hard_gaps": [],
   "deferred_enhancements": [
     {
       "enhancement_id": "blorenge-common-cl18-boundary",
       "launch_impact": "none",
       "required_evidence": "Maintained CL18 boundary plus written public display, transformation and derivative-reuse terms.",
       "presentation_constraint": "Do not label or imply that the Blorenge SSSI boundary is the legal boundary of Blorenge Common CL18."
+    },
+    {
+      "enhancement_id": "complete-incident-authority-record",
+      "launch_impact": "none",
+      "required_evidence": "SWFRS incident identifier, authoritative control or containment and stop times, and any reusable surveyed or operational perimeter.",
+      "presentation_constraint": "Until obtained, use only the bounded first-report and ongoing-response chronology and never label EFFIS FINALDATE as the end of the incident."
     }
   ]
 }

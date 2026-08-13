@@ -10,6 +10,7 @@ import {
   inspectOutput,
   loadContracts,
   reproduceRelease,
+  resolveAcquisitionTarget,
   verifyArchive
 } from "../tooling/geodata/src/pipeline.mjs";
 import { publishRelease, withdrawRelease } from "../tooling/geodata/src/r2.mjs";
@@ -19,6 +20,20 @@ const repositoryRoot = path.resolve(new URL("../", import.meta.url).pathname);
 const fixedDate = new Date("2026-08-13T10:00:00Z");
 const clock = () => fixedDate;
 const commit = "1".repeat(40);
+
+test("Planetary Computer acquisition signs only the reviewed Landsat mirror and records no SAS query", async () => {
+  const asset = "https://landsateuwest.blob.core.windows.net/landsat-c2/example.TIF";
+  const target = await resolveAcquisitionTarget(`planetary:${asset}`, async (url) => {
+    assert.equal(url.hostname, "planetarycomputer.microsoft.com");
+    assert.equal(url.searchParams.get("href"), asset);
+    return new Response(JSON.stringify({ href: `${asset}?sig=temporary` }), {
+      status: 200,
+      headers: { "content-type": "application/json" }
+    });
+  });
+  assert.equal(target.recordUrl, asset);
+  assert.equal(target.fetchUrl, `${asset}?sig=temporary`);
+});
 
 class MemoryStore {
   objects = new Map();
