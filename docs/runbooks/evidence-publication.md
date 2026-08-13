@@ -26,6 +26,49 @@ reuse it. It contains:
 Keep a completed published directory in private durable storage. Do not place
 raw provider inputs, COGs or rejected candidates in the public bucket.
 
+## Start a later release
+
+Treat every release as a new immutable candidate. Do not edit a published
+recipe, reuse an existing release directory or overwrite versioned R2 keys.
+The first factual recipe is
+`data/launch/publication-recipe-2026-08-13.json`; copy it to a new dated recipe
+and review the whole contract rather than changing it in place.
+
+For a normal post-launch update:
+
+1. Open and claim a release ticket. Record why the release is needed, which
+   sources or transformations may change and who will make the manual release
+   decision.
+2. Give the copied recipe a new `release_id`, `dataset_version` and
+   `recipe_version`. Set `supersedes` to the release currently named by
+   `releases/current.json`, and set `cross_release_qa.baseline_manifest` to a
+   locally retained, checksum-verified copy of that release's immutable
+   manifest. If there is no current pointer yet, `supersedes` remains `null`.
+3. Review the source registry, provider terms, recipe inputs, output contracts,
+   claim wording and material-change thresholds. Pin every new or changed input
+   URL, byte limit and SHA-256 before acquisition. A new checksum is evidence
+   for review, not an automatic routine update.
+4. Choose one acquisition path. Use `acquire --allow-network` when any provider
+   bytes change. Use `reuse-acquisition` only when the archived provider bytes
+   remain the intended evidence and the change is limited to the recipe,
+   transformation or presentation contract:
+
+   ```bash
+   npm run geodata -- validate --registry data/launch/source-registry.json --recipe NEW_RECIPE
+   npm run geodata -- acquire --registry data/launch/source-registry.json --recipe NEW_RECIPE --workspace .geodata-work --commit FULL_GIT_SHA --allow-network
+
+   # Or, instead of acquire:
+   npm run geodata -- reuse-acquisition --archive PRIVATE_ARCHIVE/PREVIOUS_RELEASE_ID --registry data/launch/source-registry.json --recipe NEW_RECIPE --workspace .geodata-work --commit FULL_GIT_SHA
+   ```
+
+5. Continue with the build, QA review, archive verification, clean-room
+   reproduction, staging and manual publication steps below. Retain the whole
+   completed release directory in private durable storage before promotion.
+
+The staged `release-blorenge-2026-08-13.6` release is not yet current. Its first
+promotion belongs to the launch integration and hand-off work. A later release
+only supersedes `.6` after that promotion has created `releases/current.json`.
+
 ## Build a candidate
 
 Build the pinned image once for the checked-in lock:
@@ -103,7 +146,7 @@ manual by default.
 To remove the current release without deleting its audit history:
 
 ```bash
-npm run geodata -- withdraw --release-root PRIVATE_ARCHIVE/RELEASE_ID --bucket bca-wales-evidence-production --release-id RELEASE_ID --identity timjroberts --reason "PUBLIC EXPLANATION"
+npm run geodata -- withdraw --release-root PRIVATE_ARCHIVE/RELEASE_ID --bucket bca-wales-public-releases --jurisdiction eu --release-id RELEASE_ID --identity timjroberts --reason "PUBLIC EXPLANATION"
 ```
 
 The command verifies the expected current release, writes an immutable
