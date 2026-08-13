@@ -23,6 +23,7 @@ test("the interface fixture is internally referential and never claims to be evi
 test("map and semantic routes share controls, state links and source detail", async () => {
   const explorer = await read("apps/web/app/Explorer.tsx");
   const map = await read("apps/web/app/MapCanvas.tsx");
+  const mapTools = await read("apps/web/app/MapTools.tsx");
   assert.match(explorer, /initialView: "map" \| "evidence"/);
   assert.match(explorer, /stateHref\("\/evidence\/"/);
   assert.match(explorer, /aria-live="polite"/);
@@ -32,6 +33,15 @@ test("map and semantic routes share controls, state links and source detail", as
   assert.match(map, /new maplibregl\.Map/);
   assert.match(map, /cooperativeGestures: true/);
   assert.match(map, /prefers-reduced-motion: reduce/);
+  assert.match(mapTools, /className="map-tools" open=\{openPanels\.tools\}/);
+  assert.match(mapTools, /className="map-tool-panel map-tool-layers" open=\{openPanels\.layers\}/);
+  assert.match(mapTools, /className="map-tool-panel map-tool-date" open=\{openPanels\.date\}/);
+  assert.match(mapTools, /onToggle=\{\(event\) => setPanelOpen/);
+  assert.match(mapTools, /onComparisonToggle/);
+  assert.match(mapTools, /onEarlierDateChange/);
+  assert.match(mapTools, /aria-controls="source-details"/);
+  assert.doesNotMatch(explorer, /MapOverlayPrototype|PrototypeSwitcher|prototypeVariant/);
+  assert.doesNotMatch(mapTools, /PROTOTYPE|VariantA|VariantB|VariantC/);
 });
 
 test("the accessible download contains metadata only", async () => {

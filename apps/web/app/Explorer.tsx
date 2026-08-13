@@ -11,6 +11,7 @@ import type { ExplorerFixture, ExplorerFixtureLayer } from "@bca/publication";
 import { useEffect, useMemo, useRef, useState } from "react";
 import fixtureDocument from "../../../fixtures/explorer/interface.example.json";
 import { MapCanvas } from "./MapCanvas";
+import { MapTools } from "./MapTools";
 
 const fixture = fixtureDocument as unknown as ExplorerFixture;
 const LANGUAGE_COOKIE = "bca-language";
@@ -25,11 +26,15 @@ const copy = {
     caution: "Observed vegetation change is not proof of ecological recovery. No factual evidence release is attached yet.",
     map: "Explore map",
     evidence: "Read without a map",
+    mapTools: "Map Tools",
+    toolCount: "2 tools",
     layers: "Layers and legend",
     dates: "Observation date",
+    primaryDate: "Date",
     compare: "Compare two dates",
     compareHint: "Place a later observation over an earlier one.",
     earlier: "Earlier observation",
+    earlierDate: "Earlier date",
     later: "Later overlay",
     contrast: "Overlay contrast",
     low: "Low",
@@ -72,11 +77,15 @@ const copy = {
     caution: "Nid yw newid llystyfiant a welwyd yn brawf o adferiad ecolegol. Nid oes rhyddhad tystiolaeth ffeithiol wedi’i atodi eto.",
     map: "Archwilio’r map",
     evidence: "Darllen heb fap",
+    mapTools: "Offer map",
+    toolCount: "2 offer",
     layers: "Haenau ac allwedd",
     dates: "Dyddiad arsylwi",
+    primaryDate: "Dyddiad",
     compare: "Cymharu dau ddyddiad",
     compareHint: "Gosodwch arsylwad diweddarach dros un cynharach.",
     earlier: "Arsylwad cynharach",
+    earlierDate: "Dyddiad cynharach",
     later: "Troshaen ddiweddarach",
     contrast: "Cyferbyniad y droshaen",
     low: "Isel",
@@ -126,16 +135,20 @@ function parseState(current: ExplorerState): ExplorerState {
   const allowedLayers = new Set(fixture.layers.map((layer) => layer.id));
   const requestedLayers = params.get("layers")?.split(",").filter((id) => allowedLayers.has(id));
   const allowedDates = new Set(fixture.dates.map((date) => date.id));
-  const primaryDate = params.get("date");
-  const comparisonDate = params.get("compare");
+  const requestedPrimaryDate = params.get("date");
+  const requestedComparisonDate = params.get("compare");
   const contrast = params.get("contrast");
+  const primaryDate = requestedPrimaryDate && allowedDates.has(requestedPrimaryDate) ? requestedPrimaryDate : current.primaryDate;
+  const comparisonDate = requestedComparisonDate && allowedDates.has(requestedComparisonDate) ? requestedComparisonDate : current.comparisonDate;
+  const primaryIndex = fixture.dates.findIndex((date) => date.id === primaryDate);
+  const comparisonIndex = fixture.dates.findIndex((date) => date.id === comparisonDate);
 
   return {
     ...current,
     visibleLayerIds: requestedLayers ?? current.visibleLayerIds,
-    primaryDate: primaryDate && allowedDates.has(primaryDate) ? primaryDate : current.primaryDate,
-    comparisonDate: comparisonDate && allowedDates.has(comparisonDate) ? comparisonDate : current.comparisonDate,
-    comparisonEnabled: Boolean(comparisonDate && allowedDates.has(comparisonDate)),
+    primaryDate,
+    comparisonDate,
+    comparisonEnabled: Boolean(requestedComparisonDate && comparisonIndex >= 0 && comparisonIndex < primaryIndex),
     contrast: contrast === "low" || contrast === "medium" || contrast === "high" ? contrast : current.contrast
   };
 }
@@ -221,12 +234,57 @@ export function Explorer({ initialView }: { initialView: "map" | "evidence" }) {
     });
   }
 
+  function toggleComparison(enabled: boolean) {
+    setState((current) => {
+      if (!enabled) return { ...current, comparisonEnabled: false };
+      const primaryIndex = fixture.dates.findIndex((date) => date.id === current.primaryDate);
+      const comparisonIndex = fixture.dates.findIndex((date) => date.id === current.comparisonDate);
+      if (primaryIndex > 0) {
+        return {
+          ...current,
+          comparisonEnabled: true,
+          comparisonDate: comparisonIndex >= 0 && comparisonIndex < primaryIndex
+            ? current.comparisonDate
+            : fixture.dates[primaryIndex - 1]?.id ?? null
+        };
+      }
+      return {
+        ...current,
+        comparisonEnabled: true,
+        comparisonDate: fixture.dates[0]?.id ?? null,
+        primaryDate: fixture.dates[1]?.id ?? current.primaryDate
+      };
+    });
+  }
+
   const visibleLayers = useMemo(
     () => fixture.layers.filter((layer) => state.visibleLayerIds.includes(layer.id)),
     [state.visibleLayerIds]
   );
   const detailLayer = fixture.layers.find((layer) => layer.id === detailLayerId);
   const selectedDate = fixture.dates.find((date) => date.id === state.primaryDate) ?? fixture.dates[0]!;
+  const sourcesStrip = (
+    <aside className="sources-strip" aria-live="polite" aria-labelledby="sources-heading">
+      <p><strong id="sources-heading">{c.sources}:</strong> {visibleLayers.length ? [...new Set(visibleLayers.map((layer) => layer.attribution))].join(" · ") : c.noSources}</p>
+      <span>{c.sourceHelp}{state.language === "cy" ? <small className="global-fallback"><b lang="en">EN</b> {c.fallback}</small> : null}</span>
+    </aside>
+  );
+  const sourcePanel = detailLayer ? (
+    <aside id="source-details" className="source-panel" aria-labelledby="source-title">
+      <div className="source-heading"><div><p className="panel-kicker">{c.details}</p><h2 id="source-title"><LayerName layer={detailLayer} language={state.language} /></h2></div><button ref={closeButtonRef} type="button" aria-label={c.close} onClick={() => closeDetails(detailLayer.id)}>×</button></div>
+      <p className="source-description">{localise(detailLayer.description, state.language)}</p>
+      <dl>
+        <div><dt>{c.classification}</dt><dd><span className={`status-badge status-${detailLayer.classification}`}>{detailLayer.classification}</span></dd></div>
+        <div><dt>{c.provider}</dt><dd>{detailLayer.provider}</dd></div>
+        <div><dt>{c.status}</dt><dd>{localise(detailLayer.evidenceStatus, state.language)}</dd></div>
+        <div><dt>{c.date}</dt><dd>{localise(detailLayer.sourceDate, state.language)}</dd></div>
+        <div><dt>{c.licence}</dt><dd>{detailLayer.licence}</dd></div>
+        <div><dt>{c.method}</dt><dd>{localise(detailLayer.method, state.language)}</dd></div>
+      </dl>
+      <div className="limitation-box"><strong>{c.limitations}</strong><ul>{detailLayer.limitations.map((limitation) => <li key={limitation.en}>{localise(limitation, state.language)}</li>)}</ul></div>
+      {state.language === "cy" && (!detailLayer.name.cy || !detailLayer.description.cy || !detailLayer.method.cy) ? <p className="fallback-note"><span lang="en">EN</span>{c.fallback}</p> : null}
+    </aside>
+  ) : null;
 
   return (
     <>
@@ -266,85 +324,88 @@ export function Explorer({ initialView }: { initialView: "map" | "evidence" }) {
             <p className="area-label">⌖ {c.area}</p>
           </nav>
 
-          <div className="explorer-grid">
-            <aside className="layer-panel" aria-labelledby="layers-heading">
-              <div className="panel-heading">
-                <div><p className="panel-kicker">01</p><h2 id="layers-heading">{c.layers}</h2></div>
-                <span>{visibleLayers.length}/{fixture.layers.length}</span>
-              </div>
-              {fixture.groups.map((group) => {
-                const groupLayers = fixture.layers.filter((layer) => layer.groupId === group.id);
-                const activeCount = groupLayers.filter((layer) => state.visibleLayerIds.includes(layer.id)).length;
-                return (
-                  <details className="layer-group" open key={group.id}>
-                    <summary>
-                      <span><strong>{localise(group.name, state.language)}</strong><small>{localise(group.description, state.language)}</small></span>
-                      <span className="group-count" aria-label={`${activeCount}/${groupLayers.length}`}>{activeCount}/{groupLayers.length}</span>
-                    </summary>
-                    <div className="group-layers">
-                      {groupLayers.map((layer) => (
-                        <div className="layer-row" key={layer.id}>
-                          <label>
-                            <input
-                              type="checkbox"
-                              checked={state.visibleLayerIds.includes(layer.id)}
-                              onChange={() => setState((current) => toggleVisibleLayer(current, layer.id))}
-                            />
-                            <span className={`legend-swatch swatch-${layer.mapStyle}`} aria-hidden="true" />
-                            <span className="layer-copy"><strong><LayerName layer={layer} language={state.language} /></strong><small>{layer.classification}</small></span>
-                          </label>
-                          <button
-                            id={`details-${layer.id}`}
-                            type="button"
-                            className="detail-button"
-                            aria-label={`${c.details}: ${localise(layer.name, state.language)}`}
-                            aria-expanded={detailLayerId === layer.id}
-                            aria-controls="source-details"
-                            onClick={() => setDetailLayerId(detailLayerId === layer.id ? null : layer.id)}
-                          >ⓘ</button>
-                        </div>
-                      ))}
-                    </div>
-                  </details>
-                );
-              })}
-            </aside>
-
-            <div className="content-panel">
-              <section className="date-control" aria-labelledby="date-heading">
-                <div><p className="panel-kicker">02</p><h2 id="date-heading">{c.dates}</h2></div>
-                <div className="time-controls">
-                  <label className="compare-toggle">
-                    <input
-                      type="checkbox"
-                      checked={state.comparisonEnabled}
-                      onChange={(event) => setState((current) => ({ ...current, comparisonEnabled: event.target.checked }))}
-                    />
-                    <span><strong>{c.compare}</strong><small>{c.compareHint}</small></span>
-                  </label>
-                  {state.comparisonEnabled ? (
-                    <div className="comparison-controls">
-                      <label><span>{c.earlier}</span><select value={state.comparisonDate ?? ""} onChange={(event) => setState((current) => ({ ...current, comparisonDate: event.target.value }))}>
-                        {fixture.dates.map((date, index) => <option key={date.id} value={date.id} disabled={index >= fixture.dates.findIndex((item) => item.id === state.primaryDate)}>{localise(date.label, state.language)} · {localise(date.displayDate, state.language)}</option>)}
-                      </select></label>
-                      <label><span>{c.later}</span><select value={state.primaryDate ?? ""} onChange={(event) => selectPrimaryDate(event.target.value)}>
-                        {fixture.dates.map((date, index) => <option key={date.id} value={date.id} disabled={index <= fixture.dates.findIndex((item) => item.id === state.comparisonDate)}>{localise(date.label, state.language)} · {localise(date.displayDate, state.language)}</option>)}
-                      </select></label>
-                      <fieldset className="contrast-controls"><legend>{c.contrast}</legend><div>
-                        {(["low", "medium", "high"] as const).map((contrast) => <button key={contrast} type="button" aria-pressed={state.contrast === contrast} onClick={() => setState((current) => ({ ...current, contrast }))}>{c[contrast]}</button>)}
-                      </div></fieldset>
-                    </div>
-                  ) : (
-                    <div className="date-options" aria-label={c.dates}>
-                      {fixture.dates.map((date) => <button key={date.id} type="button" aria-pressed={state.primaryDate === date.id} onClick={() => selectPrimaryDate(date.id)}><strong>{localise(date.label, state.language)}</strong><span>{localise(date.displayDate, state.language)}</span></button>)}
-                    </div>
-                  )}
-                </div>
-              </section>
-
-              {initialView === "map" ? (
+          {initialView === "map" ? (
+            <div className="map-workspace">
+              <div className="map-stage">
                 <MapCanvas fixture={fixture} language={state.language} state={state} />
-              ) : (
+                <MapTools
+                  fixture={fixture}
+                  state={state}
+                  language={state.language}
+                  copy={c}
+                  detailLayerId={detailLayerId}
+                  onLayerToggle={(layerId) => setState((current) => toggleVisibleLayer(current, layerId))}
+                  onLayerDetail={(layerId) => setDetailLayerId(detailLayerId === layerId ? null : layerId)}
+                  onPrimaryDateChange={selectPrimaryDate}
+                  onComparisonToggle={toggleComparison}
+                  onEarlierDateChange={(dateId) => setState((current) => ({ ...current, comparisonDate: dateId }))}
+                  onContrastChange={(contrast) => setState((current) => ({ ...current, contrast }))}
+                />
+              </div>
+              {sourcesStrip}
+              {sourcePanel}
+            </div>
+          ) : (
+            <div className="explorer-grid">
+              <aside className="layer-panel" aria-labelledby="layers-heading">
+                <div className="panel-heading">
+                  <div><p className="panel-kicker">01</p><h2 id="layers-heading">{c.layers}</h2></div>
+                  <span>{visibleLayers.length}/{fixture.layers.length}</span>
+                </div>
+                {fixture.groups.map((group) => {
+                  const groupLayers = fixture.layers.filter((layer) => layer.groupId === group.id);
+                  const activeCount = groupLayers.filter((layer) => state.visibleLayerIds.includes(layer.id)).length;
+                  return (
+                    <details className="layer-group" open key={group.id}>
+                      <summary>
+                        <span><strong>{localise(group.name, state.language)}</strong><small>{localise(group.description, state.language)}</small></span>
+                        <span className="group-count" aria-label={`${activeCount}/${groupLayers.length}`}>{activeCount}/{groupLayers.length}</span>
+                      </summary>
+                      <div className="group-layers">
+                        {groupLayers.map((layer) => (
+                          <div className="layer-row" key={layer.id}>
+                            <label>
+                              <input type="checkbox" checked={state.visibleLayerIds.includes(layer.id)} onChange={() => setState((current) => toggleVisibleLayer(current, layer.id))} />
+                              <span className={`legend-swatch swatch-${layer.mapStyle}`} aria-hidden="true" />
+                              <span className="layer-copy"><strong><LayerName layer={layer} language={state.language} /></strong><small>{layer.classification}</small></span>
+                            </label>
+                            <button id={`details-${layer.id}`} type="button" className="detail-button" aria-label={`${c.details}: ${localise(layer.name, state.language)}`} aria-expanded={detailLayerId === layer.id} aria-controls="source-details" onClick={() => setDetailLayerId(detailLayerId === layer.id ? null : layer.id)}>ⓘ</button>
+                          </div>
+                        ))}
+                      </div>
+                    </details>
+                  );
+                })}
+              </aside>
+
+              <div className="content-panel">
+                <section className="date-control" aria-labelledby="date-heading">
+                  <div><p className="panel-kicker">02</p><h2 id="date-heading">{c.dates}</h2></div>
+                  <div className="time-controls">
+                    <label className="compare-toggle">
+                      <input type="checkbox" checked={state.comparisonEnabled} onChange={(event) => toggleComparison(event.target.checked)} />
+                      <span><strong>{c.compare}</strong><small>{c.compareHint}</small></span>
+                    </label>
+                    {state.comparisonEnabled ? (
+                      <div className="comparison-controls">
+                        <label><span>{c.earlier}</span><select value={state.comparisonDate ?? ""} onChange={(event) => setState((current) => ({ ...current, comparisonDate: event.target.value }))}>
+                          {fixture.dates.map((date, index) => <option key={date.id} value={date.id} disabled={index >= fixture.dates.findIndex((item) => item.id === state.primaryDate)}>{localise(date.label, state.language)} · {localise(date.displayDate, state.language)}</option>)}
+                        </select></label>
+                        <label><span>{c.later}</span><select value={state.primaryDate ?? ""} onChange={(event) => selectPrimaryDate(event.target.value)}>
+                          {fixture.dates.map((date, index) => <option key={date.id} value={date.id} disabled={index <= fixture.dates.findIndex((item) => item.id === state.comparisonDate)}>{localise(date.label, state.language)} · {localise(date.displayDate, state.language)}</option>)}
+                        </select></label>
+                        <fieldset className="contrast-controls"><legend>{c.contrast}</legend><div>
+                          {(["low", "medium", "high"] as const).map((contrast) => <button key={contrast} type="button" aria-pressed={state.contrast === contrast} onClick={() => setState((current) => ({ ...current, contrast }))}>{c[contrast]}</button>)}
+                        </div></fieldset>
+                      </div>
+                    ) : (
+                      <div className="date-options" aria-label={c.dates}>
+                        {fixture.dates.map((date) => <button key={date.id} type="button" aria-pressed={state.primaryDate === date.id} onClick={() => selectPrimaryDate(date.id)}><strong>{localise(date.label, state.language)}</strong><span>{localise(date.displayDate, state.language)}</span></button>)}
+                      </div>
+                    )}
+                  </div>
+                </section>
+
                 <section className="evidence-view" aria-labelledby="evidence-heading">
                   <div className="evidence-summary"><p className="panel-kicker">03</p><h2 id="evidence-heading">{c.evidence}</h2><p>{c.mapSummary}</p></div>
                   <div className="table-wrap"><table><caption>{c.table}</caption><thead><tr><th scope="col">{c.layer}</th><th scope="col">{c.shown}</th><th scope="col">{c.source}</th><th scope="col">{c.temporal}</th></tr></thead><tbody>
@@ -352,31 +413,12 @@ export function Explorer({ initialView }: { initialView: "map" | "evidence" }) {
                   </tbody></table></div>
                   <a className="download-button" href="/explorer-interface-fixture.csv" download>{c.download}</a>
                 </section>
-              )}
 
-              <aside className="sources-strip" aria-live="polite" aria-labelledby="sources-heading">
-                <p><strong id="sources-heading">{c.sources}:</strong> {visibleLayers.length ? [...new Set(visibleLayers.map((layer) => layer.attribution))].join(" · ") : c.noSources}</p>
-                <span>{c.sourceHelp}{state.language === "cy" ? <small className="global-fallback"><b lang="en">EN</b> {c.fallback}</small> : null}</span>
-              </aside>
-
-              {detailLayer ? (
-                <aside id="source-details" className="source-panel" aria-labelledby="source-title">
-                  <div className="source-heading"><div><p className="panel-kicker">{c.details}</p><h2 id="source-title"><LayerName layer={detailLayer} language={state.language} /></h2></div><button ref={closeButtonRef} type="button" aria-label={c.close} onClick={() => closeDetails(detailLayer.id)}>×</button></div>
-                  <p className="source-description">{localise(detailLayer.description, state.language)}</p>
-                  <dl>
-                    <div><dt>{c.classification}</dt><dd><span className={`status-badge status-${detailLayer.classification}`}>{detailLayer.classification}</span></dd></div>
-                    <div><dt>{c.provider}</dt><dd>{detailLayer.provider}</dd></div>
-                    <div><dt>{c.status}</dt><dd>{localise(detailLayer.evidenceStatus, state.language)}</dd></div>
-                    <div><dt>{c.date}</dt><dd>{localise(detailLayer.sourceDate, state.language)}</dd></div>
-                    <div><dt>{c.licence}</dt><dd>{detailLayer.licence}</dd></div>
-                    <div><dt>{c.method}</dt><dd>{localise(detailLayer.method, state.language)}</dd></div>
-                  </dl>
-                  <div className="limitation-box"><strong>{c.limitations}</strong><ul>{detailLayer.limitations.map((limitation) => <li key={limitation.en}>{localise(limitation, state.language)}</li>)}</ul></div>
-                  {state.language === "cy" && (!detailLayer.name.cy || !detailLayer.description.cy || !detailLayer.method.cy) ? <p className="fallback-note"><span lang="en">EN</span>{c.fallback}</p> : null}
-                </aside>
-              ) : null}
+                {sourcesStrip}
+                {sourcePanel}
+              </div>
             </div>
-          </div>
+          )}
         </section>
 
         <section className="reading-notes" aria-labelledby="guidance-heading"><div><p className="panel-kicker">04</p><h2 id="guidance-heading">{c.howTo}</h2></div><ol>{c.guidance.map((item, index) => <li key={item}><span aria-hidden="true">{index + 1}</span><p>{item}</p></li>)}</ol></section>
