@@ -55,7 +55,7 @@ jobs:
       - name: Reproduce exact outputs before promotion
         run: npm run geodata -- reproduce --archive "${{ steps.recipe.outputs.release_root }}" --workspace .geodata-reproduction
       - name: Upload, verify and atomically promote
-        run: npm run geodata -- publish --release-root "${{ steps.recipe.outputs.release_root }}" --bucket bca-wales-public-releases --identity timjroberts --mode "$PROMOTION_MODE"
+        run: npm run geodata -- publish --release-root "${{ steps.recipe.outputs.release_root }}" --bucket bca-wales-public-releases --jurisdiction eu --identity timjroberts --mode "$PROMOTION_MODE"
       - name: Retain release audit artifact
         if: always()
         uses: actions/upload-artifact@v4

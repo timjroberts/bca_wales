@@ -26,9 +26,9 @@ Usage:
   bca-geodata build --release-root DIR
   bca-geodata reproduce --archive DIR --workspace DIR
   bca-geodata verify-archive --release-root DIR
-  bca-geodata stage --release-root DIR --bucket NAME --identity LOGIN
-  bca-geodata publish --release-root DIR --bucket NAME --identity LOGIN [--mode manual|automatic]
-  bca-geodata withdraw --release-root DIR --bucket NAME --release-id ID --identity LOGIN --reason TEXT [--replacement FILE]
+  bca-geodata stage --release-root DIR --bucket NAME --identity LOGIN [--jurisdiction eu|fedramp]
+  bca-geodata publish --release-root DIR --bucket NAME --identity LOGIN [--jurisdiction eu|fedramp] [--mode manual|automatic]
+  bca-geodata withdraw --release-root DIR --bucket NAME --release-id ID --identity LOGIN --reason TEXT [--jurisdiction eu|fedramp] [--replacement FILE]
 
 Acquisition never uses the network unless --allow-network is present. Build
 steps run shell-free inside the pinned, network-disabled geodata container.
@@ -123,7 +123,10 @@ async function main() {
   } else if (command === "verify-archive") {
     result = await verifyArchive(absolute(required(options, "release-root")));
   } else if (command === "stage") {
-    const store = new WranglerR2Store({ bucket: required(options, "bucket") });
+    const store = new WranglerR2Store({
+      bucket: required(options, "bucket"),
+      jurisdiction: options.jurisdiction ?? null
+    });
     const staged = await stageRelease({
       releaseRoot: absolute(required(options, "release-root")),
       store,
@@ -131,7 +134,10 @@ async function main() {
     });
     result = { release_id: staged.release.release_id, uploads: staged.uploads };
   } else if (command === "publish") {
-    const store = new WranglerR2Store({ bucket: required(options, "bucket") });
+    const store = new WranglerR2Store({
+      bucket: required(options, "bucket"),
+      jurisdiction: options.jurisdiction ?? null
+    });
     const published = await publishRelease({
       releaseRoot: absolute(required(options, "release-root")),
       store,
@@ -141,7 +147,10 @@ async function main() {
     result = { release_id: published.release.release_id, current: published.pointer, uploads: published.uploads };
   } else if (command === "withdraw") {
     const replacement = options.replacement ? await readJson(absolute(options.replacement)) : null;
-    const store = new WranglerR2Store({ bucket: required(options, "bucket") });
+    const store = new WranglerR2Store({
+      bucket: required(options, "bucket"),
+      jurisdiction: options.jurisdiction ?? null
+    });
     const withdrawn = await withdrawRelease({
       releaseRoot: absolute(required(options, "release-root")),
       store,

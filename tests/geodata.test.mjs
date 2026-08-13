@@ -14,13 +14,21 @@ import {
   reuseAcquisition,
   verifyArchive
 } from "../tooling/geodata/src/pipeline.mjs";
-import { publishRelease, stageRelease, withdrawRelease } from "../tooling/geodata/src/r2.mjs";
+import { publishRelease, stageRelease, withdrawRelease, WranglerR2Store } from "../tooling/geodata/src/r2.mjs";
 import { readJson } from "../tooling/geodata/src/runtime.mjs";
 
 const repositoryRoot = path.resolve(new URL("../", import.meta.url).pathname);
 const fixedDate = new Date("2026-08-13T10:00:00Z");
 const clock = () => fixedDate;
 const commit = "1".repeat(40);
+
+test("Wrangler R2 stores accept only explicit supported jurisdictions", () => {
+  assert.equal(new WranglerR2Store({ bucket: "test", jurisdiction: "eu" }).jurisdiction, "eu");
+  assert.throws(
+    () => new WranglerR2Store({ bucket: "test", jurisdiction: "unknown" }),
+    /Unsupported R2 jurisdiction/
+  );
+});
 
 test("Planetary Computer acquisition signs only the reviewed Landsat mirror and records no SAS query", async () => {
   const asset = "https://landsateuwest.blob.core.windows.net/landsat-c2/example.TIF";

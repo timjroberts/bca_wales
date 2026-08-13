@@ -39,10 +39,18 @@ function assertKey(key) {
 }
 
 export class WranglerR2Store {
-  constructor({ bucket, env = process.env }) {
+  constructor({ bucket, jurisdiction = null, env = process.env }) {
     if (!/^[a-z0-9][a-z0-9-]+$/.test(bucket)) throw new Error(`Unsafe R2 bucket name: ${bucket}`);
+    if (jurisdiction !== null && !["eu", "fedramp"].includes(jurisdiction)) {
+      throw new Error(`Unsupported R2 jurisdiction: ${jurisdiction}`);
+    }
     this.bucket = bucket;
+    this.jurisdiction = jurisdiction;
     this.env = env;
+  }
+
+  jurisdictionArgs() {
+    return this.jurisdiction ? ["--jurisdiction", this.jurisdiction] : [];
   }
 
   async putFile(key, file, contentType) {
@@ -51,6 +59,7 @@ export class WranglerR2Store {
       "r2", "object", "put", `${this.bucket}/${key}`,
       "--file", file,
       "--content-type", contentType,
+      ...this.jurisdictionArgs(),
       "--remote"
     ], this.env);
   }
@@ -60,6 +69,7 @@ export class WranglerR2Store {
     await runWrangler([
       "r2", "object", "get", `${this.bucket}/${key}`,
       "--file", destination,
+      ...this.jurisdictionArgs(),
       "--remote"
     ], this.env);
   }
