@@ -182,17 +182,17 @@
       "purpose": "Community-maintained basemap, place names, roads, tracks and paths; never a definitive public-rights-of-way record.",
       "classification": "contextual_community",
       "provider": "OpenStreetMap contributors via Geofabrik GmbH",
-      "provider_dataset_id": "wales-260806.osm.pbf",
+      "provider_dataset_id": "wales-260812.osm.pbf",
       "landing_url": "https://download.geofabrik.de/europe/united-kingdom/wales.html",
       "acquisition": {
         "method": "Fixed dated PBF download",
-        "url": "https://download.geofabrik.de/europe/united-kingdom/wales-260806.osm.pbf",
+        "url": "https://download.geofabrik.de/europe/united-kingdom/wales-260812.osm.pbf",
         "media_type": "application/vnd.openstreetmap.data+pbf",
         "crs": "EPSG:4326",
-        "source_cutoff": "2026-08-06T20:21:21Z"
+        "source_cutoff": "2026-08-12T20:21:46Z"
       },
       "upstream": {
-        "publication_date": "2026-08-07",
+        "publication_date": "2026-08-13",
         "cadence": "daily latest extract; dated snapshots retained by provider",
         "refresh_policy": "Quarterly candidate refresh; manual review of material path/place/basemap changes."
       },
