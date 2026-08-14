@@ -22,27 +22,27 @@ const copy = {
     brand: "Blorenge landscape",
     fixture: "Published evidence · 13 August 2026",
     title: "What changed after the July 2026 fire?",
-    intro: "Explore the published change evidence and keep its source, dates and limits in view.",
+    intro: "Explore open landscape evidence, compare dated observations and keep the source and its limits in view.",
     caution: "Observed vegetation change is not proof of ecological recovery. The EFFIS boundary is provisional, not an authority or surveyed perimeter.",
     map: "Explore map",
     evidence: "Read without a map",
     mapTools: "Map Tools",
     toolCount: "2 tools",
     layers: "Layers and legend",
-    observations: "Observation record",
-    fixed: "Fixed",
-    fixedComparison: "This map shows one published comparison",
-    observationHelp: "The date record is shown for provenance. Individual dated images are not yet published, so changing or swiping between dates is not available in this release.",
-    coverage: "Valid launch-area coverage",
-    contrast: "Change visibility",
+    dates: "Observation date",
+    primaryDate: "Date",
+    compare: "Compare two dates",
+    compareHint: "Place a later observation over an earlier one.",
+    earlier: "Earlier observation",
+    earlierDate: "Earlier date",
+    later: "Later overlay",
+    contrast: "Overlay contrast",
     low: "Low",
     medium: "Medium",
     high: "High",
     sources: "Sources in view",
     sourceHelp: "Open a layer’s information panel for status, provenance, licence and limitations.",
     details: "Source details",
-    stateArea: "Area",
-    share: "Share",
     close: "Close source details",
     classification: "Classification",
     provider: "Provider",
@@ -57,15 +57,15 @@ const copy = {
     layer: "Layer",
     shown: "Shown",
     source: "Source and status",
-    temporal: "Observation basis",
+    temporal: "Selected observation",
     download: "Download accessible evidence states (CSV)",
     noSources: "No layers are currently shown.",
-    mapSummary: "The map uses one fixed derived comparison: the 12 July 2025 seasonal baseline against the first suitable post-report observation on 11 August 2026. The EFFIS boundary remains a separate provisional provider interpretation.",
+    mapSummary: "The selected observations and visible layers are summarised below. The change surface is a derived comparison; the EFFIS boundary remains a separate provisional provider interpretation.",
     area: "Launch area: Blorenge SSSI plus exactly 2 km",
     howTo: "How to read this explorer",
     guidance: [
       "Check the evidence status before interpreting a layer.",
-      "Use the evidence-state areas and percentages alongside the map; individual observation images are not yet published.",
+      "Use comparison as a visual aid; the text account carries the same selection.",
       "Read limitations and provenance before downloading or reusing anything."
     ]
   },
@@ -74,27 +74,27 @@ const copy = {
     brand: "Tirwedd y Blorens",
     fixture: "Tystiolaeth gyhoeddedig · 13 Awst 2026",
     title: "Beth newidiodd ar ôl tân Gorffennaf 2026?",
-    intro: "Archwiliwch y dystiolaeth newid gyhoeddedig a chadwch ei ffynhonnell, ei dyddiadau a’i chyfyngiadau yn y golwg.",
+    intro: "Archwiliwch dystiolaeth agored am y dirwedd, cymharwch arsylwadau â dyddiad a chadwch y ffynhonnell a’i chyfyngiadau yn y golwg.",
     caution: "Nid yw newid llystyfiant a welwyd yn brawf o adferiad ecolegol. Mae ffin EFFIS yn dros dro, nid yn derfyn awdurdod nac arolwg.",
     map: "Archwilio’r map",
     evidence: "Darllen heb fap",
     mapTools: "Offer map",
     toolCount: "2 offer",
     layers: "Haenau ac allwedd",
-    observations: "Cofnod arsylwi",
-    fixed: "Sefydlog",
-    fixedComparison: "Mae’r map hwn yn dangos un gymhariaeth gyhoeddedig",
-    observationHelp: "Dangosir y cofnod dyddiadau ar gyfer tarddiad. Nid yw’r delweddau unigol â dyddiad wedi’u cyhoeddi eto, felly nid oes modd newid na llithro rhwng dyddiadau yn y datganiad hwn.",
-    coverage: "Cwmpas dilys yr ardal lansio",
-    contrast: "Gwelededd newid",
+    dates: "Dyddiad arsylwi",
+    primaryDate: "Dyddiad",
+    compare: "Cymharu dau ddyddiad",
+    compareHint: "Gosodwch arsylwad diweddarach dros un cynharach.",
+    earlier: "Arsylwad cynharach",
+    earlierDate: "Dyddiad cynharach",
+    later: "Troshaen ddiweddarach",
+    contrast: "Cyferbyniad y droshaen",
     low: "Isel",
     medium: "Canolig",
     high: "Uchel",
     sources: "Ffynonellau yn y golwg",
     sourceHelp: "Agorwch banel gwybodaeth haen ar gyfer statws, tarddiad, trwydded a chyfyngiadau.",
     details: "Manylion y ffynhonnell",
-    stateArea: "Arwynebedd",
-    share: "Cyfran",
     close: "Cau manylion y ffynhonnell",
     classification: "Dosbarthiad",
     provider: "Darparwr",
@@ -109,15 +109,15 @@ const copy = {
     layer: "Haen",
     shown: "Wedi’i dangos",
     source: "Ffynhonnell a statws",
-    temporal: "Sail arsylwi",
+    temporal: "Arsylwad a ddewiswyd",
     download: "Lawrlwytho cyflyrau tystiolaeth hygyrch (CSV)",
     noSources: "Nid oes haenau’n cael eu dangos ar hyn o bryd.",
-    mapSummary: "Mae’r map yn defnyddio un gymhariaeth ddeilliedig sefydlog: llinell sylfaen dymhorol 12 Gorffennaf 2025 yn erbyn yr arsylwad addas cyntaf ar ôl yr adroddiad ar 11 Awst 2026. Mae ffin EFFIS yn aros yn ddehongliad dros dro ar wahân gan ddarparwr.",
+    mapSummary: "Crynhoir yr arsylwadau dethol a’r haenau gweladwy isod. Cymhariaeth ddeilliedig yw’r arwyneb newid; mae ffin EFFIS yn aros yn ddehongliad dros dro ar wahân gan ddarparwr.",
     area: "Ardal lansio: SoDdGA y Blorens ynghyd ag union 2 km",
     howTo: "Sut i ddarllen yr archwiliwr hwn",
     guidance: [
       "Gwiriwch statws y dystiolaeth cyn dehongli haen.",
-      "Defnyddiwch arwynebeddau a chanrannau’r cyflyrau tystiolaeth ochr yn ochr â’r map; nid yw delweddau arsylwi unigol wedi’u cyhoeddi eto.",
+      "Defnyddiwch gymhariaeth fel cymorth gweledol; mae’r testun yn defnyddio’r un dewis.",
       "Darllenwch gyfyngiadau a tharddiad cyn lawrlwytho neu ailddefnyddio unrhyw beth."
     ]
   }
@@ -136,12 +136,21 @@ function parseState(current: ExplorerState): ExplorerState {
   const params = new URLSearchParams(window.location.search);
   const allowedLayers = new Set(explorer.layers.map((layer) => layer.id));
   const requestedLayers = params.get("layers")?.split(",").filter((id) => allowedLayers.has(id));
+  const allowedDates = new Set(explorer.dates.map((date) => date.id));
+  const requestedPrimaryDate = params.get("date");
+  const requestedComparisonDate = params.get("compare");
   const contrast = params.get("contrast");
+  const primaryDate = requestedPrimaryDate && allowedDates.has(requestedPrimaryDate) ? requestedPrimaryDate : current.primaryDate;
+  const comparisonDate = requestedComparisonDate && allowedDates.has(requestedComparisonDate) ? requestedComparisonDate : current.comparisonDate;
+  const primaryIndex = explorer.dates.findIndex((date) => date.id === primaryDate);
+  const comparisonIndex = explorer.dates.findIndex((date) => date.id === comparisonDate);
 
   return {
     ...current,
     visibleLayerIds: requestedLayers ?? current.visibleLayerIds,
-    comparisonEnabled: false,
+    primaryDate,
+    comparisonDate,
+    comparisonEnabled: Boolean(requestedComparisonDate && comparisonIndex >= 0 && comparisonIndex < primaryIndex),
     contrast: contrast === "low" || contrast === "medium" || contrast === "high" ? contrast : current.contrast
   };
 }
@@ -149,7 +158,9 @@ function parseState(current: ExplorerState): ExplorerState {
 function stateHref(path: string, state: ExplorerState): string {
   const params = new URLSearchParams();
   params.set("layers", state.visibleLayerIds.join(","));
-  params.set("contrast", state.contrast);
+  if (state.primaryDate) params.set("date", state.primaryDate);
+  if (state.comparisonEnabled && state.comparisonDate) params.set("compare", state.comparisonDate);
+  if (state.comparisonEnabled) params.set("contrast", state.contrast);
   return `${path}?${params.toString()}`;
 }
 
@@ -212,14 +223,48 @@ export function Explorer({ initialView }: { initialView: "map" | "evidence" }) {
     window.requestAnimationFrame(() => document.getElementById(`details-${layerId}`)?.focus());
   }
 
+  function selectPrimaryDate(dateId: string) {
+    setState((current) => {
+      if (!current.comparisonEnabled) return { ...current, primaryDate: dateId };
+      const primaryIndex = explorer.dates.findIndex((date) => date.id === dateId);
+      const comparisonIndex = explorer.dates.findIndex((date) => date.id === current.comparisonDate);
+      return {
+        ...current,
+        primaryDate: dateId,
+        comparisonDate: comparisonIndex < primaryIndex ? current.comparisonDate : explorer.dates[Math.max(0, primaryIndex - 1)]?.id ?? null
+      };
+    });
+  }
+
+  function toggleComparison(enabled: boolean) {
+    setState((current) => {
+      if (!enabled) return { ...current, comparisonEnabled: false };
+      const primaryIndex = explorer.dates.findIndex((date) => date.id === current.primaryDate);
+      const comparisonIndex = explorer.dates.findIndex((date) => date.id === current.comparisonDate);
+      if (primaryIndex > 0) {
+        return {
+          ...current,
+          comparisonEnabled: true,
+          comparisonDate: comparisonIndex >= 0 && comparisonIndex < primaryIndex
+            ? current.comparisonDate
+            : explorer.dates[primaryIndex - 1]?.id ?? null
+        };
+      }
+      return {
+        ...current,
+        comparisonEnabled: true,
+        comparisonDate: explorer.dates[0]?.id ?? null,
+        primaryDate: explorer.dates[1]?.id ?? current.primaryDate
+      };
+    });
+  }
+
   const visibleLayers = useMemo(
     () => explorer.layers.filter((layer) => state.visibleLayerIds.includes(layer.id)),
     [state.visibleLayerIds]
   );
   const detailLayer = explorer.layers.find((layer) => layer.id === detailLayerId);
-  const baselineDate = explorer.dates[0]!;
-  const postReportDate = explorer.dates.at(-1)!;
-  const fixedObservationBasis = `${localise(baselineDate.label, state.language)} · ${localise(baselineDate.displayDate, state.language)} → ${localise(postReportDate.label, state.language)} · ${localise(postReportDate.displayDate, state.language)}`;
+  const selectedDate = explorer.dates.find((date) => date.id === state.primaryDate) ?? explorer.dates[0]!;
   const sourcesStrip = (
     <aside className="sources-strip" aria-live="polite" aria-labelledby="sources-heading">
       <p><strong id="sources-heading">{c.sources}:</strong> {visibleLayers.length ? [...new Set(visibleLayers.map((layer) => layer.attribution))].join(" · ") : c.noSources}</p>
@@ -294,6 +339,9 @@ export function Explorer({ initialView }: { initialView: "map" | "evidence" }) {
                   detailLayerId={detailLayerId}
                   onLayerToggle={(layerId) => setState((current) => toggleVisibleLayer(current, layerId))}
                   onLayerDetail={(layerId) => setDetailLayerId(detailLayerId === layerId ? null : layerId)}
+                  onPrimaryDateChange={selectPrimaryDate}
+                  onComparisonToggle={toggleComparison}
+                  onEarlierDateChange={(dateId) => setState((current) => ({ ...current, comparisonDate: dateId }))}
                   onContrastChange={(contrast) => setState((current) => ({ ...current, contrast }))}
                 />
               </div>
@@ -334,28 +382,44 @@ export function Explorer({ initialView }: { initialView: "map" | "evidence" }) {
               </aside>
 
               <div className="content-panel">
-                <section className="observation-record" aria-labelledby="observation-heading">
-                  <div><p className="panel-kicker">02</p><h2 id="observation-heading">{c.observations}</h2></div>
-                  <div>
-                    <p><strong>{c.fixedComparison}</strong></p>
-                    <p>{c.observationHelp}</p>
-                    <ol>
-                      {explorer.dates.map((date) => <li key={date.id}><span>{localise(date.label, state.language)} · {localise(date.displayDate, state.language)}</span><small>{c.coverage}: {date.validAoiPercent}%</small></li>)}
-                    </ol>
+                <section className="date-control" aria-labelledby="date-heading">
+                  <div><p className="panel-kicker">02</p><h2 id="date-heading">{c.dates}</h2></div>
+                  <div className="time-controls">
+                    <label className="compare-toggle">
+                      <input type="checkbox" checked={state.comparisonEnabled} onChange={(event) => toggleComparison(event.target.checked)} />
+                      <span><strong>{c.compare}</strong><small>{c.compareHint}</small></span>
+                    </label>
+                    {state.comparisonEnabled ? (
+                      <div className="comparison-controls">
+                        <label><span>{c.earlier}</span><select value={state.comparisonDate ?? ""} onChange={(event) => setState((current) => ({ ...current, comparisonDate: event.target.value }))}>
+                          {explorer.dates.map((date, index) => <option key={date.id} value={date.id} disabled={index >= explorer.dates.findIndex((item) => item.id === state.primaryDate)}>{localise(date.label, state.language)} · {localise(date.displayDate, state.language)}</option>)}
+                        </select></label>
+                        <label><span>{c.later}</span><select value={state.primaryDate ?? ""} onChange={(event) => selectPrimaryDate(event.target.value)}>
+                          {explorer.dates.map((date, index) => <option key={date.id} value={date.id} disabled={index <= explorer.dates.findIndex((item) => item.id === state.comparisonDate)}>{localise(date.label, state.language)} · {localise(date.displayDate, state.language)}</option>)}
+                        </select></label>
+                        <fieldset className="contrast-controls"><legend>{c.contrast}</legend><div>
+                          {(["low", "medium", "high"] as const).map((contrast) => <button key={contrast} type="button" aria-pressed={state.contrast === contrast} onClick={() => setState((current) => ({ ...current, contrast }))}>{c[contrast]}</button>)}
+                        </div></fieldset>
+                      </div>
+                    ) : (
+                      <div className="date-options" aria-label={c.dates}>
+                        {explorer.dates.map((date) => <button key={date.id} type="button" aria-pressed={state.primaryDate === date.id} onClick={() => selectPrimaryDate(date.id)}><strong>{localise(date.label, state.language)}</strong><span>{localise(date.displayDate, state.language)}</span></button>)}
+                      </div>
+                    )}
                   </div>
                 </section>
 
                 <section className="evidence-view" aria-labelledby="evidence-heading">
                   <div className="evidence-summary"><p className="panel-kicker">03</p><h2 id="evidence-heading">{c.evidence}</h2><p>{c.mapSummary}</p></div>
                   <div className="table-wrap"><table><caption>{c.table}</caption><thead><tr><th scope="col">{c.layer}</th><th scope="col">{c.shown}</th><th scope="col">{c.source}</th><th scope="col">{c.temporal}</th></tr></thead><tbody>
-                    {explorer.layers.map((layer) => <tr key={layer.id}><th scope="row"><span className={`legend-swatch swatch-${layer.mapStyle}`} aria-hidden="true" /> <LayerName layer={layer} language={state.language} /></th><td>{state.visibleLayerIds.includes(layer.id) ? "✓" : "—"}<span className="sr-only">{state.visibleLayerIds.includes(layer.id) ? c.shown : "Hidden"}</span></td><td>{layer.provider}<br /><small>{localise(layer.evidenceStatus, state.language)}</small></td><td>{layer.temporal ? fixedObservationBasis : "—"}</td></tr>)}
+                    {explorer.layers.map((layer) => <tr key={layer.id}><th scope="row"><span className={`legend-swatch swatch-${layer.mapStyle}`} aria-hidden="true" /> <LayerName layer={layer} language={state.language} /></th><td>{state.visibleLayerIds.includes(layer.id) ? "✓" : "—"}<span className="sr-only">{state.visibleLayerIds.includes(layer.id) ? c.shown : "Hidden"}</span></td><td>{layer.provider}<br /><small>{localise(layer.evidenceStatus, state.language)}</small></td><td>{layer.temporal ? `${localise(selectedDate.label, state.language)} · ${localise(selectedDate.displayDate, state.language)} · ${selectedDate.validAoiPercent}% valid AOI` : "—"}</td></tr>)}
                   </tbody></table></div>
                   {state.language === "cy" ? <p className="fallback-note"><span lang="en">EN</span>{c.fallback}</p> : null}
                   <section className="factual-summary" aria-labelledby="factual-heading" lang={state.language === "cy" ? "en" : undefined}>
                     <h3 id="factual-heading">{explorer.claim}</h3>
                     <p><strong>First report:</strong> {explorer.incident.firstReport}. {explorer.incident.chronology} {explorer.incident.unknowns}</p>
-                    <div className="table-wrap"><table><caption>Evidence-state summary for the launch area</caption><thead><tr><th scope="col">State</th><th scope="col">Meaning</th><th scope="col">Pixels</th><th scope="col">Rounded area (ha)</th><th scope="col">Share</th></tr></thead><tbody>
-                      {explorer.evidenceStates.map((item) => <tr key={item.id}><th scope="row">{item.id.replaceAll("_", " ")}</th><td>{item.meaning}</td><td>{item.pixels.toLocaleString()}</td><td>{item.areaHaRounded.toLocaleString()}</td><td>{(item.areaHaRounded * 100 / explorer.evidenceStates.reduce((total, stateItem) => total + stateItem.areaHaRounded, 0)).toFixed(1)}%</td></tr>)}
+                    <div className="table-wrap"><table><caption>Evidence-state summary for the launch area</caption><thead><tr><th scope="col">State</th><th scope="col">Meaning</th><th scope="col">Pixels</th><th scope="col">Rounded area (ha)</th></tr></thead><tbody>
+                      {explorer.evidenceStates.map((item) => <tr key={item.id}><th scope="row">{item.id.replaceAll("_", " ")}</th><td>{item.meaning}</td><td>{item.pixels.toLocaleString()}</td><td>{item.areaHaRounded.toLocaleString()}</td></tr>)}
                     </tbody></table></div>
                     <p><strong>Terrain:</strong> {explorer.terrain.minimumM}–{explorer.terrain.maximumM} m; mean {explorer.terrain.meanM} m; {explorer.terrain.contourIntervalM} m contours.</p>
                     <ul>{explorer.limitations.map((limitation) => <li key={limitation}>{limitation}</li>)}</ul>
