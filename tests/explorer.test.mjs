@@ -59,6 +59,9 @@ test("the factual presentation contract is internally referential and exposes pu
   assert.ok(release.layers.every((layer) => layer.provider && layer.licence && layer.owner && layer.nextReviewAt));
   assert.match(release.map.assets.download, /evidence-states\.csv\.txt$/);
   assert.equal(release.evidenceStates.length, 4);
-  assert.deepEqual(release.layers.filter((layer) => layer.defaultVisible).map((layer) => layer.id), ["change", "fire"]);
+  assert.deepEqual(
+    release.layers.filter((layer) => layer.defaultVisible).map((layer) => layer.id),
+    ["change", "fire", "protected", "access", "water"]
+  );
   assert.match(release.claim, /consistent with the documented July 2026 Blaenavon wildfire/);
 });
