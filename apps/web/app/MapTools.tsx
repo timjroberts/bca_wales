@@ -8,15 +8,18 @@ type MapToolsCopy = {
   mapTools: string;
   toolCount: string;
   layers: string;
-  dates: string;
-  primaryDate: string;
-  compare: string;
-  earlierDate: string;
+  observations: string;
+  fixed: string;
+  fixedComparison: string;
+  observationHelp: string;
+  coverage: string;
   contrast: string;
   low: string;
   medium: string;
   high: string;
   details: string;
+  stateArea: string;
+  share: string;
 };
 
 type MapToolsProps = {
@@ -27,11 +30,15 @@ type MapToolsProps = {
   detailLayerId: string | null;
   onLayerToggle: (layerId: string) => void;
   onLayerDetail: (layerId: string) => void;
-  onPrimaryDateChange: (dateId: string) => void;
-  onComparisonToggle: (enabled: boolean) => void;
-  onEarlierDateChange: (dateId: string) => void;
   onContrastChange: (contrast: ContrastLevel) => void;
 };
+
+const evidenceStateNames = {
+  not_observed: { en: "Not observed", cy: "Heb ei arsylwi" },
+  observed_no_thresholded_change: { en: "No thresholded change", cy: "Dim newid uwchlaw’r trothwy" },
+  lower_confidence_observed_change: { en: "Lower-confidence change", cy: "Newid â hyder is" },
+  higher_confidence_observed_change: { en: "Higher-confidence change", cy: "Newid â hyder uwch" }
+} as const;
 
 function MapToolLayerName({ layer, language }: { layer: ExplorerLayer; language: Language }) {
   const fallback = language === "cy" && !layer.name.cy;
@@ -51,13 +58,10 @@ export function MapTools({
   detailLayerId,
   onLayerToggle,
   onLayerDetail,
-  onPrimaryDateChange,
-  onComparisonToggle,
-  onEarlierDateChange,
   onContrastChange
 }: MapToolsProps) {
-  const primaryDateIndex = fixture.dates.findIndex((date) => date.id === state.primaryDate);
-  const [openPanels, setOpenPanels] = useState({ tools: true, layers: true, date: true });
+  const totalAreaHa = fixture.evidenceStates.reduce((total, item) => total + item.areaHaRounded, 0);
+  const [openPanels, setOpenPanels] = useState({ tools: true, layers: false, observations: false });
 
   function setPanelOpen(panel: keyof typeof openPanels, open: boolean) {
     setOpenPanels((current) => current[panel] === open ? current : { ...current, [panel]: open });
@@ -84,7 +88,7 @@ export function MapTools({
               const layers = fixture.layers.filter((layer) => layer.groupId === group.id);
               const activeCount = layers.filter((layer) => state.visibleLayerIds.includes(layer.id)).length;
               return (
-                <details open key={group.id}>
+                <details open={group.id === "evidence"} key={group.id}>
                   <summary>
                     <strong>{localise(group.name, language)}</strong>
                     <small>{activeCount}/{layers.length}</small>
@@ -115,16 +119,31 @@ export function MapTools({
                   </div>
                   {group.id === "evidence" ? (
                     <div className="evidence-state-legend" aria-label={language === "en" ? "Observed-change evidence states" : "Cyflyrau tystiolaeth newid a welwyd"}>
-                      <strong>{language === "en" ? "Change surface states" : "Cyflyrau’r arwyneb newid"}</strong>
+                      <strong>{language === "en" ? "Published change surface" : "Arwyneb newid cyhoeddedig"}</strong>
                       <ul>
                         {fixture.evidenceStates.map((item, index) => (
                           <li key={item.id}>
                             <span className={`evidence-state evidence-state-${index}`} aria-hidden="true" />
-                            <span lang={language === "cy" ? "en" : undefined}>{item.id.replaceAll("_", " ")}</span>
+                            <span>
+                              <b>{localise(evidenceStateNames[item.id as keyof typeof evidenceStateNames] ?? { en: item.id, cy: item.id }, language)}</b>
+                              <small>{copy.stateArea} {item.areaHaRounded.toLocaleString(language === "cy" ? "cy-GB" : "en-GB")} ha · {copy.share} {(item.areaHaRounded * 100 / totalAreaHa).toFixed(1)}%</small>
+                            </span>
                           </li>
                         ))}
                       </ul>
-                      {language === "cy" ? <small className="global-fallback"><b lang="en">EN</b> Mae labeli technegol y cyflwr yn aros yn Saesneg.</small> : null}
+                      <fieldset className="map-tool-contrast">
+                        <legend>{copy.contrast}</legend>
+                        <div>
+                          {(["low", "medium", "high"] as const).map((contrast) => (
+                            <button
+                              key={contrast}
+                              type="button"
+                              aria-pressed={state.contrast === contrast}
+                              onClick={() => onContrastChange(contrast)}
+                            >{copy[contrast]}</button>
+                          ))}
+                        </div>
+                      </fieldset>
                     </div>
                   ) : null}
                 </details>
@@ -133,61 +152,24 @@ export function MapTools({
           </div>
         </details>
 
-        <details className="map-tool-panel map-tool-date" open={openPanels.date} onToggle={(event) => setPanelOpen("date", event.currentTarget.open)}>
+        <details className="map-tool-panel map-tool-observations" open={openPanels.observations} onToggle={(event) => setPanelOpen("observations", event.currentTarget.open)}>
           <summary>
             <span className="tool-disclosure-icon" aria-hidden="true">›</span>
-            <strong>{copy.dates}</strong>
+            <strong>{copy.observations}</strong>
+            <small>{copy.fixed}</small>
           </summary>
 
-          <div className="map-tool-date-fields">
-            <label className="map-tool-select-field">
-              <span>{copy.primaryDate}</span>
-              <select value={state.primaryDate ?? ""} onChange={(event) => onPrimaryDateChange(event.target.value)}>
-                {fixture.dates.map((date, index) => (
-                  <option key={date.id} value={date.id} disabled={state.comparisonEnabled && index === 0}>
-                    {localise(date.label, language)} · {localise(date.displayDate, language)}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label className="map-tool-compare-toggle">
-              <input
-                type="checkbox"
-                checked={state.comparisonEnabled}
-                onChange={(event) => onComparisonToggle(event.target.checked)}
-              />
-              <span><strong>{copy.compare}</strong></span>
-            </label>
-
-            {state.comparisonEnabled ? (
-              <div className="map-tool-comparison-fields">
-                <label className="map-tool-select-field">
-                  <span>{copy.earlierDate}</span>
-                  <select value={state.comparisonDate ?? ""} onChange={(event) => onEarlierDateChange(event.target.value)}>
-                    {fixture.dates.map((date, index) => (
-                      <option key={date.id} value={date.id} disabled={index >= primaryDateIndex}>
-                        {localise(date.label, language)} · {localise(date.displayDate, language)}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-
-                <fieldset className="map-tool-contrast">
-                  <legend>{copy.contrast}</legend>
-                  <div>
-                    {(["low", "medium", "high"] as const).map((contrast) => (
-                      <button
-                        key={contrast}
-                        type="button"
-                        aria-pressed={state.contrast === contrast}
-                        onClick={() => onContrastChange(contrast)}
-                      >{copy[contrast]}</button>
-                    ))}
-                  </div>
-                </fieldset>
-              </div>
-            ) : null}
+          <div className="map-tool-observation-record">
+            <strong>{copy.fixedComparison}</strong>
+            <p>{copy.observationHelp}</p>
+            <ol>
+              {fixture.dates.map((date) => (
+                <li key={date.id}>
+                  <span>{localise(date.label, language)} · {localise(date.displayDate, language)}</span>
+                  <small>{copy.coverage}: {date.validAoiPercent}%</small>
+                </li>
+              ))}
+            </ol>
           </div>
         </details>
       </div>

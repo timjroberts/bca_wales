@@ -26,15 +26,9 @@ const STYLE_LAYER_IDS: Record<string, readonly string[]> = {
 };
 
 const contrastOpacity: Record<ContrastLevel, number> = {
-  low: 0.25,
-  medium: 0.48,
-  high: 0.72
-};
-
-const contrastLabel: Record<ContrastLevel, { en: string; cy: string }> = {
-  low: { en: "low", cy: "isel" },
-  medium: { en: "medium", cy: "canolig" },
-  high: { en: "high", cy: "uchel" }
+  low: 0.38,
+  medium: 0.68,
+  high: 0.9
 };
 
 let pmtilesProtocolInstalled = false;
@@ -201,11 +195,15 @@ export function MapCanvas({
     else map.once("load", apply);
   }, [explorer.layers, state]);
 
-  const primary = explorer.dates.find((date) => date.id === state.primaryDate);
-  const comparison = explorer.dates.find((date) => date.id === state.comparisonDate);
-  const summary = state.comparisonEnabled && comparison
-    ? `${localise(comparison.label, language)} (${localise(comparison.displayDate, language)}) + ${localise(primary?.label ?? comparison.label, language)} (${localise(primary?.displayDate ?? comparison.displayDate, language)}), ${localise(contrastLabel[state.contrast], language)}`
-    : `${localise(primary?.label ?? explorer.dates[0]!.label, language)} (${localise(primary?.displayDate ?? explorer.dates[0]!.displayDate, language)})`;
+  const baseline = explorer.dates[0]!;
+  const postReport = explorer.dates.at(-1)!;
+  const totalAreaHa = explorer.evidenceStates.reduce((total, item) => total + item.areaHaRounded, 0);
+  const changedAreaHa = explorer.evidenceStates
+    .filter((item) => item.id === "lower_confidence_observed_change" || item.id === "higher_confidence_observed_change")
+    .reduce((total, item) => total + item.areaHaRounded, 0);
+  const noThresholdedChangeHa = explorer.evidenceStates.find((item) => item.id === "observed_no_thresholded_change")?.areaHaRounded ?? 0;
+  const notObservedHa = explorer.evidenceStates.find((item) => item.id === "not_observed")?.areaHaRounded ?? 0;
+  const comparisonLabel = `${localise(baseline.label, language)} (${localise(baseline.displayDate, language)}) → ${localise(postReport.label, language)} (${localise(postReport.displayDate, language)})`;
 
   return (
     <figure className="map-figure">
@@ -217,7 +215,9 @@ export function MapCanvas({
         aria-describedby="map-description"
       />
       <figcaption id="map-description" className="map-caption">
-        <strong>{language === "en" ? "Selected observation state:" : "Cyflwr arsylwi dethol:"}</strong> {summary}. {language === "en" ? "The published change surface compares the 2025 seasonal baseline with the first suitable post-report observation on 11 August 2026; EFFIS remains a separate provisional boundary." : "Mae’r arwyneb newid cyhoeddedig yn cymharu llinell sylfaen dymhorol 2025 â’r arsylwad addas cyntaf ar ôl yr adroddiad ar 11 Awst 2026; mae EFFIS yn aros yn ffin dros dro ar wahân."}
+        <strong>{language === "en" ? "Published comparison:" : "Cymhariaeth gyhoeddedig:"}</strong> {comparisonLabel}. {language === "en"
+          ? `${changedAreaHa.toLocaleString("en-GB")} ha (${(changedAreaHa * 100 / totalAreaHa).toFixed(1)}%) has lower- or higher-confidence observed change; ${noThresholdedChangeHa.toLocaleString("en-GB")} ha has no thresholded change; ${notObservedHa.toLocaleString("en-GB")} ha was not observed. EFFIS remains a separate provisional boundary.`
+          : `Mae gan ${changedAreaHa.toLocaleString("cy-GB")} ha (${(changedAreaHa * 100 / totalAreaHa).toFixed(1)}%) newid a welwyd â hyder is neu uwch; nid oes gan ${noThresholdedChangeHa.toLocaleString("cy-GB")} ha newid uwchlaw’r trothwy; ni arsylwyd ${notObservedHa.toLocaleString("cy-GB")} ha. Mae EFFIS yn aros yn ffin dros dro ar wahân.`}
       </figcaption>
     </figure>
   );
