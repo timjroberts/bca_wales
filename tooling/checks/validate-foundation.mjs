@@ -45,7 +45,10 @@ for (const required of [
   "Referrer-Policy",
   "X-Content-Type-Options",
   "frame-ancestors 'none'",
-  "object-src 'none'"
+  "object-src 'none'",
+  "worker-src 'self' blob:",
+  "child-src 'self' blob:",
+  "img-src 'self' data: blob:"
 ]) {
   assert.match(headers, new RegExp(required.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
 }
