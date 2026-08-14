@@ -19,6 +19,7 @@
     "test": "node --test tests/*.test.mjs",
     "test:geodata-container": "BCA_DOCKER_SMOKE=1 node --test --test-name-pattern='pinned container executes' tests/geodata.test.mjs",
     "validate": "node tooling/checks/validate-foundation.mjs",
+    "check:production": "node tooling/checks/check-production.mjs",
     "geodata": "node tooling/geodata/bin/bca-geodata.mjs",
     "geodata:validate": "npm run geodata -- validate --registry data/launch/source-registry.json --recipe config/publication/recipe.example.json",
     "check": "npm run lint && npm run typecheck && npm test && npm run build",

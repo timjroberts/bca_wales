@@ -1,0 +1,27 @@
+{
+  "schema_version": "1.0.0",
+  "release_authority": "Tim Roberts",
+  "critical_failures_waivable": false,
+  "performance_targets": {
+    "lighthouse_mobile_median_minimum": 90,
+    "lcp_ms_maximum": 2500,
+    "cls_maximum": 0.1,
+    "total_blocking_time_ms_maximum": 200
+  },
+  "checks": [
+    { "id": "evidence-integrity", "tier": "blocking", "description": "Claims, evidence states, uncertainty and provisional status match the immutable passing release." },
+    { "id": "rights-attribution-provenance", "tier": "blocking", "description": "Every visible layer exposes its provider, licence, attribution, dates, owner, method, lineage and limitations." },
+    { "id": "core-map-journey", "tier": "blocking", "description": "The factual map loads and supports visible layers, observation state and source details." },
+    { "id": "semantic-evidence-journey", "tier": "blocking", "description": "The evidence route exposes the substantive factual account without WebGL or client-side JavaScript." },
+    { "id": "core-accessibility", "tier": "blocking", "description": "No keyboard trap; labelled controls, visible focus, readable contrast and colour-independent meaning." },
+    { "id": "privacy-security", "tier": "blocking", "description": "No visitor tracking; restrictive headers, pinned dependencies, secret checks and no exploitable high or critical vulnerability." },
+    { "id": "publication-integrity", "tier": "blocking", "description": "The site commit, immutable release, current pointer and representative asset checksums agree." },
+    { "id": "recovery", "tier": "blocking", "description": "Known-good site and evidence state are recorded and restore rehearsal succeeds without rebuilding." },
+    { "id": "release-approval", "tier": "blocking", "description": "The sole release authority explicitly approves the paired site and evidence promotion." },
+    { "id": "supported-browsers-mobile", "tier": "non-critical", "description": "Current and previous stable Chrome, Edge, Firefox and Safari work from 320 CSS pixels upward." },
+    { "id": "performance", "tier": "non-critical", "description": "Median production-like Lighthouse mobile results meet the recorded targets." },
+    { "id": "automated-accessibility", "tier": "advisory", "description": "Automated, screen-reader, forced-colour, reduced-motion and 400% reflow reviews are recorded when performed." },
+    { "id": "non-specialist-review", "tier": "advisory", "description": "Two non-specialists exercise the phone-sized map and semantic evidence journeys." },
+    { "id": "progressive-welsh-review", "tier": "advisory", "description": "Verified Welsh coverage and acknowledged English fallbacks are reviewed." }
+  ]
+}

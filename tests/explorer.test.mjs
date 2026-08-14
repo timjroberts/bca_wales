@@ -31,6 +31,9 @@ test("map and semantic routes share controls, state links and source detail", as
   assert.match(explorer, /Max-Age=31536000/);
   assert.match(explorer, /document\.documentElement\.lang/);
   assert.match(map, /new maplibregl\.Map/);
+  assert.match(map, /new Protocol/);
+  assert.match(map, /pmtiles:\/\//);
+  assert.match(map, /release-context/);
   assert.match(map, /cooperativeGestures: true/);
   assert.match(map, /prefers-reduced-motion: reduce/);
   assert.match(mapTools, /className="map-tools" open=\{openPanels\.tools\}/);
@@ -44,8 +47,15 @@ test("map and semantic routes share controls, state links and source detail", as
   assert.doesNotMatch(mapTools, /PROTOTYPE|VariantA|VariantB|VariantC/);
 });
 
-test("the accessible download contains metadata only", async () => {
-  const csv = await read("apps/web/public/explorer-interface-fixture.csv");
-  assert.match(csv, /public_evidence/);
-  assert.equal(csv.trim().split("\n").slice(1).every((line) => line.endsWith(",false")), true);
+test("the factual presentation contract is internally referential and exposes public-safe alternatives", async () => {
+  const release = JSON.parse(await read("data/launch/explorer-release-2026-08-13.json"));
+  const groupIds = new Set(release.groups.map((group) => group.id));
+  const layerIds = release.layers.map((layer) => layer.id);
+  assert.equal(release.fixture, false);
+  assert.equal(new Set(layerIds).size, layerIds.length);
+  assert.ok(release.layers.every((layer) => groupIds.has(layer.groupId)));
+  assert.ok(release.layers.every((layer) => layer.provider && layer.licence && layer.owner && layer.nextReviewAt));
+  assert.match(release.map.assets.download, /evidence-states\.csv\.txt$/);
+  assert.equal(release.evidenceStates.length, 4);
+  assert.match(release.claim, /consistent with the documented July 2026 Blaenavon wildfire/);
 });

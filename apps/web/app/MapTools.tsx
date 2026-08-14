@@ -1,7 +1,7 @@
 "use client";
 
 import { localise, type ContrastLevel, type ExplorerState, type Language } from "@bca/domain";
-import type { ExplorerFixture, ExplorerFixtureLayer } from "@bca/publication";
+import type { ExplorerLayer, ExplorerRelease } from "@bca/publication";
 import { useState } from "react";
 
 type MapToolsCopy = {
@@ -20,7 +20,7 @@ type MapToolsCopy = {
 };
 
 type MapToolsProps = {
-  fixture: ExplorerFixture;
+  fixture: ExplorerRelease;
   state: ExplorerState;
   language: Language;
   copy: MapToolsCopy;
@@ -33,7 +33,7 @@ type MapToolsProps = {
   onContrastChange: (contrast: ContrastLevel) => void;
 };
 
-function MapToolLayerName({ layer, language }: { layer: ExplorerFixtureLayer; language: Language }) {
+function MapToolLayerName({ layer, language }: { layer: ExplorerLayer; language: Language }) {
   const fallback = language === "cy" && !layer.name.cy;
   return (
     <>
@@ -113,6 +113,20 @@ export function MapTools({
                       </div>
                     ))}
                   </div>
+                  {group.id === "evidence" ? (
+                    <div className="evidence-state-legend" aria-label={language === "en" ? "Observed-change evidence states" : "Cyflyrau tystiolaeth newid a welwyd"}>
+                      <strong>{language === "en" ? "Change surface states" : "Cyflyrau’r arwyneb newid"}</strong>
+                      <ul>
+                        {fixture.evidenceStates.map((item, index) => (
+                          <li key={item.id}>
+                            <span className={`evidence-state evidence-state-${index}`} aria-hidden="true" />
+                            <span lang={language === "cy" ? "en" : undefined}>{item.id.replaceAll("_", " ")}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      {language === "cy" ? <small className="global-fallback"><b lang="en">EN</b> Mae labeli technegol y cyflwr yn aros yn Saesneg.</small> : null}
+                    </div>
+                  ) : null}
                 </details>
               );
             })}

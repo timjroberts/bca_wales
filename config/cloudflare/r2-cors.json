@@ -3,6 +3,7 @@
     {
       "allowed": {
         "origins": [
+          "https://bca-wales-explorer.pages.dev",
           "https://explore.bca.wales",
           "https://preview.bca.wales"
         ],
