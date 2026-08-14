@@ -7,23 +7,23 @@ import {
   type ExplorerState,
   type Language
 } from "@bca/domain";
-import type { ExplorerFixture, ExplorerFixtureLayer } from "@bca/publication";
+import type { ExplorerLayer, ExplorerRelease } from "@bca/publication";
 import { useEffect, useMemo, useRef, useState } from "react";
-import fixtureDocument from "../../../fixtures/explorer/interface.example.json";
+import explorerDocument from "../../../data/launch/explorer-release-2026-08-13.json";
 import { MapCanvas } from "./MapCanvas";
 import { MapTools } from "./MapTools";
 
-const fixture = fixtureDocument as unknown as ExplorerFixture;
+const explorer = explorerDocument as unknown as ExplorerRelease;
 const LANGUAGE_COOKIE = "bca-language";
 
 const copy = {
   en: {
     skip: "Skip to the explorer",
     brand: "Blorenge landscape",
-    fixture: "Validated interface fixture",
+    fixture: "Published evidence · 13 August 2026",
     title: "What changed after the July 2026 fire?",
     intro: "Explore open landscape evidence, compare dated observations and keep the source and its limits in view.",
-    caution: "Observed vegetation change is not proof of ecological recovery. No factual evidence release is attached yet.",
+    caution: "Observed vegetation change is not proof of ecological recovery. The EFFIS boundary is provisional, not an authority or surveyed perimeter.",
     map: "Explore map",
     evidence: "Read without a map",
     mapTools: "Map Tools",
@@ -50,6 +50,7 @@ const copy = {
     date: "Source or publication date",
     licence: "Licence and reuse",
     method: "Method and provenance",
+    owner: "Owner and next review",
     limitations: "Limitations",
     fallback: "Some source names and map-control labels remain in English while verified Welsh wording is prepared.",
     table: "Evidence and sources in the current view",
@@ -57,10 +58,10 @@ const copy = {
     shown: "Shown",
     source: "Source and status",
     temporal: "Selected observation",
-    download: "Download accessible fixture data (CSV)",
+    download: "Download accessible evidence states (CSV)",
     noSources: "No layers are currently shown.",
-    mapSummary: "The map contains synthetic interface shapes only. Use this view to test layer, time and source controls; do not infer a fire boundary, vegetation value or legal boundary from it.",
-    area: "Launch area: Blorenge protected site context plus 2 km",
+    mapSummary: "The selected observations and visible layers are summarised below. The change surface is a derived comparison; the EFFIS boundary remains a separate provisional provider interpretation.",
+    area: "Launch area: Blorenge SSSI plus exactly 2 km",
     howTo: "How to read this explorer",
     guidance: [
       "Check the evidence status before interpreting a layer.",
@@ -71,10 +72,10 @@ const copy = {
   cy: {
     skip: "Neidio i’r archwiliwr",
     brand: "Tirwedd y Blorens",
-    fixture: "Gosodiad rhyngwyneb wedi’i ddilysu",
+    fixture: "Tystiolaeth gyhoeddedig · 13 Awst 2026",
     title: "Beth newidiodd ar ôl tân Gorffennaf 2026?",
     intro: "Archwiliwch dystiolaeth agored am y dirwedd, cymharwch arsylwadau â dyddiad a chadwch y ffynhonnell a’i chyfyngiadau yn y golwg.",
-    caution: "Nid yw newid llystyfiant a welwyd yn brawf o adferiad ecolegol. Nid oes rhyddhad tystiolaeth ffeithiol wedi’i atodi eto.",
+    caution: "Nid yw newid llystyfiant a welwyd yn brawf o adferiad ecolegol. Mae ffin EFFIS yn dros dro, nid yn derfyn awdurdod nac arolwg.",
     map: "Archwilio’r map",
     evidence: "Darllen heb fap",
     mapTools: "Offer map",
@@ -101,17 +102,18 @@ const copy = {
     date: "Dyddiad y ffynhonnell neu’r cyhoeddiad",
     licence: "Trwydded ac ailddefnyddio",
     method: "Dull a tharddiad",
+    owner: "Perchennog a’r adolygiad nesaf",
     limitations: "Cyfyngiadau",
-    fallback: "Mae rhai enwau ffynonellau a labeli rheoli’r map yn aros yn Saesneg tra bod geiriad Cymraeg wedi’i wirio yn cael ei baratoi.",
+    fallback: "Mae rhai enwau ffynonellau, metadata a’r crynodeb technegol yn aros yn Saesneg tra bod geiriad Cymraeg wedi’i wirio yn cael ei baratoi.",
     table: "Tystiolaeth a ffynonellau yn yr olygfa gyfredol",
     layer: "Haen",
     shown: "Wedi’i dangos",
     source: "Ffynhonnell a statws",
     temporal: "Arsylwad a ddewiswyd",
-    download: "Lawrlwytho data gosod hygyrch (CSV)",
+    download: "Lawrlwytho cyflyrau tystiolaeth hygyrch (CSV)",
     noSources: "Nid oes haenau’n cael eu dangos ar hyn o bryd.",
-    mapSummary: "Dim ond siapiau rhyngwyneb synthetig sydd ar y map. Defnyddiwch yr olygfa hon i brofi rheolyddion haen, amser a ffynhonnell; peidiwch â chasglu ffin tân, gwerth llystyfiant na ffin gyfreithiol ohoni.",
-    area: "Ardal lansio: cyd-destun safle gwarchodedig y Blorens ynghyd â 2 km",
+    mapSummary: "Crynhoir yr arsylwadau dethol a’r haenau gweladwy isod. Cymhariaeth ddeilliedig yw’r arwyneb newid; mae ffin EFFIS yn aros yn ddehongliad dros dro ar wahân gan ddarparwr.",
+    area: "Ardal lansio: SoDdGA y Blorens ynghyd ag union 2 km",
     howTo: "Sut i ddarllen yr archwiliwr hwn",
     guidance: [
       "Gwiriwch statws y dystiolaeth cyn dehongli haen.",
@@ -124,24 +126,24 @@ const copy = {
 function initialState(): ExplorerState {
   return {
     ...DEFAULT_EXPLORER_STATE,
-    visibleLayerIds: fixture.layers.filter((layer) => layer.defaultVisible).map((layer) => layer.id),
-    primaryDate: fixture.dates.at(-1)?.id ?? null,
-    comparisonDate: fixture.dates[0]?.id ?? null
+    visibleLayerIds: explorer.layers.filter((layer) => layer.defaultVisible).map((layer) => layer.id),
+    primaryDate: explorer.dates.at(-1)?.id ?? null,
+    comparisonDate: explorer.dates[0]?.id ?? null
   };
 }
 
 function parseState(current: ExplorerState): ExplorerState {
   const params = new URLSearchParams(window.location.search);
-  const allowedLayers = new Set(fixture.layers.map((layer) => layer.id));
+  const allowedLayers = new Set(explorer.layers.map((layer) => layer.id));
   const requestedLayers = params.get("layers")?.split(",").filter((id) => allowedLayers.has(id));
-  const allowedDates = new Set(fixture.dates.map((date) => date.id));
+  const allowedDates = new Set(explorer.dates.map((date) => date.id));
   const requestedPrimaryDate = params.get("date");
   const requestedComparisonDate = params.get("compare");
   const contrast = params.get("contrast");
   const primaryDate = requestedPrimaryDate && allowedDates.has(requestedPrimaryDate) ? requestedPrimaryDate : current.primaryDate;
   const comparisonDate = requestedComparisonDate && allowedDates.has(requestedComparisonDate) ? requestedComparisonDate : current.comparisonDate;
-  const primaryIndex = fixture.dates.findIndex((date) => date.id === primaryDate);
-  const comparisonIndex = fixture.dates.findIndex((date) => date.id === comparisonDate);
+  const primaryIndex = explorer.dates.findIndex((date) => date.id === primaryDate);
+  const comparisonIndex = explorer.dates.findIndex((date) => date.id === comparisonDate);
 
   return {
     ...current,
@@ -162,7 +164,7 @@ function stateHref(path: string, state: ExplorerState): string {
   return `${path}?${params.toString()}`;
 }
 
-function LayerName({ layer, language }: { layer: ExplorerFixtureLayer; language: Language }) {
+function LayerName({ layer, language }: { layer: ExplorerLayer; language: Language }) {
   const fallback = language === "cy" && !layer.name.cy;
   return (
     <>
@@ -224,12 +226,12 @@ export function Explorer({ initialView }: { initialView: "map" | "evidence" }) {
   function selectPrimaryDate(dateId: string) {
     setState((current) => {
       if (!current.comparisonEnabled) return { ...current, primaryDate: dateId };
-      const primaryIndex = fixture.dates.findIndex((date) => date.id === dateId);
-      const comparisonIndex = fixture.dates.findIndex((date) => date.id === current.comparisonDate);
+      const primaryIndex = explorer.dates.findIndex((date) => date.id === dateId);
+      const comparisonIndex = explorer.dates.findIndex((date) => date.id === current.comparisonDate);
       return {
         ...current,
         primaryDate: dateId,
-        comparisonDate: comparisonIndex < primaryIndex ? current.comparisonDate : fixture.dates[Math.max(0, primaryIndex - 1)]?.id ?? null
+        comparisonDate: comparisonIndex < primaryIndex ? current.comparisonDate : explorer.dates[Math.max(0, primaryIndex - 1)]?.id ?? null
       };
     });
   }
@@ -237,32 +239,32 @@ export function Explorer({ initialView }: { initialView: "map" | "evidence" }) {
   function toggleComparison(enabled: boolean) {
     setState((current) => {
       if (!enabled) return { ...current, comparisonEnabled: false };
-      const primaryIndex = fixture.dates.findIndex((date) => date.id === current.primaryDate);
-      const comparisonIndex = fixture.dates.findIndex((date) => date.id === current.comparisonDate);
+      const primaryIndex = explorer.dates.findIndex((date) => date.id === current.primaryDate);
+      const comparisonIndex = explorer.dates.findIndex((date) => date.id === current.comparisonDate);
       if (primaryIndex > 0) {
         return {
           ...current,
           comparisonEnabled: true,
           comparisonDate: comparisonIndex >= 0 && comparisonIndex < primaryIndex
             ? current.comparisonDate
-            : fixture.dates[primaryIndex - 1]?.id ?? null
+            : explorer.dates[primaryIndex - 1]?.id ?? null
         };
       }
       return {
         ...current,
         comparisonEnabled: true,
-        comparisonDate: fixture.dates[0]?.id ?? null,
-        primaryDate: fixture.dates[1]?.id ?? current.primaryDate
+        comparisonDate: explorer.dates[0]?.id ?? null,
+        primaryDate: explorer.dates[1]?.id ?? current.primaryDate
       };
     });
   }
 
   const visibleLayers = useMemo(
-    () => fixture.layers.filter((layer) => state.visibleLayerIds.includes(layer.id)),
+    () => explorer.layers.filter((layer) => state.visibleLayerIds.includes(layer.id)),
     [state.visibleLayerIds]
   );
-  const detailLayer = fixture.layers.find((layer) => layer.id === detailLayerId);
-  const selectedDate = fixture.dates.find((date) => date.id === state.primaryDate) ?? fixture.dates[0]!;
+  const detailLayer = explorer.layers.find((layer) => layer.id === detailLayerId);
+  const selectedDate = explorer.dates.find((date) => date.id === state.primaryDate) ?? explorer.dates[0]!;
   const sourcesStrip = (
     <aside className="sources-strip" aria-live="polite" aria-labelledby="sources-heading">
       <p><strong id="sources-heading">{c.sources}:</strong> {visibleLayers.length ? [...new Set(visibleLayers.map((layer) => layer.attribution))].join(" · ") : c.noSources}</p>
@@ -279,6 +281,7 @@ export function Explorer({ initialView }: { initialView: "map" | "evidence" }) {
         <div><dt>{c.status}</dt><dd>{localise(detailLayer.evidenceStatus, state.language)}</dd></div>
         <div><dt>{c.date}</dt><dd>{localise(detailLayer.sourceDate, state.language)}</dd></div>
         <div><dt>{c.licence}</dt><dd>{detailLayer.licence}</dd></div>
+        <div><dt>{c.owner}</dt><dd>{detailLayer.owner}; {detailLayer.nextReviewAt}</dd></div>
         <div><dt>{c.method}</dt><dd>{localise(detailLayer.method, state.language)}</dd></div>
       </dl>
       <div className="limitation-box"><strong>{c.limitations}</strong><ul>{detailLayer.limitations.map((limitation) => <li key={limitation.en}>{localise(limitation, state.language)}</li>)}</ul></div>
@@ -327,9 +330,9 @@ export function Explorer({ initialView }: { initialView: "map" | "evidence" }) {
           {initialView === "map" ? (
             <div className="map-workspace">
               <div className="map-stage">
-                <MapCanvas fixture={fixture} language={state.language} state={state} />
+                <MapCanvas explorer={explorer} language={state.language} state={state} />
                 <MapTools
-                  fixture={fixture}
+                  fixture={explorer}
                   state={state}
                   language={state.language}
                   copy={c}
@@ -350,10 +353,10 @@ export function Explorer({ initialView }: { initialView: "map" | "evidence" }) {
               <aside className="layer-panel" aria-labelledby="layers-heading">
                 <div className="panel-heading">
                   <div><p className="panel-kicker">01</p><h2 id="layers-heading">{c.layers}</h2></div>
-                  <span>{visibleLayers.length}/{fixture.layers.length}</span>
+                  <span>{visibleLayers.length}/{explorer.layers.length}</span>
                 </div>
-                {fixture.groups.map((group) => {
-                  const groupLayers = fixture.layers.filter((layer) => layer.groupId === group.id);
+                {explorer.groups.map((group) => {
+                  const groupLayers = explorer.layers.filter((layer) => layer.groupId === group.id);
                   const activeCount = groupLayers.filter((layer) => state.visibleLayerIds.includes(layer.id)).length;
                   return (
                     <details className="layer-group" open key={group.id}>
@@ -389,10 +392,10 @@ export function Explorer({ initialView }: { initialView: "map" | "evidence" }) {
                     {state.comparisonEnabled ? (
                       <div className="comparison-controls">
                         <label><span>{c.earlier}</span><select value={state.comparisonDate ?? ""} onChange={(event) => setState((current) => ({ ...current, comparisonDate: event.target.value }))}>
-                          {fixture.dates.map((date, index) => <option key={date.id} value={date.id} disabled={index >= fixture.dates.findIndex((item) => item.id === state.primaryDate)}>{localise(date.label, state.language)} · {localise(date.displayDate, state.language)}</option>)}
+                          {explorer.dates.map((date, index) => <option key={date.id} value={date.id} disabled={index >= explorer.dates.findIndex((item) => item.id === state.primaryDate)}>{localise(date.label, state.language)} · {localise(date.displayDate, state.language)}</option>)}
                         </select></label>
                         <label><span>{c.later}</span><select value={state.primaryDate ?? ""} onChange={(event) => selectPrimaryDate(event.target.value)}>
-                          {fixture.dates.map((date, index) => <option key={date.id} value={date.id} disabled={index <= fixture.dates.findIndex((item) => item.id === state.comparisonDate)}>{localise(date.label, state.language)} · {localise(date.displayDate, state.language)}</option>)}
+                          {explorer.dates.map((date, index) => <option key={date.id} value={date.id} disabled={index <= explorer.dates.findIndex((item) => item.id === state.comparisonDate)}>{localise(date.label, state.language)} · {localise(date.displayDate, state.language)}</option>)}
                         </select></label>
                         <fieldset className="contrast-controls"><legend>{c.contrast}</legend><div>
                           {(["low", "medium", "high"] as const).map((contrast) => <button key={contrast} type="button" aria-pressed={state.contrast === contrast} onClick={() => setState((current) => ({ ...current, contrast }))}>{c[contrast]}</button>)}
@@ -400,7 +403,7 @@ export function Explorer({ initialView }: { initialView: "map" | "evidence" }) {
                       </div>
                     ) : (
                       <div className="date-options" aria-label={c.dates}>
-                        {fixture.dates.map((date) => <button key={date.id} type="button" aria-pressed={state.primaryDate === date.id} onClick={() => selectPrimaryDate(date.id)}><strong>{localise(date.label, state.language)}</strong><span>{localise(date.displayDate, state.language)}</span></button>)}
+                        {explorer.dates.map((date) => <button key={date.id} type="button" aria-pressed={state.primaryDate === date.id} onClick={() => selectPrimaryDate(date.id)}><strong>{localise(date.label, state.language)}</strong><span>{localise(date.displayDate, state.language)}</span></button>)}
                       </div>
                     )}
                   </div>
@@ -409,9 +412,19 @@ export function Explorer({ initialView }: { initialView: "map" | "evidence" }) {
                 <section className="evidence-view" aria-labelledby="evidence-heading">
                   <div className="evidence-summary"><p className="panel-kicker">03</p><h2 id="evidence-heading">{c.evidence}</h2><p>{c.mapSummary}</p></div>
                   <div className="table-wrap"><table><caption>{c.table}</caption><thead><tr><th scope="col">{c.layer}</th><th scope="col">{c.shown}</th><th scope="col">{c.source}</th><th scope="col">{c.temporal}</th></tr></thead><tbody>
-                    {fixture.layers.map((layer) => <tr key={layer.id}><th scope="row"><span className={`legend-swatch swatch-${layer.mapStyle}`} aria-hidden="true" /> <LayerName layer={layer} language={state.language} /></th><td>{state.visibleLayerIds.includes(layer.id) ? "✓" : "—"}<span className="sr-only">{state.visibleLayerIds.includes(layer.id) ? c.shown : "Hidden"}</span></td><td>{layer.provider}<br /><small>{localise(layer.evidenceStatus, state.language)}</small></td><td>{layer.temporal ? `${localise(selectedDate.label, state.language)} · ${localise(selectedDate.displayDate, state.language)}` : "—"}</td></tr>)}
+                    {explorer.layers.map((layer) => <tr key={layer.id}><th scope="row"><span className={`legend-swatch swatch-${layer.mapStyle}`} aria-hidden="true" /> <LayerName layer={layer} language={state.language} /></th><td>{state.visibleLayerIds.includes(layer.id) ? "✓" : "—"}<span className="sr-only">{state.visibleLayerIds.includes(layer.id) ? c.shown : "Hidden"}</span></td><td>{layer.provider}<br /><small>{localise(layer.evidenceStatus, state.language)}</small></td><td>{layer.temporal ? `${localise(selectedDate.label, state.language)} · ${localise(selectedDate.displayDate, state.language)} · ${selectedDate.validAoiPercent}% valid AOI` : "—"}</td></tr>)}
                   </tbody></table></div>
-                  <a className="download-button" href="/explorer-interface-fixture.csv" download>{c.download}</a>
+                  {state.language === "cy" ? <p className="fallback-note"><span lang="en">EN</span>{c.fallback}</p> : null}
+                  <section className="factual-summary" aria-labelledby="factual-heading" lang={state.language === "cy" ? "en" : undefined}>
+                    <h3 id="factual-heading">{explorer.claim}</h3>
+                    <p><strong>First report:</strong> {explorer.incident.firstReport}. {explorer.incident.chronology} {explorer.incident.unknowns}</p>
+                    <div className="table-wrap"><table><caption>Evidence-state summary for the launch area</caption><thead><tr><th scope="col">State</th><th scope="col">Meaning</th><th scope="col">Pixels</th><th scope="col">Rounded area (ha)</th></tr></thead><tbody>
+                      {explorer.evidenceStates.map((item) => <tr key={item.id}><th scope="row">{item.id.replaceAll("_", " ")}</th><td>{item.meaning}</td><td>{item.pixels.toLocaleString()}</td><td>{item.areaHaRounded.toLocaleString()}</td></tr>)}
+                    </tbody></table></div>
+                    <p><strong>Terrain:</strong> {explorer.terrain.minimumM}–{explorer.terrain.maximumM} m; mean {explorer.terrain.meanM} m; {explorer.terrain.contourIntervalM} m contours.</p>
+                    <ul>{explorer.limitations.map((limitation) => <li key={limitation}>{limitation}</li>)}</ul>
+                  </section>
+                  <a className="download-button" href={`${process.env.NEXT_PUBLIC_ASSET_ORIGIN ?? "https://assets.bca.wales"}${explorer.map.assets.download}`} download>{c.download}</a>
                 </section>
 
                 {sourcesStrip}
@@ -423,7 +436,7 @@ export function Explorer({ initialView }: { initialView: "map" | "evidence" }) {
 
         <section className="reading-notes" aria-labelledby="guidance-heading"><div><p className="panel-kicker">04</p><h2 id="guidance-heading">{c.howTo}</h2></div><ol>{c.guidance.map((item, index) => <li key={item}><span aria-hidden="true">{index + 1}</span><p>{item}</p></li>)}</ol></section>
       </main>
-      <footer><p>{localise(fixture.fixtureNotice, state.language)}</p><a href="#explorer-main">{c.skip}</a></footer>
+      <footer><p>Evidence release {explorer.release.datasetVersion} · published 13 August 2026 · owner {explorer.release.owner} · next review {explorer.release.nextReviewAt}</p><nav aria-label="Service information"><a href="/accessibility/">Accessibility</a> · <a href="/privacy/">Privacy</a> · <a href="/security/">Security</a></nav><a href="#explorer-main">{c.skip}</a></footer>
     </>
   );
 }

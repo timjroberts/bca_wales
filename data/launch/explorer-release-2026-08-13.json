@@ -1,0 +1,142 @@
+{
+  "schemaVersion": "1.0.0",
+  "fixture": false,
+  "release": {
+    "id": "release-blorenge-2026-08-13.6",
+    "datasetVersion": "2026-08-13.6",
+    "publishedAt": "2026-08-13T20:08:46.245Z",
+    "retrievedAt": "2026-08-13T18:20:27.597Z",
+    "nextReviewAt": "2026-09-13",
+    "owner": "Tim Roberts",
+    "manifestPath": "/releases/release-blorenge-2026-08-13.6/manifest.json",
+    "manifestSha256": "65fa773b82e6995fe29867fca5a1c56404df53d0e399e0a4e1e0fa74426dbb2a"
+  },
+  "map": {
+    "center": [-3.0593, 51.7862],
+    "zoom": 12,
+    "assets": {
+      "context": "/releases/release-blorenge-2026-08-13.6/assets/context.pmtiles",
+      "terrain": "/releases/release-blorenge-2026-08-13.6/assets/terrain.pmtiles",
+      "contours": "/releases/release-blorenge-2026-08-13.6/assets/terrain-contours.pmtiles",
+      "change": "/releases/release-blorenge-2026-08-13.6/assets/observed-change.pmtiles",
+      "effis": "/releases/release-blorenge-2026-08-13.6/assets/effis-592404.geojson",
+      "download": "/releases/release-blorenge-2026-08-13.6/assets/evidence-states.csv.txt"
+    }
+  },
+  "dates": [
+    { "id": "seasonal-baseline", "label": { "en": "Seasonal baseline", "cy": "Llinell sylfaen dymhorol" }, "displayDate": { "en": "12 July 2025", "cy": "12 Gorffennaf 2025" }, "validAoiPercent": 99.805 },
+    { "id": "before-report", "label": { "en": "Before first report", "cy": "Cyn yr adroddiad cyntaf" }, "displayDate": { "en": "12 July 2026", "cy": "12 Gorffennaf 2026" }, "validAoiPercent": 99.435 },
+    { "id": "after-report", "label": { "en": "First suitable after report", "cy": "Y cyntaf addas ar ôl yr adroddiad" }, "displayDate": { "en": "11 August 2026", "cy": "11 Awst 2026" }, "validAoiPercent": 98.51 }
+  ],
+  "groups": [
+    { "id": "evidence", "name": { "en": "Fire and change", "cy": "Tân a newid" }, "description": { "en": "Observed change and a separate provisional provider interpretation", "cy": "Newid a welwyd a dehongliad dros dro ar wahân gan ddarparwr" } },
+    { "id": "landscape", "name": { "en": "Landscape context", "cy": "Cyd-destun y dirwedd" }, "description": { "en": "Protection, paths, terrain and water", "cy": "Gwarchodaeth, llwybrau, tirwedd a dŵr" } },
+    { "id": "historical", "name": { "en": "Historical context", "cy": "Cyd-destun hanesyddol" }, "description": { "en": "Dated sources that are not current condition", "cy": "Ffynonellau â dyddiad nad ydynt yn gyflwr presennol" } }
+  ],
+  "layers": [
+    {
+      "id": "change", "groupId": "evidence", "name": { "en": "Observed surface and vegetation change", "cy": "Newid arwyneb a llystyfiant a welwyd" },
+      "description": { "en": "A conservative, uncalibrated comparison of valid Sentinel-2 observations, independently checked where Landsat was observable.", "cy": "Cymhariaeth geidwadol heb ei graddnodi o arsylwadau Sentinel-2 dilys, wedi’i gwirio’n annibynnol lle roedd Landsat yn weladwy." },
+      "classification": "derived", "defaultVisible": true, "mapStyle": "change", "temporal": true,
+      "provider": "Copernicus Sentinel-2, USGS Landsat and BCA processing", "attribution": "Contains modified Copernicus Sentinel data 2025–2026; Landsat imagery courtesy of the U.S. Geological Survey",
+      "evidenceStatus": { "en": "Versioned derived observation — not ecological recovery or a severity class", "cy": "Arsylwad deilliedig â fersiwn — nid adferiad ecolegol na dosbarth difrifoldeb" },
+      "sourceDate": { "en": "12 July 2025, 12 July 2026 and 11 August 2026", "cy": "12 Gorffennaf 2025, 12 Gorffennaf 2026 ac 11 Awst 2026" },
+      "licence": "Copernicus Sentinel data legal notice; USGS public domain", "owner": "Tim Roberts", "nextReviewAt": "2026-09-13",
+      "method": { "en": "Quality-mask the observations, calculate continuous dNBR, NDVI and NDMI change, then display conservative evidence states. Landsat corroboration remains separate and is not fused.", "cy": "Masgio ansawdd yr arsylwadau, cyfrifo newid dNBR, NDVI ac NDMI parhaus, yna dangos cyflyrau tystiolaeth geidwadol. Mae cadarnhad Landsat yn aros ar wahân ac nid yw wedi’i uno." },
+      "limitations": [
+        { "en": "Observed change is not proof of ecological recovery, habitat condition, cause or local severity.", "cy": "Nid yw newid a welwyd yn brawf o adferiad ecolegol, cyflwr cynefin, achos na difrifoldeb lleol." },
+        { "en": "The first suitable post-report Sentinel-2 observation is 11 August; cloud-obscured areas remain not observed.", "cy": "Yr arsylwad Sentinel-2 addas cyntaf ar ôl yr adroddiad yw 11 Awst; mae ardaloedd dan gymylau yn aros heb eu harsylwi." }
+      ]
+    },
+    {
+      "id": "fire", "groupId": "evidence", "name": { "en": "EFFIS provisional provider boundary", "cy": "Ffin dros dro darparwr EFFIS" },
+      "description": { "en": "EFFIS feature 592404 is a high-confidence event match shown separately from the observed-change evidence.", "cy": "Mae nodwedd EFFIS 592404 yn gyfatebiaeth digwyddiad hyder uchel a ddangosir ar wahân i’r dystiolaeth newid a welwyd." },
+      "classification": "provisional", "defaultVisible": true, "mapStyle": "fire", "temporal": false,
+      "provider": "European Union, Copernicus EFFIS", "attribution": "European Union, Copernicus EFFIS; clipping by Blorenge Commoners Association",
+      "evidenceStatus": { "en": "Provisional provider interpretation — not an authority or surveyed perimeter", "cy": "Dehongliad dros dro gan ddarparwr — nid terfyn awdurdod nac arolwg" },
+      "sourceDate": { "en": "Provider feature last updated 30 July 2026", "cy": "Diweddarwyd nodwedd y darparwr ddiwethaf 30 Gorffennaf 2026" },
+      "licence": "Creative Commons Attribution 4.0", "owner": "Tim Roberts", "nextReviewAt": "2026-09-13",
+      "method": { "en": "Publish the exact bounded provider feature as a separate named comparison.", "cy": "Cyhoeddi union nodwedd derfynedig y darparwr fel cymhariaeth ar wahân ag enw." },
+      "limitations": [
+        { "en": "No incident-authority, legal or surveyed fire perimeter is available.", "cy": "Nid oes terfyn tân gan awdurdod y digwyddiad, terfyn cyfreithiol na therfyn wedi’i arolygu ar gael." },
+        { "en": "Provider dates are not authority ignition, containment or stop times; no cause or exact incident-area claim is made.", "cy": "Nid amseroedd cynnau, cyfyngu na stopio’r awdurdod yw dyddiadau’r darparwr; ni wneir honiad am achos nac arwynebedd union y digwyddiad." }
+      ]
+    },
+    {
+      "id": "protected", "groupId": "landscape", "name": { "en": "Blorenge SSSI and National Park", "cy": "SoDdGA y Blorens a’r Parc Cenedlaethol" },
+      "description": { "en": "The authoritative protected-site and National Park context used to define the launch area.", "cy": "Cyd-destun awdurdodol y safle gwarchodedig a’r Parc Cenedlaethol a ddefnyddiwyd i ddiffinio ardal y lansiad." },
+      "classification": "authoritative", "defaultVisible": true, "mapStyle": "protected", "temporal": false,
+      "provider": "Natural Resources Wales", "attribution": "Contains Natural Resources Wales information and Ordnance Survey data under OGL 3.0",
+      "evidenceStatus": { "en": "Authoritative designation context", "cy": "Cyd-destun dynodi awdurdodol" }, "sourceDate": { "en": "Retrieved 13 August 2026", "cy": "Adalwyd 13 Awst 2026" },
+      "licence": "Open Government Licence 3.0", "owner": "Tim Roberts", "nextReviewAt": "2026-09-13",
+      "method": { "en": "Clip allowlisted source fields to the Blorenge SSSI plus 2 km launch area.", "cy": "Clipio meysydd ffynhonnell a ganiateir i ardal lansio SoDdGA y Blorens ynghyd â 2 km." },
+      "limitations": [{ "en": "The SSSI boundary is not the legal Blorenge Common CL18 boundary.", "cy": "Nid ffin gyfreithiol Comin y Blorens CL18 yw ffin y SoDdGA." }]
+    },
+    {
+      "id": "access", "groupId": "landscape", "name": { "en": "Contextual paths and places", "cy": "Llwybrau a lleoedd cyd-destunol" },
+      "description": { "en": "A dated OpenStreetMap snapshot for orientation.", "cy": "Ciplun OpenStreetMap â dyddiad ar gyfer cyfeiriadedd." },
+      "classification": "contextual", "defaultVisible": true, "mapStyle": "access", "temporal": false,
+      "provider": "OpenStreetMap contributors via Geofabrik", "attribution": "© OpenStreetMap contributors; processed by Geofabrik",
+      "evidenceStatus": { "en": "Dated community context", "cy": "Cyd-destun cymunedol â dyddiad" }, "sourceDate": { "en": "Wales snapshot 12 August 2026", "cy": "Ciplun Cymru 12 Awst 2026" },
+      "licence": "Open Database Licence 1.0", "owner": "Tim Roberts", "nextReviewAt": "2026-11-14",
+      "method": { "en": "Clip selected place and path fields to the launch area.", "cy": "Clipio meysydd lleoedd a llwybrau dethol i ardal y lansiad." },
+      "limitations": [{ "en": "Paths are contextual and do not establish legal public-rights-of-way status.", "cy": "Mae llwybrau yn gyd-destunol ac nid ydynt yn sefydlu statws hawl tramwy cyhoeddus cyfreithiol." }]
+    },
+    {
+      "id": "water", "groupId": "landscape", "name": { "en": "Principal watercourses", "cy": "Prif gyrsiau dŵr" },
+      "description": { "en": "Named NRW main-river context within the launch area.", "cy": "Cyd-destun prif afonydd CNC ag enwau o fewn ardal y lansiad." },
+      "classification": "authoritative", "defaultVisible": true, "mapStyle": "water", "temporal": false,
+      "provider": "Natural Resources Wales", "attribution": "Contains Natural Resources Wales information and Ordnance Survey data under OGL 3.0",
+      "evidenceStatus": { "en": "Authoritative contextual source", "cy": "Ffynhonnell gyd-destunol awdurdodol" }, "sourceDate": { "en": "Retrieved 13 August 2026", "cy": "Adalwyd 13 Awst 2026" },
+      "licence": "Open Government Licence 3.0", "owner": "Tim Roberts", "nextReviewAt": "2026-11-14",
+      "method": { "en": "Clip allowlisted main-river features to the launch area.", "cy": "Clipio nodweddion prif afonydd a ganiateir i ardal y lansiad." },
+      "limitations": [{ "en": "This is landscape context, not live flood or water-quality information.", "cy": "Cyd-destun tirwedd yw hwn, nid gwybodaeth fyw am lifogydd nac ansawdd dŵr." }]
+    },
+    {
+      "id": "terrain", "groupId": "landscape", "name": { "en": "Terrain and 10 m contours", "cy": "Tirwedd a chyfuchliniau 10 m" },
+      "description": { "en": "A fixed hillshade and contours derived from Welsh Government LiDAR.", "cy": "Cysgodwedd sefydlog a chyfuchliniau wedi’u deillio o LiDAR Llywodraeth Cymru." },
+      "classification": "contextual", "defaultVisible": false, "mapStyle": "terrain", "temporal": false,
+      "provider": "Welsh Government", "attribution": "Welsh Government LiDAR",
+      "evidenceStatus": { "en": "Dated derived terrain context", "cy": "Cyd-destun tirwedd deilliedig â dyddiad" }, "sourceDate": { "en": "Captured 2021–2022", "cy": "Cofnodwyd 2021–2022" },
+      "licence": "Open Government Licence 3.0", "owner": "Tim Roberts", "nextReviewAt": "Review on source or contract change",
+      "method": { "en": "Average exact intersecting 1 m DTM tiles to 10 m, then derive fixed hillshade and 10 m contours.", "cy": "Cyfartaleddu teils DTM 1 m union sy’n croestorri i 10 m, yna deillio cysgodwedd sefydlog a chyfuchliniau 10 m." },
+      "limitations": [{ "en": "Capture dates vary by tile; hillshade is a visualisation and does not describe current surface cover.", "cy": "Mae dyddiadau cofnodi’n amrywio fesul teil; delweddiad yw’r cysgodwedd ac nid yw’n disgrifio gorchudd presennol yr arwyneb." }]
+    },
+    {
+      "id": "habitat", "groupId": "historical", "name": { "en": "Historical Phase 1 habitat survey", "cy": "Arolwg cynefinoedd Cam 1 hanesyddol" },
+      "description": { "en": "A dated survey layer that must not be read as current habitat condition.", "cy": "Haen arolwg â dyddiad na ddylid ei darllen fel cyflwr cynefin presennol." },
+      "classification": "historical", "defaultVisible": false, "mapStyle": "habitat", "temporal": false,
+      "provider": "Natural Resources Wales", "attribution": "Contains Natural Resources Wales information and Ordnance Survey data under OGL 3.0",
+      "evidenceStatus": { "en": "Historical survey context", "cy": "Cyd-destun arolwg hanesyddol" }, "sourceDate": { "en": "Historical source; retrieved 13 August 2026", "cy": "Ffynhonnell hanesyddol; adalwyd 13 Awst 2026" },
+      "licence": "Open Government Licence 3.0", "owner": "Tim Roberts", "nextReviewAt": "Review on source or contract change",
+      "method": { "en": "Clip the recorded Phase 1 habitat polygons to the launch area.", "cy": "Clipio’r polygonau cynefinoedd Cam 1 a gofnodwyd i ardal y lansiad." },
+      "limitations": [{ "en": "The survey does not describe current habitat condition or ecological recovery.", "cy": "Nid yw’r arolwg yn disgrifio cyflwr cynefin presennol nac adferiad ecolegol." }]
+    }
+  ],
+  "claim": "Satellite observations show surface and vegetation change consistent with the documented July 2026 Blaenavon wildfire.",
+  "incident": {
+    "firstReport": "19 July 2026 at 19:42 UTC",
+    "chronology": "Active and under containment operations on 23 July; work and a holding perimeter line were reported on 27 July.",
+    "unknowns": "No authority stop time, surveyed perimeter or cause is available."
+  },
+  "evidenceStates": [
+    { "id": "not_observed", "meaning": "A quality mask prevents comparison.", "pixels": 1990, "areaHaRounded": 80 },
+    { "id": "observed_no_thresholded_change", "meaning": "A valid comparison exists but the conservative change rule is not met.", "pixels": 89807, "areaHaRounded": 3592 },
+    { "id": "lower_confidence_observed_change", "meaning": "dNBR and NDVI indicate change; the moisture-sensitive indicator does not agree.", "pixels": 1505, "areaHaRounded": 60 },
+    { "id": "higher_confidence_observed_change", "meaning": "dNBR, NDVI and NDMI agree on observed surface and vegetation change.", "pixels": 38301, "areaHaRounded": 1532 }
+  ],
+  "contextCounts": [
+    { "label": "Blorenge SSSI", "count": 1 }, { "label": "Bannau Brycheiniog National Park", "count": 1 },
+    { "label": "Principal watercourses", "count": 12 }, { "label": "Place names", "count": 13 },
+    { "label": "Contextual paths", "count": 1945 }, { "label": "Historical habitat features", "count": 2530 }
+  ],
+  "terrain": { "minimumM": 38.8, "maximumM": 558.8, "meanM": 300.5, "contourIntervalM": 10 },
+  "limitations": [
+    "Observed change is not proof of ecological recovery or habitat condition.",
+    "No exact, legal, surveyed or incident-authority fire perimeter is available.",
+    "The evidence-state thresholds are conservative and are not locally calibrated severity classes.",
+    "The SSSI boundary is not the legal Blorenge Common CL18 boundary.",
+    "Paths are contextual and do not establish legal public-rights-of-way status.",
+    "Historical habitat does not describe current condition or recovery."
+  ]
+}

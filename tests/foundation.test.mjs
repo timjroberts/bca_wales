@@ -13,11 +13,13 @@ test("the production application uses static export and package seams", async ()
   assert.equal(webPackage.dependencies["@bca/publication"], "0.1.0");
 });
 
-test("prototype evidence remains quarantined while production uses a validated fixture", async () => {
+test("prototype evidence remains quarantined while production uses the validated factual release", async () => {
   const page = await read("apps/web/app/page.tsx");
   const evidence = await read("apps/web/app/evidence/page.tsx");
   const explorer = await read("apps/web/app/Explorer.tsx");
-  assert.match(explorer, /fixtures\/explorer\/interface\.example\.json/);
+  assert.match(explorer, /data\/launch\/explorer-release-2026-08-13\.json/);
+  assert.match(explorer, /Published evidence/);
+  assert.doesNotMatch(explorer, /No factual evidence release is attached/);
   assert.doesNotMatch(`${page}\n${evidence}\n${explorer}`, /prototypes\/blorenge-explorer|55%|burn scar|hectare/i);
 });
 

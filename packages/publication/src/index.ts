@@ -22,49 +22,85 @@ export interface ReleaseManifest {
   readonly assets: readonly AssetReference[];
 }
 
-export type FixtureMapStyle = "fire" | "change" | "protected" | "access" | "water" | "habitat";
+export type ExplorerMapStyle = "fire" | "change" | "protected" | "access" | "water" | "terrain" | "habitat";
 
-export interface ExplorerFixtureDate {
+export interface ExplorerDate {
   readonly id: string;
   readonly label: { readonly en: string; readonly cy: string };
   readonly displayDate: { readonly en: string; readonly cy: string };
+  readonly validAoiPercent: number;
 }
 
-export interface ExplorerFixtureLayer {
+export interface ExplorerLayer {
   readonly id: string;
   readonly groupId: string;
   readonly name: { readonly en: string; readonly cy?: string };
   readonly description: { readonly en: string; readonly cy?: string };
   readonly classification: "authoritative" | "provisional" | "derived" | "contextual" | "historical";
   readonly defaultVisible: boolean;
-  readonly mapStyle: FixtureMapStyle;
+  readonly mapStyle: ExplorerMapStyle;
   readonly temporal: boolean;
   readonly provider: string;
   readonly attribution: string;
   readonly evidenceStatus: { readonly en: string; readonly cy: string };
   readonly sourceDate: { readonly en: string; readonly cy: string };
   readonly licence: string;
+  readonly owner: string;
+  readonly nextReviewAt: string;
   readonly method: { readonly en: string; readonly cy?: string };
   readonly limitations: readonly { readonly en: string; readonly cy?: string }[];
 }
 
-export interface ExplorerFixture {
+export interface ExplorerRelease {
   readonly schemaVersion: "1.0.0";
-  readonly fixture: true;
-  readonly fixtureNotice: { readonly en: string; readonly cy: string };
+  readonly fixture: false;
+  readonly release: {
+    readonly id: string;
+    readonly datasetVersion: string;
+    readonly publishedAt: string;
+    readonly retrievedAt: string;
+    readonly nextReviewAt: string;
+    readonly owner: string;
+    readonly manifestPath: string;
+    readonly manifestSha256: string;
+  };
   readonly map: {
     readonly center: readonly [number, number];
     readonly zoom: number;
-    readonly features: {
-      readonly type: "FeatureCollection";
-      readonly features: readonly unknown[];
+    readonly assets: {
+      readonly context: string;
+      readonly terrain: string;
+      readonly contours: string;
+      readonly change: string;
+      readonly effis: string;
+      readonly download: string;
     };
   };
-  readonly dates: readonly ExplorerFixtureDate[];
+  readonly dates: readonly ExplorerDate[];
   readonly groups: readonly {
     readonly id: string;
     readonly name: { readonly en: string; readonly cy: string };
     readonly description: { readonly en: string; readonly cy: string };
   }[];
-  readonly layers: readonly ExplorerFixtureLayer[];
+  readonly layers: readonly ExplorerLayer[];
+  readonly claim: string;
+  readonly incident: {
+    readonly firstReport: string;
+    readonly chronology: string;
+    readonly unknowns: string;
+  };
+  readonly evidenceStates: readonly {
+    readonly id: string;
+    readonly meaning: string;
+    readonly pixels: number;
+    readonly areaHaRounded: number;
+  }[];
+  readonly contextCounts: readonly { readonly label: string; readonly count: number }[];
+  readonly terrain: {
+    readonly minimumM: number;
+    readonly maximumM: number;
+    readonly meanM: number;
+    readonly contourIntervalM: number;
+  };
+  readonly limitations: readonly string[];
 }

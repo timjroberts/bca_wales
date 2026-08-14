@@ -15,6 +15,7 @@ const validations = [
   ["schemas/source-registry.schema.json", "data/launch/source-registry.json"],
   ["schemas/publication-recipe.schema.json", "config/publication/recipe.example.json"],
   ["schemas/explorer-interface.schema.json", "fixtures/explorer/interface.example.json"],
+  ["schemas/explorer-release.schema.json", "data/launch/explorer-release-2026-08-13.json"],
   ["schemas/environment.schema.json", "config/environments/preview.json"],
   ["schemas/environment.schema.json", "config/environments/production.json"]
 ];
@@ -30,6 +31,12 @@ for (const [schemaPath, documentPath] of validations) {
   }
   assert.equal(validate(document), true, `${documentPath}: ${ajv.errorsText(validate.errors)}`);
 }
+
+ajv.compile(await readJson("schemas/launch-acceptance-record.schema.json"));
+const launchPolicy = await readJson("config/launch/acceptance-policy.json");
+assert.equal(launchPolicy.critical_failures_waivable, false);
+assert.equal(new Set(launchPolicy.checks.map((check) => check.id)).size, launchPolicy.checks.length);
+assert.ok(launchPolicy.checks.some((check) => check.tier === "blocking"));
 
 const headers = await readFile(new URL("apps/web/public/_headers", root), "utf8");
 for (const required of [
@@ -52,6 +59,7 @@ const cors = await readJson("config/cloudflare/r2-cors.json");
 assert.equal(cors.rules.length, 1);
 assert.deepEqual(cors.rules[0].allowed.methods, ["GET", "HEAD"]);
 assert.deepEqual(cors.rules[0].allowed.origins.sort(), [
+  "https://bca-wales-explorer.pages.dev",
   "https://preview.bca.wales",
   "https://explore.bca.wales"
 ].sort());

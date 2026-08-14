@@ -262,6 +262,15 @@ h1 { max-width: 13ch; margin: 0; font: 500 clamp(2.9rem, 7vw, 6.8rem)/.92 Georgi
 .map-tool-contrast button:first-child { border-radius: 5px 0 0 5px; }
 .map-tool-contrast button:last-child { border-right: 1px solid var(--line); border-radius: 0 5px 5px 0; }
 .map-tool-contrast button[aria-pressed="true"] { background: var(--moss-dark); color: white; }
+.evidence-state-legend { padding: 8px 10px 10px; border-top: 1px solid var(--line); background: #f7f6f0; font-size: 9px; }
+.evidence-state-legend > strong { display: block; margin-bottom: 5px; text-transform: uppercase; letter-spacing: .04em; }
+.evidence-state-legend ul { margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 4px 8px; list-style: none; }
+.evidence-state-legend li { display: flex; align-items: center; gap: 5px; }
+.evidence-state { width: 11px; height: 11px; flex: 0 0 auto; border: 1px solid #414840; }
+.evidence-state-0 { background: #111; }
+.evidence-state-1 { background: #555; }
+.evidence-state-2 { background: #aaa; }
+.evidence-state-3 { background: #fff; }
 
 .evidence-view { min-height: 565px; padding: clamp(18px, 4vw, 44px); background: #efeee7; }
 .evidence-summary { max-width: 780px; padding: 26px; border-radius: 10px; background: var(--moss-dark); color: white; }
@@ -302,6 +311,16 @@ tbody .legend-swatch { width: 13px; height: 13px; margin-right: 5px; }
 footer { padding: 24px clamp(20px, 6vw, 92px); display: flex; justify-content: space-between; gap: 20px; background: var(--ink); color: white; font-size: 12px; }
 footer p { margin: 0; }
 footer a { color: var(--lime); font-weight: 800; }
+
+.info-page {
+  width: min(52rem, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 2rem 0 4rem;
+  line-height: 1.65;
+}
+.info-page h1, .info-page h2 { line-height: 1.15; }
+.info-page code { padding: .1rem .3rem; background: #efeee7; }
+.factual-summary { margin-top: 1.25rem; padding: 1rem; border: 1px solid var(--line); background: #f7f6f0; }
 
 @media (max-width: 1040px) {
   .date-control { align-items: flex-start; flex-direction: column; }

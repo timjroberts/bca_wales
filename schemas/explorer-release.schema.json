@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.bca.wales/explorer-release/1.0.0.json",
+  "title": "BCA explorer release presentation contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "fixture", "release", "map", "dates", "groups", "layers", "claim", "incident", "evidenceStates", "contextCounts", "terrain", "limitations"],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "fixture": { "const": false },
+    "release": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "datasetVersion", "publishedAt", "retrievedAt", "nextReviewAt", "owner", "manifestPath", "manifestSha256"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^release-[a-z0-9][a-z0-9._-]+$" },
+        "datasetVersion": { "type": "string", "minLength": 1 },
+        "publishedAt": { "type": "string", "format": "date-time" },
+        "retrievedAt": { "type": "string", "format": "date-time" },
+        "nextReviewAt": { "type": "string", "format": "date" },
+        "owner": { "type": "string", "minLength": 1 },
+        "manifestPath": { "type": "string", "pattern": "^/releases/[^.].*manifest\\.json$" },
+        "manifestSha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "map": {
+      "type": "object", "additionalProperties": false, "required": ["center", "zoom", "assets"],
+      "properties": {
+        "center": { "type": "array", "prefixItems": [{ "type": "number" }, { "type": "number" }], "minItems": 2, "maxItems": 2, "items": false },
+        "zoom": { "type": "number", "minimum": 0, "maximum": 22 },
+        "assets": {
+          "type": "object", "additionalProperties": false,
+          "required": ["context", "terrain", "contours", "change", "effis", "download"],
+          "properties": {
+            "context": { "$ref": "#/$defs/assetPath" }, "terrain": { "$ref": "#/$defs/assetPath" },
+            "contours": { "$ref": "#/$defs/assetPath" }, "change": { "$ref": "#/$defs/assetPath" },
+            "effis": { "$ref": "#/$defs/assetPath" }, "download": { "$ref": "#/$defs/assetPath" }
+          }
+        }
+      }
+    },
+    "dates": { "type": "array", "minItems": 2, "items": { "$ref": "#/$defs/date" } },
+    "groups": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/group" } },
+    "layers": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/layer" } },
+    "claim": { "type": "string", "minLength": 1 },
+    "incident": {
+      "type": "object", "additionalProperties": false, "required": ["firstReport", "chronology", "unknowns"],
+      "properties": { "firstReport": { "type": "string", "minLength": 1 }, "chronology": { "type": "string", "minLength": 1 }, "unknowns": { "type": "string", "minLength": 1 } }
+    },
+    "evidenceStates": { "type": "array", "minItems": 4, "items": { "$ref": "#/$defs/evidenceState" } },
+    "contextCounts": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/count" } },
+    "terrain": {
+      "type": "object", "additionalProperties": false, "required": ["minimumM", "maximumM", "meanM", "contourIntervalM"],
+      "properties": { "minimumM": { "type": "number" }, "maximumM": { "type": "number" }, "meanM": { "type": "number" }, "contourIntervalM": { "type": "number", "exclusiveMinimum": 0 } }
+    },
+    "limitations": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "assetPath": { "type": "string", "pattern": "^/releases/release-[a-z0-9][a-z0-9._-]+/assets/[a-zA-Z0-9._-]+$" },
+    "bilingual": {
+      "type": "object", "additionalProperties": false, "required": ["en", "cy"],
+      "properties": { "en": { "type": "string", "minLength": 1 }, "cy": { "type": "string", "minLength": 1 } }
+    },
+    "date": {
+      "type": "object", "additionalProperties": false, "required": ["id", "label", "displayDate", "validAoiPercent"],
+      "properties": { "id": { "type": "string", "minLength": 1 }, "label": { "$ref": "#/$defs/bilingual" }, "displayDate": { "$ref": "#/$defs/bilingual" }, "validAoiPercent": { "type": "number", "minimum": 0, "maximum": 100 } }
+    },
+    "group": {
+      "type": "object", "additionalProperties": false, "required": ["id", "name", "description"],
+      "properties": { "id": { "type": "string", "minLength": 1 }, "name": { "$ref": "#/$defs/bilingual" }, "description": { "$ref": "#/$defs/bilingual" } }
+    },
+    "layer": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "groupId", "name", "description", "classification", "defaultVisible", "mapStyle", "temporal", "provider", "attribution", "evidenceStatus", "sourceDate", "licence", "owner", "nextReviewAt", "method", "limitations"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 }, "groupId": { "type": "string", "minLength": 1 },
+        "name": { "$ref": "#/$defs/bilingual" }, "description": { "$ref": "#/$defs/bilingual" },
+        "classification": { "enum": ["authoritative", "provisional", "derived", "contextual", "historical"] },
+        "defaultVisible": { "type": "boolean" }, "mapStyle": { "enum": ["fire", "change", "protected", "access", "water", "terrain", "habitat"] }, "temporal": { "type": "boolean" },
+        "provider": { "type": "string", "minLength": 1 }, "attribution": { "type": "string", "minLength": 1 },
+        "evidenceStatus": { "$ref": "#/$defs/bilingual" }, "sourceDate": { "$ref": "#/$defs/bilingual" },
+        "licence": { "type": "string", "minLength": 1 }, "owner": { "type": "string", "minLength": 1 }, "nextReviewAt": { "type": "string", "minLength": 1 },
+        "method": { "$ref": "#/$defs/bilingual" }, "limitations": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/bilingual" } }
+      }
+    },
+    "evidenceState": {
+      "type": "object", "additionalProperties": false, "required": ["id", "meaning", "pixels", "areaHaRounded"],
+      "properties": { "id": { "type": "string", "minLength": 1 }, "meaning": { "type": "string", "minLength": 1 }, "pixels": { "type": "integer", "minimum": 0 }, "areaHaRounded": { "type": "integer", "minimum": 0 } }
+    },
+    "count": {
+      "type": "object", "additionalProperties": false, "required": ["label", "count"],
+      "properties": { "label": { "type": "string", "minLength": 1 }, "count": { "type": "integer", "minimum": 0 } }
+    }
+  }
+}
