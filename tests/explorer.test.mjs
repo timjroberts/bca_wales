@@ -38,11 +38,13 @@ test("map and semantic routes share controls, state links and source detail", as
   assert.match(map, /prefers-reduced-motion: reduce/);
   assert.match(mapTools, /className="map-tools" open=\{openPanels\.tools\}/);
   assert.match(mapTools, /className="map-tool-panel map-tool-layers" open=\{openPanels\.layers\}/);
-  assert.match(mapTools, /className="map-tool-panel map-tool-date" open=\{openPanels\.date\}/);
+  assert.match(mapTools, /className="map-tool-panel map-tool-observations" open=\{openPanels\.observations\}/);
   assert.match(mapTools, /onToggle=\{\(event\) => setPanelOpen/);
-  assert.match(mapTools, /onComparisonToggle/);
-  assert.match(mapTools, /onEarlierDateChange/);
+  assert.match(explorer, /one published comparison/i);
+  assert.match(mapTools, /copy\.fixedComparison/);
+  assert.doesNotMatch(mapTools, /<select|type="checkbox".*comparison/i);
   assert.match(mapTools, /aria-controls="source-details"/);
+  assert.match(map, /Published comparison:/);
   assert.doesNotMatch(explorer, /MapOverlayPrototype|PrototypeSwitcher|prototypeVariant/);
   assert.doesNotMatch(mapTools, /PROTOTYPE|VariantA|VariantB|VariantC/);
 });
@@ -57,5 +59,6 @@ test("the factual presentation contract is internally referential and exposes pu
   assert.ok(release.layers.every((layer) => layer.provider && layer.licence && layer.owner && layer.nextReviewAt));
   assert.match(release.map.assets.download, /evidence-states\.csv\.txt$/);
   assert.equal(release.evidenceStates.length, 4);
+  assert.deepEqual(release.layers.filter((layer) => layer.defaultVisible).map((layer) => layer.id), ["change", "fire"]);
   assert.match(release.claim, /consistent with the documented July 2026 Blaenavon wildfire/);
 });

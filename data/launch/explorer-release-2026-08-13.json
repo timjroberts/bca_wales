@@ -65,7 +65,7 @@
     {
       "id": "protected", "groupId": "landscape", "name": { "en": "Blorenge SSSI and National Park", "cy": "SoDdGA y Blorens a’r Parc Cenedlaethol" },
       "description": { "en": "The authoritative protected-site and National Park context used to define the launch area.", "cy": "Cyd-destun awdurdodol y safle gwarchodedig a’r Parc Cenedlaethol a ddefnyddiwyd i ddiffinio ardal y lansiad." },
-      "classification": "authoritative", "defaultVisible": true, "mapStyle": "protected", "temporal": false,
+      "classification": "authoritative", "defaultVisible": false, "mapStyle": "protected", "temporal": false,
       "provider": "Natural Resources Wales", "attribution": "Contains Natural Resources Wales information and Ordnance Survey data under OGL 3.0",
       "evidenceStatus": { "en": "Authoritative designation context", "cy": "Cyd-destun dynodi awdurdodol" }, "sourceDate": { "en": "Retrieved 13 August 2026", "cy": "Adalwyd 13 Awst 2026" },
       "licence": "Open Government Licence 3.0", "owner": "Tim Roberts", "nextReviewAt": "2026-09-13",
@@ -75,7 +75,7 @@
     {
       "id": "access", "groupId": "landscape", "name": { "en": "Contextual paths and places", "cy": "Llwybrau a lleoedd cyd-destunol" },
       "description": { "en": "A dated OpenStreetMap snapshot for orientation.", "cy": "Ciplun OpenStreetMap â dyddiad ar gyfer cyfeiriadedd." },
-      "classification": "contextual", "defaultVisible": true, "mapStyle": "access", "temporal": false,
+      "classification": "contextual", "defaultVisible": false, "mapStyle": "access", "temporal": false,
       "provider": "OpenStreetMap contributors via Geofabrik", "attribution": "© OpenStreetMap contributors; processed by Geofabrik",
       "evidenceStatus": { "en": "Dated community context", "cy": "Cyd-destun cymunedol â dyddiad" }, "sourceDate": { "en": "Wales snapshot 12 August 2026", "cy": "Ciplun Cymru 12 Awst 2026" },
       "licence": "Open Database Licence 1.0", "owner": "Tim Roberts", "nextReviewAt": "2026-11-14",
@@ -85,7 +85,7 @@
     {
       "id": "water", "groupId": "landscape", "name": { "en": "Principal watercourses", "cy": "Prif gyrsiau dŵr" },
       "description": { "en": "Named NRW main-river context within the launch area.", "cy": "Cyd-destun prif afonydd CNC ag enwau o fewn ardal y lansiad." },
-      "classification": "authoritative", "defaultVisible": true, "mapStyle": "water", "temporal": false,
+      "classification": "authoritative", "defaultVisible": false, "mapStyle": "water", "temporal": false,
       "provider": "Natural Resources Wales", "attribution": "Contains Natural Resources Wales information and Ordnance Survey data under OGL 3.0",
       "evidenceStatus": { "en": "Authoritative contextual source", "cy": "Ffynhonnell gyd-destunol awdurdodol" }, "sourceDate": { "en": "Retrieved 13 August 2026", "cy": "Adalwyd 13 Awst 2026" },
       "licence": "Open Government Licence 3.0", "owner": "Tim Roberts", "nextReviewAt": "2026-11-14",
