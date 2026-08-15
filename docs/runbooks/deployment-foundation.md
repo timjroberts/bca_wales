@@ -94,8 +94,8 @@ a public integrity failure.
 Roll back the site to a known-good Cloudflare Pages deployment without changing
 the evidence pointer. Roll back evidence by atomically restoring a previously
 verified current-release manifest without redeploying the site. After either
-operation, check the homepage, `/evidence/`, the current manifest and one
-representative asset plus its checksum.
+operation, check the homepage map, source details, accessible CSV, current
+manifest and one representative asset plus its checksum.
 
 The target is restoration within one working day. Before launch, record the
 known-good Pages deployment, current evidence release, asset checksum and the

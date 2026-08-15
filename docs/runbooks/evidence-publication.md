@@ -158,4 +158,5 @@ rebuild during an incident or silently substitute a different dataset.
 
 After promotion, withdrawal or rollback, fetch `current.json`, its manifest and
 one representative asset through the public asset hostname and verify the
-recorded SHA-256. Confirm the homepage and `/evidence/` show the same state.
+recorded SHA-256. Confirm the homepage map, source details and accessible CSV
+show the same release state.

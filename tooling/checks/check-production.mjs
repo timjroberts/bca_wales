@@ -13,8 +13,7 @@ async function fetchOk(url, options) {
 }
 
 const routeChecks = [
-  ["/", /Published evidence|Tystiolaeth gyhoeddedig/],
-  ["/evidence/", /Satellite observations show surface and vegetation change/],
+  ["/", /Explore the Blorenge landscape and see how it changes over time/],
   ["/accessibility/", /Accessibility statement/],
   ["/privacy/", /Privacy notice/],
   ["/security/", /Security/]
@@ -29,6 +28,9 @@ for (const [path, expected] of routeChecks) {
     assert.equal(response.headers.get("x-content-type-options"), "nosniff");
   }
 }
+
+const evidenceResponse = await fetch(`${siteOrigin}/evidence/`, { redirect: "manual" });
+assert.equal(evidenceResponse.status, 404, "/evidence/ must use the normal not-found response");
 
 const pointerResponse = await fetchOk(`${assetOrigin}/releases/current.json`, { cache: "no-store" });
 const pointer = await pointerResponse.json();

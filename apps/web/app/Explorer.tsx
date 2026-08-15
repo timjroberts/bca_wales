@@ -19,23 +19,19 @@ const LANGUAGE_COOKIE = "bca-language";
 const copy = {
   en: {
     skip: "Skip to the explorer",
-    brand: "Blorenge landscape",
+    brand: "Blorenge Landscape Explorer",
     fixture: "Published evidence · 13 August 2026",
-    title: "What changed after the July 2026 fire?",
-    intro: "Explore open landscape evidence, compare dated observations and keep the source and its limits in view.",
+    title: "Explore the Blorenge landscape and see how it changes over time",
+    intro: "After exploring this beautiful landscape on foot, why not explore its data and compare and observe how it changes over time.",
     caution: "Observed vegetation change is not proof of ecological recovery. The EFFIS boundary is provisional, not an authority or surveyed perimeter.",
     map: "Explore map",
-    evidence: "Read without a map",
     mapTools: "Map Tools",
     toolCount: "2 tools",
     layers: "Layers and legend",
     dates: "Observation date",
     primaryDate: "Date",
     compare: "Compare two dates",
-    compareHint: "Place a later observation over an earlier one.",
-    earlier: "Earlier observation",
     earlierDate: "Earlier date",
-    later: "Later overlay",
     contrast: "Overlay contrast",
     low: "Low",
     medium: "Medium",
@@ -53,41 +49,25 @@ const copy = {
     owner: "Owner and next review",
     limitations: "Limitations",
     fallback: "Some source names and map-control labels remain in English while verified Welsh wording is prepared.",
-    table: "Evidence and sources in the current view",
-    layer: "Layer",
-    shown: "Shown",
-    source: "Source and status",
-    temporal: "Selected observation",
     download: "Download accessible evidence states (CSV)",
     noSources: "No layers are currently shown.",
-    mapSummary: "The selected observations and visible layers are summarised below. The change surface is a derived comparison; the EFFIS boundary remains a separate provisional provider interpretation.",
-    area: "Launch area: Blorenge SSSI plus exactly 2 km",
-    howTo: "How to read this explorer",
-    guidance: [
-      "Check the evidence status before interpreting a layer.",
-      "Use comparison as a visual aid; the text account carries the same selection.",
-      "Read limitations and provenance before downloading or reusing anything."
-    ]
+    area: "Launch area: Blorenge SSSI plus exactly 2 km"
   },
   cy: {
     skip: "Neidio i’r archwiliwr",
-    brand: "Tirwedd y Blorens",
+    brand: "Archwiliwr Tirwedd y Blorens",
     fixture: "Tystiolaeth gyhoeddedig · 13 Awst 2026",
-    title: "Beth newidiodd ar ôl tân Gorffennaf 2026?",
-    intro: "Archwiliwch dystiolaeth agored am y dirwedd, cymharwch arsylwadau â dyddiad a chadwch y ffynhonnell a’i chyfyngiadau yn y golwg.",
+    title: "Archwiliwch dirwedd y Blorens a gweld sut mae’n newid dros amser",
+    intro: "Ar ôl archwilio’r dirwedd hardd hon ar droed, beth am archwilio ei data a chymharu a gweld sut mae’n newid dros amser.",
     caution: "Nid yw newid llystyfiant a welwyd yn brawf o adferiad ecolegol. Mae ffin EFFIS yn dros dro, nid yn derfyn awdurdod nac arolwg.",
     map: "Archwilio’r map",
-    evidence: "Darllen heb fap",
     mapTools: "Offer map",
     toolCount: "2 offer",
     layers: "Haenau ac allwedd",
     dates: "Dyddiad arsylwi",
     primaryDate: "Dyddiad",
     compare: "Cymharu dau ddyddiad",
-    compareHint: "Gosodwch arsylwad diweddarach dros un cynharach.",
-    earlier: "Arsylwad cynharach",
     earlierDate: "Dyddiad cynharach",
-    later: "Troshaen ddiweddarach",
     contrast: "Cyferbyniad y droshaen",
     low: "Isel",
     medium: "Canolig",
@@ -105,21 +85,9 @@ const copy = {
     owner: "Perchennog a’r adolygiad nesaf",
     limitations: "Cyfyngiadau",
     fallback: "Mae rhai enwau ffynonellau, metadata a’r crynodeb technegol yn aros yn Saesneg tra bod geiriad Cymraeg wedi’i wirio yn cael ei baratoi.",
-    table: "Tystiolaeth a ffynonellau yn yr olygfa gyfredol",
-    layer: "Haen",
-    shown: "Wedi’i dangos",
-    source: "Ffynhonnell a statws",
-    temporal: "Arsylwad a ddewiswyd",
     download: "Lawrlwytho cyflyrau tystiolaeth hygyrch (CSV)",
     noSources: "Nid oes haenau’n cael eu dangos ar hyn o bryd.",
-    mapSummary: "Crynhoir yr arsylwadau dethol a’r haenau gweladwy isod. Cymhariaeth ddeilliedig yw’r arwyneb newid; mae ffin EFFIS yn aros yn ddehongliad dros dro ar wahân gan ddarparwr.",
-    area: "Ardal lansio: SoDdGA y Blorens ynghyd ag union 2 km",
-    howTo: "Sut i ddarllen yr archwiliwr hwn",
-    guidance: [
-      "Gwiriwch statws y dystiolaeth cyn dehongli haen.",
-      "Defnyddiwch gymhariaeth fel cymorth gweledol; mae’r testun yn defnyddio’r un dewis.",
-      "Darllenwch gyfyngiadau a tharddiad cyn lawrlwytho neu ailddefnyddio unrhyw beth."
-    ]
+    area: "Ardal lansio: SoDdGA y Blorens ynghyd ag union 2 km"
   }
 } as const;
 
@@ -155,13 +123,13 @@ function parseState(current: ExplorerState): ExplorerState {
   };
 }
 
-function stateHref(path: string, state: ExplorerState): string {
+function stateHref(state: ExplorerState): string {
   const params = new URLSearchParams();
   params.set("layers", state.visibleLayerIds.join(","));
   if (state.primaryDate) params.set("date", state.primaryDate);
   if (state.comparisonEnabled && state.comparisonDate) params.set("compare", state.comparisonDate);
   if (state.comparisonEnabled) params.set("contrast", state.contrast);
-  return `${path}?${params.toString()}`;
+  return `/?${params.toString()}`;
 }
 
 function LayerName({ layer, language }: { layer: ExplorerLayer; language: Language }) {
@@ -174,7 +142,7 @@ function LayerName({ layer, language }: { layer: ExplorerLayer; language: Langua
   );
 }
 
-export function Explorer({ initialView }: { initialView: "map" | "evidence" }) {
+export function Explorer() {
   const [state, setState] = useState<ExplorerState>(initialState);
   const [ready, setReady] = useState(false);
   const [detailLayerId, setDetailLayerId] = useState<string | null>(null);
@@ -199,7 +167,7 @@ export function Explorer({ initialView }: { initialView: "map" | "evidence" }) {
   useEffect(() => {
     document.documentElement.lang = state.language;
     if (!ready) return;
-    window.history.replaceState(null, "", stateHref(window.location.pathname, state));
+    window.history.replaceState(null, "", stateHref(state));
   }, [ready, state]);
 
   useEffect(() => {
@@ -264,11 +232,11 @@ export function Explorer({ initialView }: { initialView: "map" | "evidence" }) {
     [state.visibleLayerIds]
   );
   const detailLayer = explorer.layers.find((layer) => layer.id === detailLayerId);
-  const selectedDate = explorer.dates.find((date) => date.id === state.primaryDate) ?? explorer.dates[0]!;
   const sourcesStrip = (
     <aside className="sources-strip" aria-live="polite" aria-labelledby="sources-heading">
       <p><strong id="sources-heading">{c.sources}:</strong> {visibleLayers.length ? [...new Set(visibleLayers.map((layer) => layer.attribution))].join(" · ") : c.noSources}</p>
       <span>{c.sourceHelp}{state.language === "cy" ? <small className="global-fallback"><b lang="en">EN</b> {c.fallback}</small> : null}</span>
+      <a className="download-link" href={`${(process.env.NEXT_PUBLIC_ASSET_ORIGIN ?? "").trim()}${explorer.map.assets.download}`} download>{c.download}</a>
     </aside>
   );
   const sourcePanel = detailLayer ? (
@@ -293,7 +261,7 @@ export function Explorer({ initialView }: { initialView: "map" | "evidence" }) {
     <>
       <a className="skip-link" href="#explorer-main">{c.skip}</a>
       <header className="site-header">
-        <a className="brand" href={stateHref("/", state)} aria-label={`${c.brand} — ${c.map}`}>
+        <a className="brand" href={stateHref(state)} aria-label={`${c.brand} — ${c.map}`}>
           <span className="brand-mark" aria-hidden="true">B</span>
           <span>{c.brand}</span>
         </a>
@@ -319,122 +287,32 @@ export function Explorer({ initialView }: { initialView: "map" | "evidence" }) {
         </section>
 
         <section className="explorer-shell" aria-label={state.language === "en" ? "Landscape explorer" : "Archwiliwr tirwedd"}>
-          <nav className="view-toolbar" aria-label={state.language === "en" ? "Explorer views" : "Golygfeydd yr archwiliwr"}>
-            <div className="segmented">
-              <a href={stateHref("/", state)} aria-current={initialView === "map" ? "page" : undefined}>{c.map}</a>
-              <a href={stateHref("/evidence/", state)} aria-current={initialView === "evidence" ? "page" : undefined}>{c.evidence}</a>
-            </div>
+          <div className="view-toolbar">
+            <strong>{c.map}</strong>
             <p className="area-label">⌖ {c.area}</p>
-          </nav>
+          </div>
 
-          {initialView === "map" ? (
-            <div className="map-workspace">
-              <div className="map-stage">
-                <MapCanvas explorer={explorer} language={state.language} state={state} />
-                <MapTools
-                  fixture={explorer}
-                  state={state}
-                  language={state.language}
-                  copy={c}
-                  detailLayerId={detailLayerId}
-                  onLayerToggle={(layerId) => setState((current) => toggleVisibleLayer(current, layerId))}
-                  onLayerDetail={(layerId) => setDetailLayerId(detailLayerId === layerId ? null : layerId)}
-                  onPrimaryDateChange={selectPrimaryDate}
-                  onComparisonToggle={toggleComparison}
-                  onEarlierDateChange={(dateId) => setState((current) => ({ ...current, comparisonDate: dateId }))}
-                  onContrastChange={(contrast) => setState((current) => ({ ...current, contrast }))}
-                />
-              </div>
-              {sourcesStrip}
-              {sourcePanel}
+          <div className="map-workspace">
+            <div className="map-stage">
+              <MapCanvas explorer={explorer} language={state.language} state={state} />
+              <MapTools
+                fixture={explorer}
+                state={state}
+                language={state.language}
+                copy={c}
+                detailLayerId={detailLayerId}
+                onLayerToggle={(layerId) => setState((current) => toggleVisibleLayer(current, layerId))}
+                onLayerDetail={(layerId) => setDetailLayerId(detailLayerId === layerId ? null : layerId)}
+                onPrimaryDateChange={selectPrimaryDate}
+                onComparisonToggle={toggleComparison}
+                onEarlierDateChange={(dateId) => setState((current) => ({ ...current, comparisonDate: dateId }))}
+                onContrastChange={(contrast) => setState((current) => ({ ...current, contrast }))}
+              />
             </div>
-          ) : (
-            <div className="explorer-grid">
-              <aside className="layer-panel" aria-labelledby="layers-heading">
-                <div className="panel-heading">
-                  <div><p className="panel-kicker">01</p><h2 id="layers-heading">{c.layers}</h2></div>
-                  <span>{visibleLayers.length}/{explorer.layers.length}</span>
-                </div>
-                {explorer.groups.map((group) => {
-                  const groupLayers = explorer.layers.filter((layer) => layer.groupId === group.id);
-                  const activeCount = groupLayers.filter((layer) => state.visibleLayerIds.includes(layer.id)).length;
-                  return (
-                    <details className="layer-group" open key={group.id}>
-                      <summary>
-                        <span><strong>{localise(group.name, state.language)}</strong><small>{localise(group.description, state.language)}</small></span>
-                        <span className="group-count" aria-label={`${activeCount}/${groupLayers.length}`}>{activeCount}/{groupLayers.length}</span>
-                      </summary>
-                      <div className="group-layers">
-                        {groupLayers.map((layer) => (
-                          <div className="layer-row" key={layer.id}>
-                            <label>
-                              <input type="checkbox" checked={state.visibleLayerIds.includes(layer.id)} onChange={() => setState((current) => toggleVisibleLayer(current, layer.id))} />
-                              <span className={`legend-swatch swatch-${layer.mapStyle}`} aria-hidden="true" />
-                              <span className="layer-copy"><strong><LayerName layer={layer} language={state.language} /></strong><small>{layer.classification}</small></span>
-                            </label>
-                            <button id={`details-${layer.id}`} type="button" className="detail-button" aria-label={`${c.details}: ${localise(layer.name, state.language)}`} aria-expanded={detailLayerId === layer.id} aria-controls="source-details" onClick={() => setDetailLayerId(detailLayerId === layer.id ? null : layer.id)}>ⓘ</button>
-                          </div>
-                        ))}
-                      </div>
-                    </details>
-                  );
-                })}
-              </aside>
-
-              <div className="content-panel">
-                <section className="date-control" aria-labelledby="date-heading">
-                  <div><p className="panel-kicker">02</p><h2 id="date-heading">{c.dates}</h2></div>
-                  <div className="time-controls">
-                    <label className="compare-toggle">
-                      <input type="checkbox" checked={state.comparisonEnabled} onChange={(event) => toggleComparison(event.target.checked)} />
-                      <span><strong>{c.compare}</strong><small>{c.compareHint}</small></span>
-                    </label>
-                    {state.comparisonEnabled ? (
-                      <div className="comparison-controls">
-                        <label><span>{c.earlier}</span><select value={state.comparisonDate ?? ""} onChange={(event) => setState((current) => ({ ...current, comparisonDate: event.target.value }))}>
-                          {explorer.dates.map((date, index) => <option key={date.id} value={date.id} disabled={index >= explorer.dates.findIndex((item) => item.id === state.primaryDate)}>{localise(date.label, state.language)} · {localise(date.displayDate, state.language)}</option>)}
-                        </select></label>
-                        <label><span>{c.later}</span><select value={state.primaryDate ?? ""} onChange={(event) => selectPrimaryDate(event.target.value)}>
-                          {explorer.dates.map((date, index) => <option key={date.id} value={date.id} disabled={index <= explorer.dates.findIndex((item) => item.id === state.comparisonDate)}>{localise(date.label, state.language)} · {localise(date.displayDate, state.language)}</option>)}
-                        </select></label>
-                        <fieldset className="contrast-controls"><legend>{c.contrast}</legend><div>
-                          {(["low", "medium", "high"] as const).map((contrast) => <button key={contrast} type="button" aria-pressed={state.contrast === contrast} onClick={() => setState((current) => ({ ...current, contrast }))}>{c[contrast]}</button>)}
-                        </div></fieldset>
-                      </div>
-                    ) : (
-                      <div className="date-options" aria-label={c.dates}>
-                        {explorer.dates.map((date) => <button key={date.id} type="button" aria-pressed={state.primaryDate === date.id} onClick={() => selectPrimaryDate(date.id)}><strong>{localise(date.label, state.language)}</strong><span>{localise(date.displayDate, state.language)}</span></button>)}
-                      </div>
-                    )}
-                  </div>
-                </section>
-
-                <section className="evidence-view" aria-labelledby="evidence-heading">
-                  <div className="evidence-summary"><p className="panel-kicker">03</p><h2 id="evidence-heading">{c.evidence}</h2><p>{c.mapSummary}</p></div>
-                  <div className="table-wrap"><table><caption>{c.table}</caption><thead><tr><th scope="col">{c.layer}</th><th scope="col">{c.shown}</th><th scope="col">{c.source}</th><th scope="col">{c.temporal}</th></tr></thead><tbody>
-                    {explorer.layers.map((layer) => <tr key={layer.id}><th scope="row"><span className={`legend-swatch swatch-${layer.mapStyle}`} aria-hidden="true" /> <LayerName layer={layer} language={state.language} /></th><td>{state.visibleLayerIds.includes(layer.id) ? "✓" : "—"}<span className="sr-only">{state.visibleLayerIds.includes(layer.id) ? c.shown : "Hidden"}</span></td><td>{layer.provider}<br /><small>{localise(layer.evidenceStatus, state.language)}</small></td><td>{layer.temporal ? `${localise(selectedDate.label, state.language)} · ${localise(selectedDate.displayDate, state.language)} · ${selectedDate.validAoiPercent}% valid AOI` : "—"}</td></tr>)}
-                  </tbody></table></div>
-                  {state.language === "cy" ? <p className="fallback-note"><span lang="en">EN</span>{c.fallback}</p> : null}
-                  <section className="factual-summary" aria-labelledby="factual-heading" lang={state.language === "cy" ? "en" : undefined}>
-                    <h3 id="factual-heading">{explorer.claim}</h3>
-                    <p><strong>First report:</strong> {explorer.incident.firstReport}. {explorer.incident.chronology} {explorer.incident.unknowns}</p>
-                    <div className="table-wrap"><table><caption>Evidence-state summary for the launch area</caption><thead><tr><th scope="col">State</th><th scope="col">Meaning</th><th scope="col">Pixels</th><th scope="col">Rounded area (ha)</th></tr></thead><tbody>
-                      {explorer.evidenceStates.map((item) => <tr key={item.id}><th scope="row">{item.id.replaceAll("_", " ")}</th><td>{item.meaning}</td><td>{item.pixels.toLocaleString()}</td><td>{item.areaHaRounded.toLocaleString()}</td></tr>)}
-                    </tbody></table></div>
-                    <p><strong>Terrain:</strong> {explorer.terrain.minimumM}–{explorer.terrain.maximumM} m; mean {explorer.terrain.meanM} m; {explorer.terrain.contourIntervalM} m contours.</p>
-                    <ul>{explorer.limitations.map((limitation) => <li key={limitation}>{limitation}</li>)}</ul>
-                  </section>
-                  <a className="download-button" href={`${(process.env.NEXT_PUBLIC_ASSET_ORIGIN ?? "").trim()}${explorer.map.assets.download}`} download>{c.download}</a>
-                </section>
-
-                {sourcesStrip}
-                {sourcePanel}
-              </div>
-            </div>
-          )}
+            {sourcesStrip}
+            {sourcePanel}
+          </div>
         </section>
-
-        <section className="reading-notes" aria-labelledby="guidance-heading"><div><p className="panel-kicker">04</p><h2 id="guidance-heading">{c.howTo}</h2></div><ol>{c.guidance.map((item, index) => <li key={item}><span aria-hidden="true">{index + 1}</span><p>{item}</p></li>)}</ol></section>
       </main>
       <footer><p>Evidence release {explorer.release.datasetVersion} · published 13 August 2026 · owner {explorer.release.owner} · next review {explorer.release.nextReviewAt}</p><nav aria-label="Service information"><a href="/accessibility/">Accessibility</a> · <a href="/privacy/">Privacy</a> · <a href="/security/">Security</a></nav><a href="#explorer-main">{c.skip}</a></footer>
     </>

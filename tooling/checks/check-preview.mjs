@@ -32,10 +32,13 @@ async function fetchPreview(path, options = {}) {
 }
 
 const homepage = await fetchPreview("/");
-assert.match(await homepage.text(), /Blorenge landscape explorer/i);
+const homepageBody = await homepage.text();
+assert.match(homepageBody, /Blorenge Landscape Explorer/);
+assert.match(homepageBody, /Explore the Blorenge landscape and see how it changes over time/);
+assert.match(homepageBody, /Download accessible evidence states \(CSV\)/);
 
-const evidencePage = await fetchPreview("/evidence/");
-assert.match(await evidencePage.text(), /Evidence/i);
+const evidencePage = await fetch(new URL("/evidence/", `${origin}/`), { redirect: "manual" });
+assert.equal(evidencePage.status, 404, "/evidence/ must use the normal not-found response");
 
 const manifestResponse = await fetchPreview(`${releaseRoot}/manifest.json`);
 const manifestBytes = Buffer.from(await manifestResponse.arrayBuffer());

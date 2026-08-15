@@ -15,12 +15,12 @@ test("the production application uses static export and package seams", async ()
 
 test("prototype evidence remains quarantined while production uses the validated factual release", async () => {
   const page = await read("apps/web/app/page.tsx");
-  const evidence = await read("apps/web/app/evidence/page.tsx");
   const explorer = await read("apps/web/app/Explorer.tsx");
   assert.match(explorer, /data\/launch\/explorer-release-2026-08-13\.json/);
   assert.match(explorer, /Published evidence/);
   assert.doesNotMatch(explorer, /No factual evidence release is attached/);
-  assert.doesNotMatch(`${page}\n${evidence}\n${explorer}`, /prototypes\/blorenge-explorer|55%|burn scar|hectare/i);
+  assert.doesNotMatch(`${page}\n${explorer}`, /prototypes\/blorenge-explorer|55%|burn scar|hectare/i);
+  await assert.rejects(read("apps/web/app/evidence/page.tsx"), { code: "ENOENT" });
 });
 
 test("site and evidence delivery remain separately scoped", async () => {

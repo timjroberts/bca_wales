@@ -20,16 +20,23 @@ test("the interface fixture is internally referential and never claims to be evi
   assert.ok(fixture.layers.every((layer) => /fixture|release|snapshot/i.test(layer.evidenceStatus.en)));
 });
 
-test("map and semantic routes share controls, state links and source detail", async () => {
+test("the single explorer route keeps map controls, shareable state and source detail", async () => {
   const explorer = await read("apps/web/app/Explorer.tsx");
+  const accessibility = await read("apps/web/app/accessibility/page.tsx");
   const map = await read("apps/web/app/MapCanvas.tsx");
   const mapTools = await read("apps/web/app/MapTools.tsx");
-  assert.match(explorer, /initialView: "map" \| "evidence"/);
-  assert.match(explorer, /stateHref\("\/evidence\/"/);
+  assert.match(explorer, /Blorenge Landscape Explorer/);
+  assert.match(explorer, /Explore the Blorenge landscape and see how it changes over time/);
+  assert.match(explorer, /After exploring this beautiful landscape on foot, why not explore its data and compare and observe how it changes over time\./);
+  assert.match(explorer, /Download accessible evidence states \(CSV\)/);
+  assert.match(explorer, /window\.history\.replaceState/);
   assert.match(explorer, /aria-live="polite"/);
-  assert.match(explorer, /aria-controls="source-details"/);
   assert.match(explorer, /Max-Age=31536000/);
   assert.match(explorer, /document\.documentElement\.lang/);
+  assert.doesNotMatch(explorer, /initialView|\/evidence\/|Read without a map|How to read this explorer|reading-notes/);
+  assert.match(accessibility, /interactive map requires WebGL/);
+  assert.match(accessibility, /downloadable CSV/);
+  assert.doesNotMatch(accessibility, /href="\/evidence\/"|same substantive evidence without a map/);
   assert.match(map, /new maplibregl\.Map/);
   assert.match(map, /new Protocol/);
   assert.match(map, /pmtiles:\/\//);

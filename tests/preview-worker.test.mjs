@@ -27,7 +27,7 @@ test("preview worker returns bounded PMTiles byte ranges", async () => {
   assert.equal((await response.arrayBuffer()).byteLength, 127);
 });
 
-test("preview worker rejects unsatisfiable ranges and forwards ordinary assets", async () => {
+test("preview worker rejects unsatisfiable ranges and forwards the explorer", async () => {
   const rangeResponse = await previewWorker.fetch(new Request(
     "https://preview.example/releases/release-example-1/assets/context.pmtiles",
     { headers: { Range: "bytes=999-1000" } }
@@ -36,7 +36,7 @@ test("preview worker rejects unsatisfiable ranges and forwards ordinary assets",
   assert.equal(rangeResponse.headers.get("content-range"), `bytes */${bytes.byteLength}`);
 
   const ordinaryResponse = await previewWorker.fetch(
-    new Request("https://preview.example/evidence/"),
+    new Request("https://preview.example/"),
     env
   );
   assert.equal(ordinaryResponse.status, 200);
