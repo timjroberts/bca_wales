@@ -36,6 +36,26 @@ function runWrangler(argv, env = process.env) {
   });
 }
 
+function runCurl(argv, credentials) {
+  return new Promise((resolve, reject) => {
+    const child = spawn("curl", ["--fail-with-body", "--silent", "--show-error", ...argv, "--config", "-"], {
+      stdio: ["pipe", "pipe", "pipe"]
+    });
+    let stdout = "";
+    let stderr = "";
+    child.stdout.setEncoding("utf8");
+    child.stderr.setEncoding("utf8");
+    child.stdout.on("data", (chunk) => { stdout += chunk; });
+    child.stderr.on("data", (chunk) => { stderr += chunk; });
+    child.on("error", reject);
+    child.on("close", (code) => {
+      if (code === 0) resolve({ stdout, stderr });
+      else reject(new Error(`R2 S3 request exited ${code}: ${stderr.trim()}`));
+    });
+    child.stdin.end(`user = "${credentials.accessKeyId}:${credentials.secretAccessKey}"\n`);
+  });
+}
+
 function assertKey(key) {
   if (!/^[a-zA-Z0-9][a-zA-Z0-9._/-]+$/.test(key) || key.includes("..")) {
     throw new Error(`Unsafe R2 object key: ${key}`);
@@ -76,6 +96,58 @@ export class WranglerR2Store {
       ...this.jurisdictionArgs(),
       "--remote"
     ], this.env);
+  }
+
+  async getOptional(key, destination) {
+    try {
+      await this.getFile(key, destination);
+      return true;
+    } catch (error) {
+      if (isMissingObjectError(error)) return false;
+      throw error;
+    }
+  }
+}
+
+export class S3R2Store {
+  constructor({ bucket, accountId, accessKeyId, secretAccessKey, jurisdiction = null }) {
+    if (!/^[a-z0-9][a-z0-9-]+$/.test(bucket)) throw new Error(`Unsafe R2 bucket name: ${bucket}`);
+    if (!/^[a-f0-9]{32}$/.test(accountId)) throw new Error("Invalid Cloudflare account ID");
+    if (!/^[A-Za-z0-9._-]+$/.test(accessKeyId) || !/^[A-Za-z0-9._-]+$/.test(secretAccessKey)) {
+      throw new Error("Invalid R2 S3 credentials");
+    }
+    if (jurisdiction !== null && !["eu", "fedramp"].includes(jurisdiction)) {
+      throw new Error(`Unsupported R2 jurisdiction: ${jurisdiction}`);
+    }
+    this.bucket = bucket;
+    this.credentials = { accessKeyId, secretAccessKey };
+    const jurisdictionLabel = jurisdiction ? `${jurisdiction}.` : "";
+    this.endpoint = `https://${accountId}.${jurisdictionLabel}r2.cloudflarestorage.com`;
+  }
+
+  objectUrl(key) {
+    assertKey(key);
+    const encodedKey = key.split("/").map(encodeURIComponent).join("/");
+    return `${this.endpoint}/${this.bucket}/${encodedKey}`;
+  }
+
+  async putFile(key, file, contentType) {
+    if (/\r|\n/.test(contentType)) throw new Error("Unsafe content type");
+    await runCurl([
+      "--aws-sigv4", "aws:amz:auto:s3",
+      "--request", "PUT",
+      "--upload-file", file,
+      "--header", `Content-Type: ${contentType}`,
+      this.objectUrl(key)
+    ], this.credentials);
+  }
+
+  async getFile(key, destination) {
+    await runCurl([
+      "--aws-sigv4", "aws:amz:auto:s3",
+      "--output", destination,
+      this.objectUrl(key)
+    ], this.credentials);
   }
 
   async getOptional(key, destination) {
