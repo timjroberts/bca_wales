@@ -54,10 +54,15 @@ its versioned public key, verifies byte counts and checksums, and then places
 the files under `/releases/<release-id>/` in the static export. Browser asset
 URLs are same-origin, so both the branch alias and Cloudflare's immutable
 hash-addressed deployment remain self-contained and require no R2 CORS rule or
-preview evidence credential. The workflow exercises the deployed homepage,
-semantic route, PMTiles byte ranges, GeoJSON and accessible download before it
-succeeds. It never reads or creates `releases/current.json`, and it cannot write
-the production bucket. Forked pull requests receive no Pages credential and
+preview evidence credential. Because Pages static delivery does not honour
+PMTiles byte ranges, the staging step also adds a preview-only advanced-mode
+Pages Function. It forwards ordinary assets unchanged and returns bounded `206`
+responses only for range requests to versioned `.pmtiles` paths. This Function
+is generated after the production build and is never part of a production site
+deployment. The workflow exercises the deployed homepage, semantic route,
+PMTiles byte ranges, GeoJSON and accessible download before it succeeds. It
+never reads or creates `releases/current.json`, and it cannot write the
+production bucket. Forked pull requests receive no Pages credential and
 therefore validate and stage the public bytes without creating a hosted preview.
 
 Production deployment is manual, runs in the protected `production`

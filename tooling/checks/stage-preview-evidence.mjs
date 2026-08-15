@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL("../../", import.meta.url));
 const explorerContractPath = path.join(root, "data/launch/explorer-release-2026-08-13.json");
+const previewWorkerPath = path.join(root, "config/cloudflare/preview-worker.mjs");
 const outputRoot = path.join(root, "apps/web/out");
 const sourceOrigin = "https://assets.bca.wales";
 
@@ -57,8 +58,10 @@ const assets = await Promise.all(manifest.assets.map(async (asset) => {
 
 const releaseRoot = path.join(outputRoot, "releases", releaseId);
 const assetRoot = path.join(releaseRoot, "assets");
+const previewWorker = await readFile(previewWorkerPath);
 await mkdir(assetRoot, { recursive: true });
 await writeFile(path.join(releaseRoot, "manifest.json"), manifestBytes, { flag: "wx" });
+await writeFile(path.join(outputRoot, "_worker.js"), previewWorker, { flag: "wx" });
 for (const asset of assets) {
   await writeFile(path.join(assetRoot, asset.filename), asset.bytes, { flag: "wx" });
 }
@@ -69,5 +72,6 @@ process.stdout.write(`${JSON.stringify({
   manifest_sha256: sha256(manifestBytes),
   assets: assets.length,
   bytes: assets.reduce((total, asset) => total + asset.bytes.byteLength, 0),
-  delivery: "same-origin-pages"
+  delivery: "same-origin-pages",
+  pmtiles_ranges: "preview-worker"
 })}\n`);
