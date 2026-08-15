@@ -122,7 +122,7 @@ external source is proposed. No analytics or client-side telemetry is enabled.
 
 ## Monitoring and hand-off
 
-The `Monitor production` workflow runs every five minutes and checks the
+The `Monitor production` workflow runs every six hours and checks the
 homepage, semantic evidence route, service-information routes, security
 headers, current pointer, immutable manifest and a representative PMTiles
 checksum. A failed workflow run is the operational alert. Tim Roberts owns
