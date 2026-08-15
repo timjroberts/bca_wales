@@ -12,7 +12,13 @@ import {
   reuseAcquisition,
   verifyArchive
 } from "../src/pipeline.mjs";
-import { publishRelease, stageRelease, withdrawRelease, WranglerR2Store } from "../src/r2.mjs";
+import {
+  publishRelease,
+  restoreCurrentPointer,
+  stageRelease,
+  withdrawRelease,
+  WranglerR2Store
+} from "../src/r2.mjs";
 import { readJson } from "../src/runtime.mjs";
 
 const execFileAsync = promisify(execFile);
@@ -28,6 +34,7 @@ Usage:
   bca-geodata verify-archive --release-root DIR
   bca-geodata stage --release-root DIR --bucket NAME --identity LOGIN [--jurisdiction eu|fedramp]
   bca-geodata publish --release-root DIR --bucket NAME --identity LOGIN [--jurisdiction eu|fedramp] [--mode manual|automatic]
+  bca-geodata restore-pointer --bucket NAME --release-id ID --manifest-sha256 SHA --identity LOGIN [--jurisdiction eu|fedramp] [--asset-origin URL]
   bca-geodata withdraw --release-root DIR --bucket NAME --release-id ID --identity LOGIN --reason TEXT [--jurisdiction eu|fedramp] [--replacement FILE]
 
 Acquisition never uses the network unless --allow-network is present. Build
@@ -160,6 +167,23 @@ async function main() {
       replacement
     });
     result = { release_id: withdrawn.record.release_id, current: withdrawn.pointer };
+  } else if (command === "restore-pointer") {
+    const store = new WranglerR2Store({
+      bucket: required(options, "bucket"),
+      jurisdiction: options.jurisdiction ?? null
+    });
+    const restored = await restoreCurrentPointer({
+      store,
+      releaseId: required(options, "release-id"),
+      expectedManifestSha256: required(options, "manifest-sha256"),
+      identity: required(options, "identity"),
+      publicAssetOrigin: options["asset-origin"] ?? "https://assets.bca.wales"
+    });
+    result = {
+      release_id: restored.release.release_id,
+      current: restored.pointer,
+      verified_assets: restored.verifiedAssets
+    };
   } else {
     throw new Error(`Unknown command: ${command}\n\n${help}`);
   }
