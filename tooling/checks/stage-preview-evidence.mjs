@@ -3,10 +3,10 @@ import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { stagePagesWorker } from "./stage-pages-worker.mjs";
 
 const root = fileURLToPath(new URL("../../", import.meta.url));
 const explorerContractPath = path.join(root, "data/launch/explorer-release-2026-08-13.json");
-const previewWorkerPath = path.join(root, "config/cloudflare/preview-worker.mjs");
 const outputRoot = path.join(root, "apps/web/out");
 const sourceOrigin = "https://assets.bca.wales";
 
@@ -58,10 +58,9 @@ const assets = await Promise.all(manifest.assets.map(async (asset) => {
 
 const releaseRoot = path.join(outputRoot, "releases", releaseId);
 const assetRoot = path.join(releaseRoot, "assets");
-const previewWorker = await readFile(previewWorkerPath);
 await mkdir(assetRoot, { recursive: true });
 await writeFile(path.join(releaseRoot, "manifest.json"), manifestBytes, { flag: "wx" });
-await writeFile(path.join(outputRoot, "_worker.js"), previewWorker, { flag: "wx" });
+await stagePagesWorker(path.join(outputRoot, "_worker.js"));
 for (const asset of assets) {
   await writeFile(path.join(assetRoot, asset.filename), asset.bytes, { flag: "wx" });
 }

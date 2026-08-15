@@ -70,6 +70,24 @@ environment and requires the evidence release identifier paired with the site
 commit. Configure Tim Roberts as the required environment reviewer. The site
 workflow cannot write to R2 or change the current evidence pointer.
 
+When a static HTML route is removed, add each public path variant to
+`config/cloudflare/retired-pages-routes.json` in the same change. The production
+workflow validates that this allowlist contains only extensionless routes
+outside `/_next` and `/releases`, then stages a minimal Pages Worker ahead of
+the static asset binding. The worker serves the site's current not-found page
+with `404`, `no-store` and `noindex` for those exact paths; every other request
+continues to the normal static asset delivery. The preview workflow installs
+the same guard alongside its PMTiles range support.
+
+This tombstone is deliberate. Pages can retain a removed static object in a
+datacentre for up to one week, and zone-level URL or prefix purges do not evict
+that internal Pages object reliably. Keep retired paths in the allowlist while
+an older deployment remains a supported rollback target. The production check
+runs after deployment, so a stale retired response fails the workflow. The
+guard uses the existing project-scoped Pages deployment credential and cannot
+modify DNS, R2 or zone cache; it never purges hash-addressed `/_next` files or
+immutable evidence assets.
+
 For the first release, use this order:
 
 1. Confirm both production hostnames, R2 CORS, Pages security headers and the
@@ -81,8 +99,8 @@ For the first release, use this order:
    manual QA warnings. Tim Roberts records the explicit release decision.
 4. Run the manual evidence `publish` command in the evidence runbook. This is
    the single atomic change to `releases/current.json`.
-5. Run `npm run check:production` through the public hostnames and save its JSON
-   output in the final launch record. Confirm the map and semantic evidence
+5. Retain the production workflow's `npm run check:production` JSON output in
+   the final launch record. Confirm the map, source details and accessible CSV
    journeys manually, then finalise the schema-valid acceptance record.
 
 Never publish evidence first: a deployed site can safely report an unavailable
@@ -123,9 +141,9 @@ external source is proposed. No analytics or client-side telemetry is enabled.
 ## Monitoring and hand-off
 
 The `Monitor production` workflow runs every six hours and checks the
-homepage, semantic evidence route, service-information routes, security
-headers, current pointer, immutable manifest and a representative PMTiles
-checksum. A failed workflow run is the operational alert. Tim Roberts owns
+homepage, retired evidence route, service-information routes, security headers,
+current pointer, immutable manifest and a representative PMTiles checksum. A
+failed workflow run is the operational alert. Tim Roberts owns
 release approval, Cloudflare, GitHub production access, incident response and
 the within-one-working-day restoration target.
 
