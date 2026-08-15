@@ -12,6 +12,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import explorerDocument from "../../../data/launch/explorer-release-2026-08-13.json";
 import { MapCanvas } from "./MapCanvas";
 import { MapTools } from "./MapTools";
+import {
+  prototypeVariantFromSearch,
+  StickyMapPrototype,
+  type StickyMapPrototypeVariant
+} from "./StickyMapPrototype";
 
 const explorer = explorerDocument as unknown as ExplorerRelease;
 const LANGUAGE_COOKIE = "bca-language";
@@ -123,8 +128,11 @@ function parseState(current: ExplorerState): ExplorerState {
   };
 }
 
-function stateHref(state: ExplorerState): string {
+function stateHref(state: ExplorerState, prototypeVariant?: StickyMapPrototypeVariant): string {
   const params = new URLSearchParams();
+  if ((process.env.NODE_ENV !== "production" || process.env.NEXT_PUBLIC_STICKY_MAP_PROTOTYPE === "1") && prototypeVariant) {
+    params.set("variant", prototypeVariant);
+  }
   params.set("layers", state.visibleLayerIds.join(","));
   if (state.primaryDate) params.set("date", state.primaryDate);
   if (state.comparisonEnabled && state.comparisonDate) params.set("compare", state.comparisonDate);
@@ -146,6 +154,7 @@ export function Explorer() {
   const [state, setState] = useState<ExplorerState>(initialState);
   const [ready, setReady] = useState(false);
   const [detailLayerId, setDetailLayerId] = useState<string | null>(null);
+  const [prototypeVariant, setPrototypeVariant] = useState<StickyMapPrototypeVariant>("a");
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const c = copy[state.language];
 
@@ -159,6 +168,7 @@ export function Explorer() {
         ...current,
         language: cookieLanguage === "cy" || cookieLanguage === "en" ? cookieLanguage : current.language
       }));
+      setPrototypeVariant(prototypeVariantFromSearch(window.location.search));
       setReady(true);
     });
     return () => window.cancelAnimationFrame(frame);
@@ -167,8 +177,15 @@ export function Explorer() {
   useEffect(() => {
     document.documentElement.lang = state.language;
     if (!ready) return;
-    window.history.replaceState(null, "", stateHref(state));
-  }, [ready, state]);
+    window.history.replaceState(null, "", stateHref(state, prototypeVariant));
+  }, [prototypeVariant, ready, state]);
+
+  useEffect(() => {
+    if (process.env.NODE_ENV === "production") return;
+    const onPopState = () => setPrototypeVariant(prototypeVariantFromSearch(window.location.search));
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, []);
 
   useEffect(() => {
     if (!detailLayerId) return;
@@ -184,6 +201,13 @@ export function Explorer() {
     const secure = window.location.protocol === "https:" ? "; Secure" : "";
     document.cookie = `${LANGUAGE_COOKIE}=${language}; Max-Age=31536000; Path=/; SameSite=Lax${secure}`;
     setState((current) => ({ ...current, language }));
+  }
+
+  function choosePrototypeVariant(variant: StickyMapPrototypeVariant) {
+    setPrototypeVariant(variant);
+    const params = new URLSearchParams(window.location.search);
+    params.set("variant", variant);
+    window.history.pushState(null, "", `/?${params.toString()}`);
   }
 
   function closeDetails(layerId: string) {
@@ -260,8 +284,8 @@ export function Explorer() {
   return (
     <>
       <a className="skip-link" href="#explorer-main">{c.skip}</a>
-      <header className="site-header">
-        <a className="brand" href={stateHref(state)} aria-label={`${c.brand} — ${c.map}`}>
+      <header id="page-top" className="site-header" tabIndex={-1}>
+        <a className="brand" href={stateHref(state, prototypeVariant)} aria-label={`${c.brand} — ${c.map}`}>
           <span className="brand-mark" aria-hidden="true">B</span>
           <span>{c.brand}</span>
         </a>
@@ -286,35 +310,42 @@ export function Explorer() {
           </aside>
         </section>
 
-        <section className="explorer-shell" aria-label={state.language === "en" ? "Landscape explorer" : "Archwiliwr tirwedd"}>
-          <div className="view-toolbar">
-            <strong>{c.map}</strong>
-            <p className="area-label">⌖ {c.area}</p>
-          </div>
-
-          <div className="map-workspace">
-            <div className="map-stage">
-              <MapCanvas explorer={explorer} language={state.language} state={state} />
-              <MapTools
-                fixture={explorer}
-                state={state}
-                language={state.language}
-                copy={c}
-                detailLayerId={detailLayerId}
-                onLayerToggle={(layerId) => setState((current) => toggleVisibleLayer(current, layerId))}
-                onLayerDetail={(layerId) => setDetailLayerId(detailLayerId === layerId ? null : layerId)}
-                onPrimaryDateChange={selectPrimaryDate}
-                onComparisonToggle={toggleComparison}
-                onEarlierDateChange={(dateId) => setState((current) => ({ ...current, comparisonDate: dateId }))}
-                onContrastChange={(contrast) => setState((current) => ({ ...current, contrast }))}
-              />
+        <StickyMapPrototype
+          variant={prototypeVariant}
+          language={state.language}
+          area={c.area}
+          onVariantChange={choosePrototypeVariant}
+        >
+          <section className="explorer-shell" aria-label={state.language === "en" ? "Landscape explorer" : "Archwiliwr tirwedd"}>
+            <div className="view-toolbar">
+              <strong>{c.map}</strong>
+              <p className="area-label">⌖ {c.area}</p>
             </div>
-            {sourcesStrip}
-            {sourcePanel}
-          </div>
-        </section>
+
+            <div className="map-workspace">
+              <div className="map-stage">
+                <MapCanvas explorer={explorer} language={state.language} state={state} />
+                <MapTools
+                  fixture={explorer}
+                  state={state}
+                  language={state.language}
+                  copy={c}
+                  detailLayerId={detailLayerId}
+                  onLayerToggle={(layerId) => setState((current) => toggleVisibleLayer(current, layerId))}
+                  onLayerDetail={(layerId) => setDetailLayerId(detailLayerId === layerId ? null : layerId)}
+                  onPrimaryDateChange={selectPrimaryDate}
+                  onComparisonToggle={toggleComparison}
+                  onEarlierDateChange={(dateId) => setState((current) => ({ ...current, comparisonDate: dateId }))}
+                  onContrastChange={(contrast) => setState((current) => ({ ...current, contrast }))}
+                />
+              </div>
+              {sourcesStrip}
+              {sourcePanel}
+            </div>
+          </section>
+        </StickyMapPrototype>
       </main>
-      <footer><p>Evidence release {explorer.release.datasetVersion} · published 13 August 2026 · owner {explorer.release.owner} · next review {explorer.release.nextReviewAt}</p><nav aria-label="Service information"><a href="/accessibility/">Accessibility</a> · <a href="/privacy/">Privacy</a> · <a href="/security/">Security</a></nav><a href="#explorer-main">{c.skip}</a></footer>
+      <footer id="service-footer" tabIndex={-1}><p>Evidence release {explorer.release.datasetVersion} · published 13 August 2026 · owner {explorer.release.owner} · next review {explorer.release.nextReviewAt}</p><nav aria-label="Service information"><a href="/accessibility/">Accessibility</a> · <a href="/privacy/">Privacy</a> · <a href="/security/">Security</a></nav><a href="#explorer-main">{c.skip}</a></footer>
     </>
   );
 }
