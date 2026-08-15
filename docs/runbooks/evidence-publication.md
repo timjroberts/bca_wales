@@ -113,9 +113,13 @@ output checksum equals the archived lineage. No live upstream source is used.
 
 ## Stage, then promote
 
-Use a dedicated `CLOUDFLARE_API_TOKEN` restricted to object read/write on the
-target evidence bucket and `CLOUDFLARE_ACCOUNT_ID`. Site-deployment tokens must
-not have this permission. Production runs in the protected GitHub `production`
+Use dedicated `CLOUDFLARE_R2_ACCESS_KEY_ID` and
+`CLOUDFLARE_R2_SECRET_ACCESS_KEY` environment secrets from an R2 token
+restricted to object read/write on the target evidence bucket, together with
+`CLOUDFLARE_ACCOUNT_ID`. Site-deployment tokens must not have this permission.
+Wrangler's API-token authentication is not used for evidence objects because
+it attempts account enumeration that a bucket-scoped account token correctly
+cannot perform. Production runs in the protected GitHub `production`
 environment and the workflow concurrency group prevents two pointer changes at
 once.
 

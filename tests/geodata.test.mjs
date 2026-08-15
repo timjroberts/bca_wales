@@ -18,6 +18,7 @@ import {
   isMissingObjectError,
   publishRelease,
   restoreCurrentPointer,
+  S3R2Store,
   stageRelease,
   withdrawRelease,
   WranglerR2Store
@@ -35,6 +36,22 @@ test("Wrangler R2 stores accept only explicit supported jurisdictions", () => {
     () => new WranglerR2Store({ bucket: "test", jurisdiction: "unknown" }),
     /Unsupported R2 jurisdiction/
   );
+});
+
+test("S3 R2 stores remain bound to an explicit bucket and jurisdiction endpoint", () => {
+  const store = new S3R2Store({
+    bucket: "bca-wales-public-releases",
+    accountId: "a".repeat(32),
+    accessKeyId: "access-key",
+    secretAccessKey: "secret-key",
+    jurisdiction: "eu"
+  });
+  assert.equal(store.endpoint, `https://${"a".repeat(32)}.eu.r2.cloudflarestorage.com`);
+  assert.equal(
+    store.objectUrl("releases/release-test/assets/a-file.json"),
+    `https://${"a".repeat(32)}.eu.r2.cloudflarestorage.com/bca-wales-public-releases/releases/release-test/assets/a-file.json`
+  );
+  assert.throws(() => store.objectUrl("../other-bucket/secret"), /Unsafe R2 object key/);
 });
 
 test("Wrangler's jurisdictional missing-key response is treated as an absent optional object", () => {
