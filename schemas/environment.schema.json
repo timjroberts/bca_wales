@@ -3,13 +3,29 @@
   "$id": "https://schemas.bca.wales/environment/1.0.0.json",
   "type": "object",
   "additionalProperties": false,
-  "required": ["name", "site_origin", "asset_origin", "release_manifest_url", "pages_project", "r2_bucket"],
+  "required": ["name", "site_origin", "asset_origin", "release_manifest_url", "evidence_delivery", "pages_project", "r2_bucket"],
   "properties": {
     "name": { "enum": ["preview", "production"] },
-    "site_origin": { "type": "string", "format": "uri" },
-    "asset_origin": { "type": "string", "format": "uri" },
-    "release_manifest_url": { "type": "string", "format": "uri" },
+    "site_origin": {
+      "oneOf": [
+        { "const": "per-pull-request-pages-alias" },
+        { "type": "string", "format": "uri" }
+      ]
+    },
+    "asset_origin": {
+      "oneOf": [
+        { "const": "same-origin" },
+        { "type": "string", "format": "uri" }
+      ]
+    },
+    "release_manifest_url": { "type": "string", "format": "uri-reference" },
+    "evidence_delivery": { "enum": ["same-origin-pages", "r2"] },
     "pages_project": { "type": "string", "pattern": "^[a-z0-9-]+$" },
-    "r2_bucket": { "type": "string", "pattern": "^[a-z0-9-]+$" }
+    "r2_bucket": {
+      "oneOf": [
+        { "type": "string", "pattern": "^[a-z0-9-]+$" },
+        { "type": "null" }
+      ]
+    }
   }
 }

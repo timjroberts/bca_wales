@@ -40,7 +40,8 @@ const contrastLabel: Record<ContrastLevel, { en: string; cy: string }> = {
 let pmtilesProtocolInstalled = false;
 
 function assetOrigin(): string {
-  return (process.env.NEXT_PUBLIC_ASSET_ORIGIN ?? "https://assets.bca.wales").replace(/\/$/, "");
+  const configuredOrigin = (process.env.NEXT_PUBLIC_ASSET_ORIGIN ?? "").trim();
+  return (configuredOrigin || window.location.origin).replace(/\/$/, "");
 }
 
 function makeStyle(explorer: ExplorerRelease, state: ExplorerState): StyleSpecification {

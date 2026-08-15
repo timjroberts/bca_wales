@@ -1,8 +1,9 @@
 {
   "name": "preview",
-  "site_origin": "https://preview.bca.wales",
-  "asset_origin": "https://assets-preview.bca.wales",
-  "release_manifest_url": "https://assets-preview.bca.wales/releases/current.json",
+  "site_origin": "per-pull-request-pages-alias",
+  "asset_origin": "same-origin",
+  "release_manifest_url": "/releases/release-blorenge-2026-08-13.6/manifest.json",
+  "evidence_delivery": "same-origin-pages",
   "pages_project": "bca-wales-explorer-preview",
-  "r2_bucket": "bca-wales-public-preview"
+  "r2_bucket": null
 }

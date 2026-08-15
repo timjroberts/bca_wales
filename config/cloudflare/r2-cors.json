@@ -4,8 +4,7 @@
       "allowed": {
         "origins": [
           "https://bca-wales-explorer.pages.dev",
-          "https://explore.bca.wales",
-          "https://preview.bca.wales"
+          "https://explore.bca.wales"
         ],
         "methods": ["GET", "HEAD"],
         "headers": ["Range", "If-None-Match", "If-Modified-Since"]

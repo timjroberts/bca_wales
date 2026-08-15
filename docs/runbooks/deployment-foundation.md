@@ -7,10 +7,11 @@ remains a quarantined design record and is never served by the production app.
 
 ## Environments and accounts
 
-The public site uses Cloudflare Pages. Immutable public display assets and the
-small current-release pointer use Cloudflare R2 through first-party asset
-domains. Preview and production use different Pages projects, R2 buckets,
-credentials and hostnames; their non-secret identifiers are recorded in
+The public site uses Cloudflare Pages. Immutable production display assets and
+the small current-release pointer use Cloudflare R2 through a first-party asset
+domain. Pull-request previews use a separate Pages project and package a pinned,
+checksum-verified copy of the staged public release into each Pages deployment.
+Their non-secret identifiers and delivery modes are recorded in
 `config/environments/`.
 
 The production Pages project is `bca-wales-explorer` and the EU-jurisdiction R2
@@ -27,7 +28,9 @@ or repository secrets, never in source, builds, logs or R2.
 
 ## Credential scopes
 
-- `CLOUDFLARE_PAGES_PREVIEW_TOKEN`: edit only the preview Pages project.
+- `CLOUDFLARE_PAGES_PREVIEW_TOKEN`: edit only the preview Pages project. It
+  needs no R2 access: preview evidence is downloaded from immutable public
+  production keys, verified, and uploaded as part of the Pages artifact.
 - `CLOUDFLARE_PAGES_PRODUCTION_TOKEN`: edit only the production Pages project;
   expose it only through the protected `production` GitHub environment.
 - Evidence-publication credentials are deliberately absent from the site
@@ -44,10 +47,18 @@ change in the repository's operational log.
 
 ## Preview and production
 
-Every pull request validates and builds an isolated Pages branch preview. It
-can read only preview evidence through the preview asset origin. Forked pull
-requests do not receive deployment credentials and therefore run validation
-without a hosted preview.
+Every pull request validates and builds an isolated Pages branch preview. The
+build fetches the exact immutable release manifest named by the checked-in
+explorer contract, verifies its SHA-256, downloads every allowlisted asset from
+its versioned public key, verifies byte counts and checksums, and then places
+the files under `/releases/<release-id>/` in the static export. Browser asset
+URLs are same-origin, so both the branch alias and Cloudflare's immutable
+hash-addressed deployment remain self-contained and require no R2 CORS rule or
+preview evidence credential. The workflow exercises the deployed homepage,
+semantic route, PMTiles byte ranges, GeoJSON and accessible download before it
+succeeds. It never reads or creates `releases/current.json`, and it cannot write
+the production bucket. Forked pull requests receive no Pages credential and
+therefore validate and stage the public bytes without creating a hosted preview.
 
 Production deployment is manual, runs in the protected `production`
 environment and requires the evidence release identifier paired with the site
@@ -97,11 +108,12 @@ than substitution.
 
 ## Security headers and CORS
 
-Cloudflare Pages serves `apps/web/public/_headers`. R2 applies
-`config/cloudflare/r2-cors.json`, which permits read-only range requests from
-the two first-party site origins. Re-check headers and CORS after any new
-browser runtime or external source is proposed. No analytics or client-side
-telemetry is enabled.
+Cloudflare Pages serves `apps/web/public/_headers`. Production R2 applies
+`config/cloudflare/r2-cors.json`, which permits read-only range requests only
+from the production Pages and first-party site origins. Pull-request previews
+serve evidence from their own Pages origin and therefore do not widen the R2
+CORS allowlist. Re-check headers and CORS after any new browser runtime or
+external source is proposed. No analytics or client-side telemetry is enabled.
 
 ## Monitoring and hand-off
 

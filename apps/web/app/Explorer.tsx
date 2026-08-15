@@ -424,7 +424,7 @@ export function Explorer({ initialView }: { initialView: "map" | "evidence" }) {
                     <p><strong>Terrain:</strong> {explorer.terrain.minimumM}–{explorer.terrain.maximumM} m; mean {explorer.terrain.meanM} m; {explorer.terrain.contourIntervalM} m contours.</p>
                     <ul>{explorer.limitations.map((limitation) => <li key={limitation}>{limitation}</li>)}</ul>
                   </section>
-                  <a className="download-button" href={`${process.env.NEXT_PUBLIC_ASSET_ORIGIN ?? "https://assets.bca.wales"}${explorer.map.assets.download}`} download>{c.download}</a>
+                  <a className="download-button" href={`${(process.env.NEXT_PUBLIC_ASSET_ORIGIN ?? "").trim()}${explorer.map.assets.download}`} download>{c.download}</a>
                 </section>
 
                 {sourcesStrip}

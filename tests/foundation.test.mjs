@@ -27,6 +27,10 @@ test("site and evidence delivery remain separately scoped", async () => {
   const preview = await read(".github/workflows/preview.yml");
   const production = await read(".github/workflows/deploy-site.yml");
   assert.match(preview, /pages deploy apps\/web\/out/);
+  assert.match(preview, /npm run stage:preview-evidence/);
+  assert.match(preview, /NEXT_PUBLIC_ASSET_ORIGIN: ""/);
+  assert.match(preview, /npm run check:preview/);
+  assert.doesNotMatch(preview, /assets-preview\.bca\.wales/);
   assert.match(production, /environment: production/);
   assert.doesNotMatch(`${preview}\n${production}`, /wrangler r2 object put/);
 });
