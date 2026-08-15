@@ -25,6 +25,7 @@ test("the single explorer route keeps map controls, shareable state and source d
   const accessibility = await read("apps/web/app/accessibility/page.tsx");
   const map = await read("apps/web/app/MapCanvas.tsx");
   const mapTools = await read("apps/web/app/MapTools.tsx");
+  const applicationMode = await read("apps/web/app/MapApplicationMode.tsx");
   assert.match(explorer, /Blorenge Landscape Explorer/);
   assert.match(explorer, /Explore the Blorenge landscape and see how it changes over time/);
   assert.match(explorer, /After exploring this beautiful landscape on foot, why not explore its data and compare and observe how it changes over time\./);
@@ -43,6 +44,7 @@ test("the single explorer route keeps map controls, shareable state and source d
   assert.match(map, /release-context/);
   assert.match(map, /cooperativeGestures: true/);
   assert.match(map, /prefers-reduced-motion: reduce/);
+  assert.match(map, /new ResizeObserver\(\(\) => map\.resize\(\)\)/);
   assert.match(mapTools, /className="map-tools" open=\{openPanels\.tools\}/);
   assert.match(mapTools, /className="map-tool-panel map-tool-layers" open=\{openPanels\.layers\}/);
   assert.match(mapTools, /className="map-tool-panel map-tool-date" open=\{openPanels\.date\}/);
@@ -52,6 +54,12 @@ test("the single explorer route keeps map controls, shareable state and source d
   assert.match(mapTools, /aria-controls="source-details"/);
   assert.doesNotMatch(explorer, /MapOverlayPrototype|PrototypeSwitcher|prototypeVariant/);
   assert.doesNotMatch(mapTools, /PROTOTYPE|VariantA|VariantB|VariantC/);
+  assert.doesNotMatch(explorer, /className="view-toolbar"/);
+  assert.match(applicationMode, /window\.visualViewport\?\.addEventListener\("resize"/);
+  assert.match(applicationMode, /document\.body\.style\.overflow = "hidden"/);
+  assert.match(applicationMode, /document\.getElementById\("source-details"\)/);
+  assert.match(applicationMode, /focus\(\{ preventScroll: true \}\)/);
+  assert.match(applicationMode, /a\[href\^='#'\]/);
 });
 
 test("the factual presentation contract is internally referential and exposes public-safe alternatives", async () => {

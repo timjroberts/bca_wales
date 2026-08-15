@@ -10,6 +10,7 @@ import {
 import type { ExplorerLayer, ExplorerRelease } from "@bca/publication";
 import { useEffect, useMemo, useRef, useState } from "react";
 import explorerDocument from "../../../data/launch/explorer-release-2026-08-13.json";
+import { MapApplicationMode } from "./MapApplicationMode";
 import { MapCanvas } from "./MapCanvas";
 import { MapTools } from "./MapTools";
 
@@ -260,7 +261,7 @@ export function Explorer() {
   return (
     <>
       <a className="skip-link" href="#explorer-main">{c.skip}</a>
-      <header className="site-header">
+      <header id="page-top" className="site-header" tabIndex={-1}>
         <a className="brand" href={stateHref(state)} aria-label={`${c.brand} — ${c.map}`}>
           <span className="brand-mark" aria-hidden="true">B</span>
           <span>{c.brand}</span>
@@ -286,35 +287,35 @@ export function Explorer() {
           </aside>
         </section>
 
-        <section className="explorer-shell" aria-label={state.language === "en" ? "Landscape explorer" : "Archwiliwr tirwedd"}>
-          <div className="view-toolbar">
-            <strong>{c.map}</strong>
-            <p className="area-label">⌖ {c.area}</p>
-          </div>
-
-          <div className="map-workspace">
-            <div className="map-stage">
-              <MapCanvas explorer={explorer} language={state.language} state={state} />
-              <MapTools
-                fixture={explorer}
-                state={state}
-                language={state.language}
-                copy={c}
-                detailLayerId={detailLayerId}
-                onLayerToggle={(layerId) => setState((current) => toggleVisibleLayer(current, layerId))}
-                onLayerDetail={(layerId) => setDetailLayerId(detailLayerId === layerId ? null : layerId)}
-                onPrimaryDateChange={selectPrimaryDate}
-                onComparisonToggle={toggleComparison}
-                onEarlierDateChange={(dateId) => setState((current) => ({ ...current, comparisonDate: dateId }))}
-                onContrastChange={(contrast) => setState((current) => ({ ...current, contrast }))}
-              />
+        <MapApplicationMode language={state.language} area={c.area}>
+          <section className="explorer-shell" aria-label={state.language === "en" ? "Landscape explorer" : "Archwiliwr tirwedd"}>
+            <div className="map-workspace">
+              <div className="map-stage">
+                <MapCanvas explorer={explorer} language={state.language} state={state} />
+                <noscript>
+                  <p className="map-no-script">The interactive map requires JavaScript. Source information and the accessible evidence CSV remain available below the map.</p>
+                </noscript>
+                <MapTools
+                  fixture={explorer}
+                  state={state}
+                  language={state.language}
+                  copy={c}
+                  detailLayerId={detailLayerId}
+                  onLayerToggle={(layerId) => setState((current) => toggleVisibleLayer(current, layerId))}
+                  onLayerDetail={(layerId) => setDetailLayerId(detailLayerId === layerId ? null : layerId)}
+                  onPrimaryDateChange={selectPrimaryDate}
+                  onComparisonToggle={toggleComparison}
+                  onEarlierDateChange={(dateId) => setState((current) => ({ ...current, comparisonDate: dateId }))}
+                  onContrastChange={(contrast) => setState((current) => ({ ...current, contrast }))}
+                />
+              </div>
+              {sourcesStrip}
+              {sourcePanel}
             </div>
-            {sourcesStrip}
-            {sourcePanel}
-          </div>
-        </section>
+          </section>
+        </MapApplicationMode>
       </main>
-      <footer><p>Evidence release {explorer.release.datasetVersion} · published 13 August 2026 · owner {explorer.release.owner} · next review {explorer.release.nextReviewAt}</p><nav aria-label="Service information"><a href="/accessibility/">Accessibility</a> · <a href="/privacy/">Privacy</a> · <a href="/security/">Security</a></nav><a href="#explorer-main">{c.skip}</a></footer>
+      <footer id="service-footer" tabIndex={-1}><p>Evidence release {explorer.release.datasetVersion} · published 13 August 2026 · owner {explorer.release.owner} · next review {explorer.release.nextReviewAt}</p><nav aria-label="Service information"><a href="/accessibility/">Accessibility</a> · <a href="/privacy/">Privacy</a> · <a href="/security/">Security</a></nav><a href="#explorer-main">{c.skip}</a></footer>
     </>
   );
 }
