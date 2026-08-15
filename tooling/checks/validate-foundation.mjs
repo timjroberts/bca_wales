@@ -63,10 +63,17 @@ assert.equal(cors.rules.length, 1);
 assert.deepEqual(cors.rules[0].allowed.methods, ["GET", "HEAD"]);
 assert.deepEqual(cors.rules[0].allowed.origins.sort(), [
   "https://bca-wales-explorer.pages.dev",
-  "https://preview.bca.wales",
   "https://explore.bca.wales"
 ].sort());
 assert.equal("AllowedOrigins" in cors.rules[0], false, "R2 CORS must use Cloudflare API shape");
+
+const previewEnvironment = await readJson("config/environments/preview.json");
+const productionEnvironment = await readJson("config/environments/production.json");
+assert.equal(previewEnvironment.asset_origin, "same-origin");
+assert.equal(previewEnvironment.evidence_delivery, "same-origin-pages");
+assert.equal(previewEnvironment.r2_bucket, null);
+assert.equal(productionEnvironment.evidence_delivery, "r2");
+assert.ok(productionEnvironment.r2_bucket);
 
 const toolchain = await readJson("config/publication/toolchain.lock.json");
 const pmtilesWrapper = await readFile(new URL("tooling/geodata/pmtiles-wrapper.sh", root), "utf8");

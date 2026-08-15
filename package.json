@@ -14,6 +14,8 @@
   "scripts": {
     "dev": "npm run dev --workspace @bca/web",
     "build": "npm run validate && npm run build --workspace @bca/web",
+    "stage:preview-evidence": "node tooling/checks/stage-preview-evidence.mjs",
+    "check:preview": "node tooling/checks/check-preview.mjs",
     "lint": "eslint apps packages tooling tests --max-warnings=0",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test": "node --test tests/*.test.mjs",
