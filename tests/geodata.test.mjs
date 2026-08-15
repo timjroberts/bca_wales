@@ -14,7 +14,14 @@ import {
   reuseAcquisition,
   verifyArchive
 } from "../tooling/geodata/src/pipeline.mjs";
-import { isMissingObjectError, publishRelease, stageRelease, withdrawRelease, WranglerR2Store } from "../tooling/geodata/src/r2.mjs";
+import {
+  isMissingObjectError,
+  publishRelease,
+  restoreCurrentPointer,
+  stageRelease,
+  withdrawRelease,
+  WranglerR2Store
+} from "../tooling/geodata/src/r2.mjs";
 import { readJson } from "../tooling/geodata/src/runtime.mjs";
 
 const repositoryRoot = path.resolve(new URL("../", import.meta.url).pathname);
@@ -433,6 +440,70 @@ test("staging publishes immutable release assets without changing the current po
   });
   assert.equal(published.uploads.every((upload) => upload.uploaded === false), true);
   assert.equal(store.objects.has("releases/current.json"), true);
+});
+
+test("pointer restoration verifies retained immutable release objects before writing current", async (context) => {
+  const root = await mkdtemp(path.join(tmpdir(), "bca-restore-pointer-test-"));
+  context.after(() => rm(root, { recursive: true }));
+  const contracts = await fixture(root);
+  const acquired = await acquireRelease({
+    ...contracts,
+    workspaceRoot: path.join(root, "work"),
+    codeCommit: commit,
+    clock
+  });
+  await buildRelease({ releaseRoot: acquired.releaseRoot, clock, runner: localRunner(acquired.releaseRoot) });
+  const store = new MemoryStore();
+  const published = await publishRelease({
+    releaseRoot: acquired.releaseRoot,
+    store,
+    identity: "timjroberts",
+    mode: "manual",
+    clock
+  });
+  store.objects.delete("releases/current.json");
+
+  const restored = await restoreCurrentPointer({
+    store,
+    releaseId: "release-test-001",
+    expectedManifestSha256: published.pointer.manifest_sha256,
+    identity: "timjroberts",
+    publicAssetOrigin: "https://assets.example.invalid"
+  });
+  assert.equal(restored.verifiedAssets, 2);
+  assert.deepEqual(JSON.parse(store.objects.get("releases/current.json").toString()), published.pointer);
+});
+
+test("pointer restoration refuses a corrupt immutable asset and leaves current absent", async (context) => {
+  const root = await mkdtemp(path.join(tmpdir(), "bca-restore-pointer-corrupt-test-"));
+  context.after(() => rm(root, { recursive: true }));
+  const contracts = await fixture(root);
+  const acquired = await acquireRelease({
+    ...contracts,
+    workspaceRoot: path.join(root, "work"),
+    codeCommit: commit,
+    clock
+  });
+  await buildRelease({ releaseRoot: acquired.releaseRoot, clock, runner: localRunner(acquired.releaseRoot) });
+  const store = new MemoryStore();
+  const published = await publishRelease({
+    releaseRoot: acquired.releaseRoot,
+    store,
+    identity: "timjroberts",
+    mode: "manual",
+    clock
+  });
+  store.objects.delete("releases/current.json");
+  store.objects.set("releases/release-test-001/assets/public.geojson", Buffer.from("corrupt"));
+
+  await assert.rejects(restoreCurrentPointer({
+    store,
+    releaseId: "release-test-001",
+    expectedManifestSha256: published.pointer.manifest_sha256,
+    identity: "timjroberts",
+    publicAssetOrigin: "https://assets.example.invalid"
+  }), /immutable asset does not match/);
+  assert.equal(store.objects.has("releases/current.json"), false);
 });
 
 test("a failed gate cannot upload or promote anything", async (context) => {

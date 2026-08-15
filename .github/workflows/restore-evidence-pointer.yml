@@ -1,0 +1,43 @@
+name: Restore evidence pointer
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_id:
+        description: Existing immutable release ID
+        required: true
+        type: string
+      manifest_sha256:
+        description: Reviewed immutable manifest SHA-256
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-evidence-pointer
+  cancel-in-progress: false
+
+jobs:
+  restore:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    environment: production
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_R2_PUBLICATION_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - name: Verify immutable release and restore current pointer
+        run: npm run geodata -- restore-pointer --bucket bca-wales-public-releases --jurisdiction eu --release-id "${{ inputs.release_id }}" --manifest-sha256 "${{ inputs.manifest_sha256 }}" --identity timjroberts --asset-origin https://assets.bca.wales
+      - name: Verify production after restoration
+        run: npm run check:production

@@ -160,3 +160,19 @@ After promotion, withdrawal or rollback, fetch `current.json`, its manifest and
 one representative asset through the public asset hostname and verify the
 recorded SHA-256. Confirm the homepage map, source details and accessible CSV
 show the same release state.
+
+### Recover a missing current pointer
+
+If `releases/current.json` is absent but a previously published immutable
+release is retained, run the protected **Restore evidence pointer** workflow
+with the reviewed release ID and manifest SHA-256. The workflow uses the
+existing token restricted to the evidence bucket. It downloads the immutable
+manifest and every referenced asset directly from R2, verifies their paths,
+sizes and SHA-256 values, confirms the passing gate and original release
+authority, and only then recreates `current.json`.
+
+The command refuses to replace a withdrawn pointer or a pointer selecting a
+different release. It never writes versioned assets, deletes objects, changes
+DNS, or purges a Cloudflare zone. Preserve the workflow run with the incident
+record and confirm the public pointer, manifest, representative asset and site
+with `npm run check:production`.
