@@ -1,0 +1,75 @@
+{
+  "type": "FeatureCollection",
+  "name": "BCA-area of interest",
+  "bbox": [-3.170513, 51.697865, -2.982754, 51.82407],
+  "features": [
+    {
+      "type": "Feature",
+      "id": "bca-area-of-interest",
+      "properties": {
+        "name": "BCA-area of interest",
+        "classification": "bca-defined-approximate",
+        "owner": "BCA",
+        "version": "2026-08-16.1",
+        "captured_date": "2026-08-16",
+        "capture_method": "Hand-captured by BCA",
+        "normalization": "Converted from a near-closed LineString to a Polygon; snapped the final endpoint 5.741 metres to the first; reversed the exterior ring; otherwise preserved the captured vertices.",
+        "source_crs": "EPSG:4326",
+        "source_sha256": "e51685992eeb4803e0180e20ca89a7752f2d7b07b445677c5248e8b0cfa75415",
+        "limitations": "A BCA-defined approximate landscape area for exploration and processing. It is not the legal, official, surveyed or current boundary of Blorenge Common CL18."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-3.170513, 51.797574],
+            [-3.147024, 51.792173],
+            [-3.127889, 51.782787],
+            [-3.106466, 51.776289],
+            [-3.081397, 51.770823],
+            [-3.068595, 51.765321],
+            [-3.059485, 51.756874],
+            [-3.059825, 51.741757],
+            [-3.056821, 51.72856],
+            [-3.058871, 51.715619],
+            [-3.045254, 51.705172],
+            [-3.038946, 51.697865],
+            [-3.0301, 51.697946],
+            [-3.021927, 51.698254],
+            [-3.017188, 51.702193],
+            [-3.008463, 51.7042],
+            [-2.998156, 51.715699],
+            [-2.99024, 51.719119],
+            [-2.98652, 51.7279],
+            [-2.987746, 51.732376],
+            [-2.982754, 51.737001],
+            [-2.986391, 51.742406],
+            [-2.986827, 51.752572],
+            [-2.994087, 51.766014],
+            [-3.003063, 51.771408],
+            [-3.011114, 51.787243],
+            [-3.008936, 51.792549],
+            [-3.006009, 51.797529],
+            [-3.008646, 51.801146],
+            [-3.007905, 51.804367],
+            [-3.009781, 51.80815],
+            [-3.011816, 51.809988],
+            [-3.028474, 51.815706],
+            [-3.04714, 51.819473],
+            [-3.084919, 51.82407],
+            [-3.096607, 51.823487],
+            [-3.11715, 51.815605],
+            [-3.125768, 51.808306],
+            [-3.135331, 51.807357],
+            [-3.142179, 51.805386],
+            [-3.150207, 51.805021],
+            [-3.158117, 51.802977],
+            [-3.161777, 51.802758],
+            [-3.165437, 51.802977],
+            [-3.170513, 51.797574]
+          ]
+        ]
+      }
+    }
+  ]
+}
