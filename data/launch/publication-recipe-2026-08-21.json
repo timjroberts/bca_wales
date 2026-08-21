@@ -1,9 +1,9 @@
 {
   "schema_version": "1.0.0",
   "recipe_id": "blorenge-second-release",
-  "recipe_version": "2.0.0",
-  "release_id": "release-blorenge-2026-08-21.1",
-  "dataset_version": "2026-08-21.1",
+  "recipe_version": "2.0.1",
+  "release_id": "release-blorenge-2026-08-21.2",
+  "dataset_version": "2026-08-21.2",
   "registry_id": "blorenge-launch",
   "public_asset_origin": "https://assets.bca.wales",
   "supersedes": "release-blorenge-2026-08-13.6",
@@ -318,7 +318,7 @@
       "source": "https://datamap.gov.wales/geoserver/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=geonode%3Anrw_phase1_vegetation_voronoi&outputFormat=application%2Fjson&srsName=EPSG%3A27700&BBOX=323233.5310126663,198414.9666252311,333993.16014189116,215940.42484088655,EPSG%3A27700",
       "destination": "quarantine/nrw/phase1-habitat.geojson",
       "media_type": "application/geo+json",
-      "maximum_bytes": 12000000,
+      "maximum_bytes": 16777216,
       "expected_sha256": "ce8b0343b54413945028274728a432634cd827be8fdf7fa660a3081da5c55a33"
     },
     {
@@ -2849,9 +2849,9 @@
         "--change",
         "{artifact:change-report}",
         "--release-id",
-        "release-blorenge-2026-08-21.1",
+        "release-blorenge-2026-08-21.2",
         "--dataset-version",
-        "2026-08-21.1",
+        "2026-08-21.2",
         "--output",
         "{artifact:release-summary}"
       ],
@@ -3246,7 +3246,7 @@
         "nrw-main-rivers",
         "nrw-phase1-vegetation-voronoi"
       ],
-      "evidence_version": "2026-08-21.1",
+      "evidence_version": "2026-08-21.2",
       "title": "Expanded Blorenge landscape context / Cyd-destun tirwedd ehangach Blorenge",
       "provider": "Blorenge Commoners Association, Natural Resources Wales, OpenStreetMap contributors and Geofabrik",
       "licence": "BCA publication authority, OGL 3.0 and ODbL 1.0 by source",
@@ -3271,7 +3271,7 @@
         "bca-area-of-interest",
         "wg-lidar-dtm-2020-2023"
       ],
-      "evidence_version": "2026-08-21.1",
+      "evidence_version": "2026-08-21.2",
       "title": "Expanded Blorenge terrain context / Cyd-destun tir ehangach Blorenge",
       "provider": "Welsh Government; BCA processing",
       "licence": "Open Government Licence 3.0 and BCA publication authority",
@@ -3297,7 +3297,7 @@
         "copernicus-sentinel-2-l2a",
         "usgs-landsat-c2-l2-sr"
       ],
-      "evidence_version": "2026-08-21.1",
+      "evidence_version": "2026-08-21.2",
       "title": "Observed surface and vegetation change / Newid arwyneb a llystyfiant a arsylwyd",
       "provider": "European Union Copernicus programme, USGS and BCA processing",
       "licence": "Copernicus Sentinel data legal notice, USGS public domain and BCA publication authority",
@@ -3323,7 +3323,7 @@
         "bca-area-of-interest",
         "copernicus-sentinel-2-l2a"
       ],
-      "evidence_version": "2026-08-21.1",
+      "evidence_version": "2026-08-21.2",
       "title": "Vegetation greenness index change (NDVI) / Newid mynegai gwyrddni llystyfiant (NDVI)",
       "provider": "European Union Copernicus programme; BCA processing",
       "licence": "Copernicus Sentinel data legal notice and BCA publication authority",
@@ -3346,7 +3346,7 @@
         "bca-area-of-interest",
         "copernicus-sentinel-2-l2a"
       ],
-      "evidence_version": "2026-08-21.1",
+      "evidence_version": "2026-08-21.2",
       "title": "Moisture-sensitive index change (NDMI) / Newid mynegai sy’n sensitif i leithder (NDMI)",
       "provider": "European Union Copernicus programme; BCA processing",
       "licence": "Copernicus Sentinel data legal notice and BCA publication authority",
@@ -3369,7 +3369,7 @@
         "bca-area-of-interest",
         "effis-current-burnt-areas"
       ],
-      "evidence_version": "2026-08-21.1",
+      "evidence_version": "2026-08-21.2",
       "title": "EFFIS provisional provider boundary / Ffin dros dro y darparwr EFFIS",
       "provider": "European Union, Copernicus EFFIS; BCA processing",
       "licence": "CC BY 4.0 and BCA publication authority",
