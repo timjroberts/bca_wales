@@ -4,6 +4,7 @@ out/
 dist/
 .wrangler/
 .geodata-work/
+.geodata-staging/
 .env
 .env.*
 !.env.example

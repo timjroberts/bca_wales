@@ -8,7 +8,7 @@
 
 import { createHash } from "node:crypto";
 import { createReadStream, createWriteStream } from "node:fs";
-import { mkdir, readFile, rename, stat, writeFile } from "node:fs/promises";
+import { copyFile, mkdir, readFile, rename, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { Readable } from "node:stream";
 import { pipeline } from "node:stream/promises";
@@ -19,8 +19,9 @@ const selectedPath = process.argv[2];
 const cataloguePath = process.argv[3];
 const outputPath = process.argv[4];
 const cacheRoot = process.argv[5] ?? "/tmp/bca-release-two-prefetch";
-const releaseId = "release-blorenge-2026-08-21.3";
-const datasetVersion = "2026-08-21.3";
+const releaseId = "release-blorenge-2026-08-21.4";
+const datasetVersion = "2026-08-21.4";
+const stagingRoot = path.join(repositoryRoot, ".geodata-staging/release-two");
 
 if (!selectedPath || !cataloguePath || !outputPath) {
   throw new Error("Usage: prepare_release_two.mjs SELECTED.json CATALOGUE.geojson OUTPUT.json [CACHE]");
@@ -75,14 +76,15 @@ function input({ input_id, dataset_id, source, destination, media_type, maximum_
 }
 
 const oldRecipe = JSON.parse(await readFile(oldRecipePath, "utf8"));
+const registry = JSON.parse(await readFile(path.join(repositoryRoot, "data/launch/source-registry.json"), "utf8"));
 const selectedTiles = JSON.parse(await readFile(selectedPath, "utf8"))
   .sort((left, right) => left.dtm_link.localeCompare(right.dtm_link));
 const oldInputs = new Map(oldRecipe.inputs.map((item) => [item.input_id, item]));
 const knownHashByUrl = new Map(oldRecipe.inputs.map((item) => [item.source.replace(/^planetary:/, ""), item.expected_sha256]));
 
 const bounds = "323233.5310126663,198414.9666252311,333993.16014189116,215940.42484088655,EPSG%3A27700";
-const catalogueUrl = `https://datamap.gov.wales/geoserver/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=geonode%3Awelsh_government_lidar_tile_catalogue_2020_2023&outputFormat=application%2Fjson&srsName=EPSG%3A27700&BBOX=${bounds}`;
 const contextUrls = {
+  "nrw-sssi": registry.sources.find((source) => source.dataset_id === "nrw-sssi").acquisition.url,
   "nrw-national-park": `https://datamap.gov.wales/geoserver/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=inspire-nrw%3ANRW_NATIONAL_PARK&outputFormat=application%2Fjson&srsName=EPSG%3A27700&BBOX=${bounds}`,
   "nrw-main-rivers": `https://datamap.gov.wales/geoserver/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=inspire-nrw%3ANRW_MAIN_RIVERS&outputFormat=application%2Fjson&srsName=EPSG%3A27700&BBOX=${bounds}`,
   "nrw-phase1-habitat": `https://datamap.gov.wales/geoserver/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=geonode%3Anrw_phase1_vegetation_voronoi&outputFormat=application%2Fjson&srsName=EPSG%3A27700&BBOX=${bounds}`,
@@ -102,6 +104,12 @@ const reviewHashes = new Map((await mapLimit(reviewDownloads, 4, async ({ id, ur
   id,
   await download(url, `${id}.bin`),
 ])).map((entry) => entry));
+await mkdir(stagingRoot, { recursive: true });
+for (const { id } of reviewDownloads) {
+  if (id.startsWith("s2-")) continue;
+  await copyFile(path.join(cacheRoot, `${id}.bin`), path.join(stagingRoot, `${id}.geojson`));
+}
+await copyFile(cataloguePath, path.join(stagingRoot, "lidar-catalogue.geojson"));
 
 const lidarInputs = await mapLimit(selectedTiles, 8, async (tile) => {
   const url = `https://${tile.dtm_link}`;
@@ -130,11 +138,10 @@ const inputs = [
     maximum_bytes: 1048576,
     expected_sha256: await sha256File(path.join(repositoryRoot, "Blorenge.geojson")),
   }),
-  oldInputs.get("nrw-sssi"),
-  ...Object.entries(contextUrls).map(([id, url]) => input({
+  ...Object.entries(contextUrls).map(([id]) => input({
     input_id: id,
     dataset_id: oldInputs.get(id).dataset_id,
-    source: url,
+    source: `.geodata-staging/release-two/${id}.geojson`,
     destination: oldInputs.get(id).destination,
     media_type: "application/geo+json",
     maximum_bytes: id === "nrw-phase1-habitat" ? 16777216 : oldInputs.get(id).maximum_bytes,
@@ -146,8 +153,8 @@ const inputs = [
   },
   input({
     input_id: "lidar-catalogue",
-    dataset_id: "wg-lidar-dtm-2020-2023",
-    source: catalogueUrl,
+    dataset_id: "wg-lidar-tile-catalogue",
+    source: ".geodata-staging/release-two/lidar-catalogue.geojson",
     destination: "quarantine/lidar/catalogue-expanded-aoi.geojson",
     media_type: "application/geo+json",
     maximum_bytes: 104857600,
@@ -330,7 +337,7 @@ const datasets = [
     title: "Expanded Blorenge landscape context / Cyd-destun tirwedd ehangach Blorenge", provider: "Blorenge Commoners Association, Natural Resources Wales, OpenStreetMap contributors and Geofabrik", licence: "BCA publication authority, OGL 3.0 and ODbL 1.0 by source", attribution: "Blorenge Commoners Association; contains NRW and Ordnance Survey information under the recorded attribution; © OpenStreetMap contributors; processed by Geofabrik.", classification: "contextual", observation_dates: ["2026-07-30", "2026-08-12", "2026-08-21"], method: "Preserve the canonical BCA core, derive its exact 2 km AOI in EPSG:27700, and clip only allowlisted context fields to that AOI.", uncertainty: "Source dates and completeness vary; the BCA core is approximate and contextual paths do not establish legal status.", limitations: ["The BCA-area is not the legal, official, surveyed or current CL18 boundary.", "The SSSI remains an independent authoritative context layer.", "Phase 1 habitat is historical."],
   },
   {
-    dataset_id: "terrain", source_dataset_ids: ["bca-area-of-interest", "wg-lidar-dtm-2020-2023"], evidence_version: datasetVersion,
+    dataset_id: "terrain", source_dataset_ids: ["bca-area-of-interest", "wg-lidar-tile-catalogue", "wg-lidar-dtm-2020-2023"], evidence_version: datasetVersion,
     title: "Expanded Blorenge terrain context / Cyd-destun tir ehangach Blorenge", provider: "Welsh Government; BCA processing", licence: "Open Government Licence 3.0 and BCA publication authority", attribution: "Welsh Government LiDAR; processed by Blorenge Commoners Association.", classification: "contextual", observation_dates: ["2020-12-24", "2020-12-25", "2021-02-27", "2022-01-12"], method: "Mosaic the 163 exact intersecting 1 m DTM tiles, average to 10 m inside the expanded AOI, then derive fixed hillshade and contours.", uncertainty: "Capture dates vary by tile and hillshade is a visualisation.", limitations: ["Not produced specifically for flood modelling.", "Terrain does not describe current surface cover."],
   },
   {
@@ -354,7 +361,7 @@ const datasets = [
 const recipe = {
   schema_version: "1.0.0",
   recipe_id: "blorenge-second-release",
-  recipe_version: "2.0.2",
+  recipe_version: "2.0.3",
   release_id: releaseId,
   dataset_version: datasetVersion,
   registry_id: "blorenge-launch",
