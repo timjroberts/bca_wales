@@ -42,6 +42,7 @@ jobs:
       - name: Derive exact release-two AOI
         run: >-
           docker run --rm
+          --user "$(id -u):$(id -g)"
           --volume "$PWD:/repo"
           --workdir /repo
           bca/geodata-toolchain:1.0.0
