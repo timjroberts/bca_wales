@@ -290,7 +290,7 @@ test("the factual release-two recipe pins the expanded AOI and component contrac
     registryPath: path.join(repositoryRoot, "data/launch/source-registry.json"),
     recipePath: path.join(repositoryRoot, "data/launch/publication-recipe-2026-08-21.json")
   });
-  assert.equal(loaded.recipe.release_id, "release-blorenge-2026-08-21.2");
+  assert.equal(loaded.recipe.release_id, "release-blorenge-2026-08-21.3");
   assert.equal(loaded.recipe.supersedes, "release-blorenge-2026-08-13.6");
   assert.equal(loaded.recipe.spatial_contract.core_version, "2026-08-21.1");
   assert.equal(loaded.recipe.inputs.filter((item) => item.input_id.startsWith("lidar-") && item.input_id !== "lidar-catalogue").length, 163);

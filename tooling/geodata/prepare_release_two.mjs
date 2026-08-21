@@ -19,6 +19,8 @@ const selectedPath = process.argv[2];
 const cataloguePath = process.argv[3];
 const outputPath = process.argv[4];
 const cacheRoot = process.argv[5] ?? "/tmp/bca-release-two-prefetch";
+const releaseId = "release-blorenge-2026-08-21.3";
+const datasetVersion = "2026-08-21.3";
 
 if (!selectedPath || !cataloguePath || !outputPath) {
   throw new Error("Usage: prepare_release_two.mjs SELECTED.json CATALOGUE.geojson OUTPUT.json [CACHE]");
@@ -138,7 +140,10 @@ const inputs = [
     maximum_bytes: id === "nrw-phase1-habitat" ? 16777216 : oldInputs.get(id).maximum_bytes,
     expected_sha256: reviewHashes.get(id),
   })),
-  oldInputs.get("osm-wales"),
+  {
+    ...oldInputs.get("osm-wales"),
+    source: ".geodata-work/release-blorenge-2026-08-13.6/quarantine/osm/wales-260812.osm.pbf",
+  },
   input({
     input_id: "lidar-catalogue",
     dataset_id: "wg-lidar-dtm-2020-2023",
@@ -192,7 +197,7 @@ const sceneIds = (role) => ["red", "nir", "nir20", "swir1", "swir2", "scl"].map(
 const landsatIds = inputs.filter((item) => item.input_id.startsWith("landsat-")).map((item) => item.input_id);
 const aoiDependentInputIds = inputs
   .map((item) => item.input_id)
-  .filter((id) => !["bca-area-core", "effis-release-one"].includes(id));
+  .filter((id) => !["bca-area-core", "effis-release-one", "osm-wales"].includes(id));
 
 const intermediates = [
   ["context-geojson", "private/context.geojson"],
@@ -291,7 +296,7 @@ const steps = [
   ]),
   {
     step_id: "build-release-summary-v2", tool: "python3",
-    argv: ["/repo/tooling/geodata/recipes/build_release_summary_v2.py", "--context", "{artifact:context-summary}", "--terrain", "{artifact:terrain-summary}", "--change", "{artifact:change-report}", "--release-id", "release-blorenge-2026-08-21.2", "--dataset-version", "2026-08-21.2", "--output", "{artifact:release-summary}"],
+    argv: ["/repo/tooling/geodata/recipes/build_release_summary_v2.py", "--context", "{artifact:context-summary}", "--terrain", "{artifact:terrain-summary}", "--change", "{artifact:change-report}", "--release-id", releaseId, "--dataset-version", datasetVersion, "--output", "{artifact:release-summary}"],
     inputs: ["context-summary", "terrain-summary", "change-report"], outputs: ["release-summary"],
   },
 ];
@@ -321,27 +326,27 @@ const outputs = [
 
 const datasets = [
   {
-    dataset_id: "landscape-context", source_dataset_ids: ["bca-area-of-interest", "nrw-sssi", "nrw-national-park", "osm-wales-geofabrik", "nrw-main-rivers", "nrw-phase1-vegetation-voronoi"], evidence_version: "2026-08-21.2",
+    dataset_id: "landscape-context", source_dataset_ids: ["bca-area-of-interest", "nrw-sssi", "nrw-national-park", "osm-wales-geofabrik", "nrw-main-rivers", "nrw-phase1-vegetation-voronoi"], evidence_version: datasetVersion,
     title: "Expanded Blorenge landscape context / Cyd-destun tirwedd ehangach Blorenge", provider: "Blorenge Commoners Association, Natural Resources Wales, OpenStreetMap contributors and Geofabrik", licence: "BCA publication authority, OGL 3.0 and ODbL 1.0 by source", attribution: "Blorenge Commoners Association; contains NRW and Ordnance Survey information under the recorded attribution; © OpenStreetMap contributors; processed by Geofabrik.", classification: "contextual", observation_dates: ["2026-07-30", "2026-08-12", "2026-08-21"], method: "Preserve the canonical BCA core, derive its exact 2 km AOI in EPSG:27700, and clip only allowlisted context fields to that AOI.", uncertainty: "Source dates and completeness vary; the BCA core is approximate and contextual paths do not establish legal status.", limitations: ["The BCA-area is not the legal, official, surveyed or current CL18 boundary.", "The SSSI remains an independent authoritative context layer.", "Phase 1 habitat is historical."],
   },
   {
-    dataset_id: "terrain", source_dataset_ids: ["bca-area-of-interest", "wg-lidar-dtm-2020-2023"], evidence_version: "2026-08-21.2",
+    dataset_id: "terrain", source_dataset_ids: ["bca-area-of-interest", "wg-lidar-dtm-2020-2023"], evidence_version: datasetVersion,
     title: "Expanded Blorenge terrain context / Cyd-destun tir ehangach Blorenge", provider: "Welsh Government; BCA processing", licence: "Open Government Licence 3.0 and BCA publication authority", attribution: "Welsh Government LiDAR; processed by Blorenge Commoners Association.", classification: "contextual", observation_dates: ["2020-12-24", "2020-12-25", "2021-02-27", "2022-01-12"], method: "Mosaic the 163 exact intersecting 1 m DTM tiles, average to 10 m inside the expanded AOI, then derive fixed hillshade and contours.", uncertainty: "Capture dates vary by tile and hillshade is a visualisation.", limitations: ["Not produced specifically for flood modelling.", "Terrain does not describe current surface cover."],
   },
   {
-    dataset_id: "observed-change", source_dataset_ids: ["bca-area-of-interest", "copernicus-sentinel-2-l2a", "usgs-landsat-c2-l2-sr"], evidence_version: "2026-08-21.2",
+    dataset_id: "observed-change", source_dataset_ids: ["bca-area-of-interest", "copernicus-sentinel-2-l2a", "usgs-landsat-c2-l2-sr"], evidence_version: datasetVersion,
     title: "Observed surface and vegetation change / Newid arwyneb a llystyfiant a arsylwyd", provider: "European Union Copernicus programme, USGS and BCA processing", licence: "Copernicus Sentinel data legal notice, USGS public domain and BCA publication authority", attribution: "Contains modified Copernicus Sentinel data 2025–2026; Landsat imagery courtesy of the U.S. Geological Survey; processing by Blorenge Commoners Association.", classification: "derived", observation_dates: ["2025-07-12", "2026-07-12", "2026-07-27", "2026-08-11"], method: "Apply the common Sentinel mask, require three-observation comparability, calculate continuous dNBR/NDVI/NDMI and publish the conservative uncalibrated combined states; Landsat corroboration remains separate and unfused.", uncertainty: "Evidence states are not locally calibrated severity and do not establish pixel-level cause.", limitations: ["Not proof of ecological condition or recovery.", "No exact incident-authority perimeter is available.", "Not observed is never no change."],
   },
   {
-    dataset_id: "ndvi-change", source_dataset_ids: ["bca-area-of-interest", "copernicus-sentinel-2-l2a"], evidence_version: "2026-08-21.2",
+    dataset_id: "ndvi-change", source_dataset_ids: ["bca-area-of-interest", "copernicus-sentinel-2-l2a"], evidence_version: datasetVersion,
     title: "Vegetation greenness index change (NDVI) / Newid mynegai gwyrddni llystyfiant (NDVI)", provider: "European Union Copernicus programme; BCA processing", licence: "Copernicus Sentinel data legal notice and BCA publication authority", attribution: "Contains modified Copernicus Sentinel data 2025–2026; processing by Blorenge Commoners Association.", classification: "derived", observation_dates: ["2025-07-12", "2026-08-11"], method: "Publish NDVI(2026-08-11) minus NDVI(2025-07-12) from native B8/B4 at 10 m after the common SCL mask.", uncertainty: "Rainfall, phenology, grazing, management and residual observation effects may contribute.", limitations: ["Does not establish cause, fire damage, severity, habitat condition or recovery.", "Not observed pixels fail one or both date masks."],
   },
   {
-    dataset_id: "ndmi-change", source_dataset_ids: ["bca-area-of-interest", "copernicus-sentinel-2-l2a"], evidence_version: "2026-08-21.2",
+    dataset_id: "ndmi-change", source_dataset_ids: ["bca-area-of-interest", "copernicus-sentinel-2-l2a"], evidence_version: datasetVersion,
     title: "Moisture-sensitive index change (NDMI) / Newid mynegai sy’n sensitif i leithder (NDMI)", provider: "European Union Copernicus programme; BCA processing", licence: "Copernicus Sentinel data legal notice and BCA publication authority", attribution: "Contains modified Copernicus Sentinel data 2025–2026; processing by Blorenge Commoners Association.", classification: "derived", observation_dates: ["2025-07-12", "2026-08-11"], method: "Publish NDMI(2026-08-11) minus NDMI(2025-07-12) from native B8A/B11 at 20 m after the common SCL mask.", uncertainty: "Rainfall, phenology, grazing, management and residual observation effects may contribute.", limitations: ["Does not establish cause, fire damage, severity, dryness or wetness.", "Not observed pixels fail one or both date masks."],
   },
   {
-    dataset_id: "effis-event", source_dataset_ids: ["bca-area-of-interest", "effis-current-burnt-areas"], evidence_version: "2026-08-21.2",
+    dataset_id: "effis-event", source_dataset_ids: ["bca-area-of-interest", "effis-current-burnt-areas"], evidence_version: datasetVersion,
     title: "EFFIS provisional provider boundary / Ffin dros dro y darparwr EFFIS", provider: "European Union, Copernicus EFFIS; BCA processing", licence: "CC BY 4.0 and BCA publication authority", attribution: "European Union, Copernicus EFFIS; clipped and reformatted by Blorenge Commoners Association.", classification: "provisional", observation_dates: ["2026-07-20", "2026-07-29"], method: "Reacquire complete provider feature 592404, preserve its fields and snapshot, compare it with release one, and clip only the display geometry to the expanded AOI.", uncertainty: "Provider dates and geometry are not incident-authority truth.", limitations: ["Not an authority, legal or surveyed perimeter.", "Does not validate raster change or thermal anomalies."],
   },
 ];
@@ -349,9 +354,9 @@ const datasets = [
 const recipe = {
   schema_version: "1.0.0",
   recipe_id: "blorenge-second-release",
-  recipe_version: "2.0.1",
-  release_id: "release-blorenge-2026-08-21.2",
-  dataset_version: "2026-08-21.2",
+  recipe_version: "2.0.2",
+  release_id: releaseId,
+  dataset_version: datasetVersion,
   registry_id: "blorenge-launch",
   public_asset_origin: "https://assets.bca.wales",
   supersedes: "release-blorenge-2026-08-13.6",
