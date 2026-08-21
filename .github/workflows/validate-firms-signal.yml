@@ -1,0 +1,61 @@
+name: Validate FIRMS signal
+
+on:
+  push:
+    branches: [codex/firms-signal-validation]
+    paths:
+      - Blorenge.geojson
+      - .github/workflows/validate-firms-signal.yml
+      - package.json
+      - package-lock.json
+      - tooling/firms/**
+      - tooling/geodata/Containerfile
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: firms-signal-validation
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      FIRMS_MAP_KEY: ${{ secrets.FIRMS_MAP_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - name: Require protected access
+        run: test -n "$FIRMS_MAP_KEY"
+      - name: Build pinned geodata image
+        run: docker build --file tooling/geodata/Containerfile --tag bca/geodata-toolchain:1.0.0 .
+      - name: Derive exact release-two AOI
+        run: >-
+          docker run --rm
+          --volume "$PWD:/repo"
+          --workdir /repo
+          bca/geodata-toolchain:1.0.0
+          python3 tooling/firms/prepare_aoi.py
+          --core Blorenge.geojson
+          --output .firms-validation
+      - name: Acquire and measure protected FIRMS responses
+        run: npm run firms:validate -- --aoi .firms-validation/aoi.geojson --output .firms-validation/evidence
+      - name: Summarise validation
+        run: sed -n '1,160p' .firms-validation/evidence/report.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Retain exact validation evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: firms-signal-validation
+          path: .firms-validation/
+          if-no-files-found: error
+          retention-days: 90
