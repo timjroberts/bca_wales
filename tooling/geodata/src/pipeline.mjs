@@ -454,9 +454,12 @@ export async function reuseAcquisition({
     throw new Error(`Retained inputs use registry ${archived.registry_id}, not ${registry.registry_id}`);
   }
   if (recipe.spatial_contract?.rebuild_aoi_dependent_inputs) {
-    throw new Error(
-      `Spatial contract requires fresh acquisition of AOI-dependent inputs: ${recipe.spatial_contract.aoi_dependent_input_ids.join(", ")}`
-    );
+    const archivedRecipe = await readJson(path.join(archiveRoot, "snapshots/publication-recipe.json"));
+    if (canonicalJson(archivedRecipe.spatial_contract) !== canonicalJson(recipe.spatial_contract)) {
+      throw new Error(
+        `Spatial contract changed and requires a fresh matching acquisition of AOI-dependent inputs: ${recipe.spatial_contract.aoi_dependent_input_ids.join(", ")}`
+      );
+    }
   }
 
   await mkdir(workspaceRoot, { recursive: true });
@@ -535,8 +538,10 @@ export async function reuseAcquisition({
 
   qaEvents.push({
     severity: "information",
-    code: "RETAINED_INPUTS_REUSED",
-    message: `${inputs.length} exact, checksum-verified provider inputs were retained from ${archived.release_id}; original retrieval metadata is preserved.`
+    code: recipe.spatial_contract?.rebuild_aoi_dependent_inputs
+      ? "MATCHED_SPATIAL_ACQUISITION_RETAINED"
+      : "RETAINED_INPUTS_REUSED",
+    message: `${inputs.length} exact, checksum-verified provider inputs were retained from ${archived.release_id}; original retrieval metadata is preserved${recipe.spatial_contract?.rebuild_aoi_dependent_inputs ? " and the complete spatial contract is unchanged" : ""}.`
   });
   const manifest = {
     schema_version: "1.0.0",

@@ -9,16 +9,105 @@ from collections import Counter
 from osgeo import ogr, osr
 
 from build_launch_context import (
+    clean,
     clipped_features,
     feature_json,
     field,
     first_geometry,
-    osm_features,
+    intersection,
+    osm_tags,
     transform_geometry,
 )
 
 ogr.UseExceptions()
 osr.UseExceptions()
+
+
+def readable_features(layer, errors):
+    consecutive_errors = 0
+    while True:
+        try:
+            feature = layer.GetNextFeature()
+        except RuntimeError as error:
+            errors.append(str(error))
+            consecutive_errors += 1
+            if consecutive_errors > 100:
+                raise RuntimeError("OSM layer produced more than 100 consecutive unreadable features") from error
+            continue
+        consecutive_errors = 0
+        if feature is None:
+            break
+        yield feature
+
+
+def osm_features_v2(path, aoi, aoi_srs, target_srs):
+    datasource = ogr.Open(path)
+    spatial_filter = transform_geometry(aoi, aoi_srs, target_srs)
+    results = []
+    path_types = Counter()
+    read_errors = []
+
+    points = datasource.GetLayerByName("points")
+    if points:
+        points.SetSpatialFilter(spatial_filter)
+        for item in readable_features(points, read_errors):
+            tags = osm_tags(item)
+            place = clean(field(item, "place"))
+            name = clean(field(item, "name"))
+            if not place or not name:
+                continue
+            geometry = item.GetGeometryRef()
+            clipped = intersection(geometry, spatial_filter) if geometry else None
+            if clipped is not None and not clipped.IsEmpty():
+                results.append(feature_json(geometry, {
+                    "layer_id": "place-names", "source": "OpenStreetMap", "source_id": field(item, "osm_id"),
+                    "name": name, "name_cy": tags.get("name:cy"), "place": place,
+                }))
+
+    lines = datasource.GetLayerByName("lines")
+    if lines:
+        lines.SetSpatialFilter(spatial_filter)
+        for item in readable_features(lines, read_errors):
+            tags = osm_tags(item)
+            highway = clean(field(item, "highway"))
+            if not highway:
+                continue
+            geometry = item.GetGeometryRef()
+            if geometry is None:
+                continue
+            clipped = intersection(geometry, spatial_filter)
+            if clipped is None or clipped.IsEmpty():
+                continue
+            path_types[highway] += 1
+            results.append(feature_json(clipped, {
+                "layer_id": "contextual-paths", "source": "OpenStreetMap", "source_id": field(item, "osm_id"),
+                "name": field(item, "name"), "name_cy": tags.get("name:cy"), "highway": highway,
+                "access": tags.get("access"), "foot": tags.get("foot"), "surface": tags.get("surface"),
+                "tracktype": tags.get("tracktype"),
+                "limitation": "Context only; not the definitive legal public-rights-of-way record.",
+            }))
+
+    multipolygons = datasource.GetLayerByName("multipolygons")
+    if multipolygons:
+        multipolygons.SetSpatialFilter(spatial_filter)
+        for item in readable_features(multipolygons, read_errors):
+            tags = osm_tags(item)
+            natural = clean(field(item, "natural"))
+            landuse = clean(field(item, "landuse"))
+            if not natural and not landuse:
+                continue
+            geometry = item.GetGeometryRef()
+            if geometry is None:
+                continue
+            clipped = intersection(geometry, spatial_filter)
+            if clipped is None or clipped.IsEmpty():
+                continue
+            results.append(feature_json(clipped, {
+                "layer_id": "basemap-land", "source": "OpenStreetMap", "source_id": field(item, "osm_id"),
+                "name": field(item, "name"), "name_cy": tags.get("name:cy"),
+                "natural": natural, "landuse": landuse,
+            }))
+    return results, path_types, read_errors
 
 
 def release_aoi(core_path):
@@ -85,7 +174,7 @@ def main():
     for item in habitat:
         item["properties"]["limitation"] = "Historical survey; not current habitat condition or ecological recovery."
     features.extend(habitat)
-    osm, path_types = osm_features(args.osm, aoi, source_srs, target_srs)
+    osm, path_types, osm_read_errors = osm_features_v2(args.osm, aoi, source_srs, target_srs)
     features.extend(osm)
 
     counts = Counter(item["properties"]["layer_id"] for item in features)
@@ -126,12 +215,17 @@ def main():
             for layer_id, count in sorted(counts.items())
         ],
         "path_types": dict(sorted(path_types.items())),
+        "source_qa": {
+            "osm_unreadable_feature_count": len(osm_read_errors),
+            "osm_unreadable_feature_errors": sorted(set(osm_read_errors)),
+        },
         "historical_phase1_codes": dict(sorted(habitat_codes.items())),
         "limitations": [
             "The BCA-area of interest is approximate and is not the legal, official, surveyed or current CL18 boundary.",
             "The Blorenge SSSI remains a separate authoritative protected-site context layer.",
             "OpenStreetMap paths are contextual and do not establish legal public-rights-of-way status.",
             "The Phase 1 habitat survey is historical and does not describe current condition or recovery.",
+            "OpenStreetMap records that GDAL cannot parse are omitted and counted in source_qa; valid records remain independently clipped.",
         ],
     }
     with open(args.summary, "x", encoding="utf-8") as handle:

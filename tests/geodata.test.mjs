@@ -290,7 +290,7 @@ test("the factual release-two recipe pins the expanded AOI and component contrac
     registryPath: path.join(repositoryRoot, "data/launch/source-registry.json"),
     recipePath: path.join(repositoryRoot, "data/launch/publication-recipe-2026-08-21.json")
   });
-  assert.equal(loaded.recipe.release_id, "release-blorenge-2026-08-21.4");
+  assert.equal(loaded.recipe.release_id, "release-blorenge-2026-08-21.5");
   assert.equal(loaded.recipe.supersedes, "release-blorenge-2026-08-13.6");
   assert.equal(loaded.recipe.spatial_contract.core_version, "2026-08-21.1");
   assert.equal(loaded.recipe.inputs.filter((item) => item.input_id.startsWith("lidar-") && item.input_id !== "lidar-catalogue").length, 163);
@@ -472,14 +472,26 @@ test("spatial contracts pin the canonical core checksum and every AOI-dependent 
     codeCommit: commit,
     clock
   });
+  const retained = await reuseAcquisition({
+    archiveRoot: acquired.releaseRoot,
+    ...contracts,
+    workspaceRoot: path.join(root, "retained-same-spatial-contract"),
+    codeCommit: commit,
+    clock
+  });
+  assert.equal(retained.manifest.qa_events.at(-1).code, "MATCHED_SPATIAL_ACQUISITION_RETAINED");
+
+  recipe.spatial_contract.buffer_distance_m = 2500;
+  await writeFile(contracts.recipePath, JSON.stringify(recipe));
   await assert.rejects(reuseAcquisition({
     archiveRoot: acquired.releaseRoot,
     ...contracts,
     workspaceRoot: path.join(root, "retained"),
     codeCommit: commit,
     clock
-  }), /requires fresh acquisition of AOI-dependent inputs/);
+  }), /requires a fresh matching acquisition of AOI-dependent inputs/);
 
+  recipe.spatial_contract.buffer_distance_m = 2000;
   recipe.spatial_contract.core_sha256 = "0".repeat(64);
   await writeFile(contracts.recipePath, JSON.stringify(recipe));
   await assert.rejects(loadContracts(contracts), /core checksum must match/);
