@@ -236,7 +236,8 @@ async function pause(milliseconds) {
 
 async function acquire({ id, url, template, rawPath, key, expectOk = true, fetchImpl = globalThis.fetch }) {
   let lastFailure;
-  for (let attempt = 1; attempt <= 3; attempt += 1) {
+  const retryDelays = [1_000, 2_000, 4_000, 8_000];
+  for (let attempt = 1; attempt <= retryDelays.length + 1; attempt += 1) {
     const started = performance.now();
     try {
       const response = await fetchImpl(url, {
@@ -271,7 +272,7 @@ async function acquire({ id, url, template, rawPath, key, expectOk = true, fetch
       };
     } catch (error) {
       lastFailure = new Error(`${id}: ${error.message}`);
-      if (attempt < 3) await pause(attempt * 250);
+      if (attempt <= retryDelays.length) await pause(retryDelays[attempt - 1]);
     }
   }
   throw lastFailure;
