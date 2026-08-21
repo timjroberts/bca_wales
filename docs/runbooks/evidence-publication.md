@@ -69,6 +69,25 @@ The staged `release-blorenge-2026-08-13.6` release is not yet current. Its first
 promotion belongs to the launch integration and hand-off work. A later release
 only supersedes `.6` after that promotion has created `releases/current.json`.
 
+For the second Blorenge release, the copied recipe must additionally:
+
+- acquire checksum-pinned `Blorenge.geojson` version `2026-08-21.1` as a
+  quarantined input and declare it as `spatial_contract.core_input_id`;
+- set the spatial contract to the exact 2000 m `EPSG:27700` buffer and list all
+  context, terrain, Sentinel, EFFIS and other AOI-dependent datasets for full
+  reacquisition or rebuild;
+- acquire B8A as well as B04, B08, B11, B12 and SCL for every selected
+  Sentinel-2 scene and invoke `build_change_evidence_v2.py`;
+- declare JSON quality assertions for every scene's 95% valid-AOI floor, each
+  product's 90% comparable-AOI floor, and the combined product's 95% EFFIS
+  comparability floor; and
+- declare 32 MiB component-COG and 8 MiB component-PMTiles ceilings, with COG
+  resolution, CRS, band count and band-description expectations.
+
+Any failed coverage assertion stops the candidate and requires a dated scene-
+reselection decision. Any size ceiling exceeded by the real assets surfaces the
+pending delivery trade-off; do not silently reduce analytical resolution.
+
 ## Build a candidate
 
 Build the pinned image once for the checked-in lock:

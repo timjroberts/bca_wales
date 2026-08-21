@@ -14,6 +14,51 @@
     "registry_id": { "$ref": "#/$defs/id" },
     "public_asset_origin": { "type": "string", "format": "uri" },
     "supersedes": { "type": ["string", "null"] },
+    "spatial_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["core_input_id", "core_label", "core_version", "core_sha256", "buffer_distance_m", "buffer_crs", "clip_mode", "aoi_dependent_input_ids", "aoi_dependent_dataset_ids", "rebuild_aoi_dependent_inputs"],
+      "properties": {
+        "core_input_id": { "$ref": "#/$defs/id" },
+        "core_label": { "type": "string", "minLength": 1 },
+        "core_version": { "type": "string", "minLength": 1 },
+        "core_sha256": { "$ref": "#/$defs/sha256" },
+        "buffer_distance_m": { "type": "number", "exclusiveMinimum": 0 },
+        "buffer_crs": { "type": "string", "pattern": "^EPSG:[0-9]+$" },
+        "clip_mode": { "const": "exact" },
+        "aoi_dependent_input_ids": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
+        "aoi_dependent_dataset_ids": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
+        "rebuild_aoi_dependent_inputs": { "type": "boolean" }
+      }
+    },
+    "quality_gates": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["gate_id", "report_artifact_id", "assertions"],
+        "properties": {
+          "gate_id": { "$ref": "#/$defs/id" },
+          "report_artifact_id": { "$ref": "#/$defs/id" },
+          "assertions": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["path", "operator", "value", "message"],
+              "properties": {
+                "path": { "type": "string", "pattern": "^[a-zA-Z0-9_-]+(?:\\.[a-zA-Z0-9_-]+)*$" },
+                "operator": { "enum": ["eq", "gte", "lte"] },
+                "value": { "anyOf": [{ "type": "number" }, { "type": "string" }, { "type": "boolean" }] },
+                "message": { "type": "string", "minLength": 1 }
+              }
+            }
+          }
+        }
+      }
+    },
     "inputs": {
       "type": "array",
       "minItems": 1,
@@ -81,9 +126,15 @@
             "required": ["minimum_bytes"],
             "properties": {
               "minimum_bytes": { "type": "integer", "minimum": 1 },
+              "maximum_bytes": { "type": "integer", "minimum": 1 },
               "minimum_features": { "type": "integer", "minimum": 0 },
               "required_fields": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
-              "minimum_rows": { "type": "integer", "minimum": 0 }
+              "minimum_rows": { "type": "integer", "minimum": 0 },
+              "expected_crs": { "type": "string", "pattern": "^EPSG:[0-9]+$" },
+              "expected_resolution_m": { "type": "number", "exclusiveMinimum": 0 },
+              "resolution_tolerance_m": { "type": "number", "minimum": 0, "default": 0.01 },
+              "expected_band_count": { "type": "integer", "minimum": 1 },
+              "expected_band_descriptions": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
             }
           }
         }

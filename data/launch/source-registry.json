@@ -1,42 +1,73 @@
 {
   "schema_version": "1.0.0",
   "registry_id": "blorenge-launch",
-  "reviewed_at": "2026-08-13T18:45:00Z",
+  "reviewed_at": "2026-08-21T21:00:00Z",
   "release_authority": "timjroberts",
   "status": "approved",
-  "status_reason": "The SSSI-only launch boundary, bounded incident chronology, EFFIS event match, selected observations, licence snapshots and AOI-level scene QA are approved for a conservative manual factual release.",
+  "status_reason": "The chair-reviewed BCA-area of interest, exact 2 km release AOI rule, retained SSSI context, bounded incident chronology, EFFIS event match, selected observations, licence snapshots and fail-closed AOI-level scene QA are approved for controlled manual releases.",
   "area_of_interest": {
-    "intended_rule": "Blorenge SSSI feature NRW_SSSI.13108 buffered by 2000 metres in EPSG:27700.",
-    "status": "validated_launch_rule",
-    "validated_component": {
-      "provider": "Natural Resources Wales",
-      "dataset_id": "nrw-sssi",
-      "feature_id": "NRW_SSSI.13108",
-      "provider_identifiers": {
-        "sssi_id": 748,
-        "sssi_code": "33WFL",
-        "name": "Blorenge"
-      },
-      "crs": "EPSG:27700",
-      "bbox": [325291.23, 207559.73, 328771.19, 212952.14],
-      "area_ha": 979.18
-    },
-    "deferred_component": {
-      "name": "Blorenge Common",
-      "register_id": "CL18",
-      "reported_area_ha": 2017,
-      "registration_authority": "Torfaen County Borough Council",
-      "evidence_url": "https://www.gov.wales/sites/default/files/publications/2018-01/common-land-blorenge-common-report.pdf",
-      "reason": "Blorenge Common is urban common. The NRW Open Access - Registered Common Land dataset explicitly omits urban commons and contains no feature that can stand in for CL18. HM Land Registry Local Land Charges geometry has no CL18 or Blorenge identifier. The launch therefore uses the SSSI boundary without representing it as the common boundary.",
-      "required_action": "After launch, obtain the maintained CL18 register map or GIS boundary and written public display/derivative-reuse terms from the registration authority before adding a separately labelled common-land layer. Do not substitute nearby NRW_COMMON_LAND_2014 or HMLR Local Land Charges features."
-    },
-    "temporary_discovery_envelopes": {
-      "epsg_27700_sssi_plus_2km_bbox": [323291.23, 205559.73, 330771.19, 214952.14],
-      "epsg_4326_conservative_bbox": [-3.1134, 51.744, -3.0049, 51.8285],
-      "use_limit": "Discovery and over-acquisition only. The publishable AOI must be derived from the validated SSSI geometry buffered by exactly 2000 metres, not from either bounding box."
-    }
+    "status": "validated_release_rule",
+    "core_dataset_id": "bca-area-of-interest",
+    "core_label": "BCA-area of interest",
+    "core_version": "2026-08-21.1",
+    "core_path": "Blorenge.geojson",
+    "core_sha256": "825404bb2e7fb85620d874b900a0884e3dc5f0107c26b5491dca665f90f77d73",
+    "source_capture_path": "Blorenge_small.geojson",
+    "source_capture_sha256": "ddbf971f4a134e23b8d5a97611a48617d91a3f6a56eae7e2b28bdc182ca932ee",
+    "buffer_distance_m": 2000,
+    "buffer_crs": "EPSG:27700",
+    "clip_mode": "exact",
+    "rule": "Preserve the canonical core separately; derive the release-wide AOI by transforming it to EPSG:27700 and buffering by exactly 2000 metres. Rebuild every AOI-dependent input and output for a new core version.",
+    "limitations": "The core is a BCA-defined approximate landscape area, not the legal, official, surveyed or current boundary of Blorenge Common CL18. The Blorenge SSSI remains a separate authoritative context layer."
   },
   "sources": [
+    {
+      "dataset_id": "bca-area-of-interest",
+      "title": "BCA-area of interest",
+      "purpose": "Canonical chair-reviewed core geometry used to derive the release-wide exact 2 km processing and display AOI.",
+      "classification": "bca_defined_approximate",
+      "provider": "Blorenge Commoners Association",
+      "provider_dataset_id": "bca-area-of-interest/2026-08-21.1",
+      "landing_url": "https://github.com/timjroberts/bca_wales/blob/main/Blorenge.geojson",
+      "acquisition": {
+        "method": "Checksum-pinned repository source copy",
+        "path": "Blorenge.geojson",
+        "media_type": "application/geo+json",
+        "crs": "EPSG:4326",
+        "expected_features": 1,
+        "version": "2026-08-21.1",
+        "sha256": "825404bb2e7fb85620d874b900a0884e3dc5f0107c26b5491dca665f90f77d73"
+      },
+      "upstream": {
+        "captured_date": "2026-08-21",
+        "review": "Captured by the owner and reviewed with the BCA chair.",
+        "refresh_policy": "Manual only. Any geometry or provenance change requires a new version, checksum and full AOI-dependent rebuild."
+      },
+      "licence": {
+        "id": "BCA-publication-authority",
+        "url": "https://github.com/timjroberts/bca_wales/blob/main/data/launch/licences/bca-area-of-interest.md",
+        "attribution": "Blorenge Commoners Association",
+        "reviewed_at": "2026-08-21"
+      },
+      "schema": {
+        "geometry": "Polygon",
+        "required_fields": ["name", "classification", "owner", "version", "captured_date", "capture_method", "source_crs", "source_sha256", "limitations"]
+      },
+      "transformation": "Preserve the canonical polygon unchanged; derive the release AOI only by transforming to EPSG:27700 and applying an exact 2000 metre buffer.",
+      "known_gaps": ["This is an approximate BCA working area and must never be presented as the legal or official CL18 boundary."],
+      "safety": "public_safe_with_non_legal_boundary_label",
+      "publication": "approved_candidate",
+      "contract": {
+        "owner": "timjroberts",
+        "temporal_role": "versioned release core",
+        "licence_terms": { "snapshot_path": "licences/bca-area-of-interest.md", "sha256": "9afa5d7000b3c391d70fc793823b6066bb7ddfe8ec4ec17cc4d01b3c38f58a8d" },
+        "recipe": { "id": "bca-area-of-interest", "version": "2.0.0" },
+        "output_profiles": ["geojson", "accessible_json"],
+        "refresh": { "mode": "manual", "maximum_age_days": null, "approved_change_bounds": {} },
+        "retention": "Retain every canonical version and raw reviewed capture used by a published release.",
+        "withdrawal": "Withdraw affected releases without substituting another geometry or weakening the boundary limitation."
+      }
+    },
     {
       "dataset_id": "nrw-sssi",
       "title": "Sites of Special Scientific Interest (SSSI)",
@@ -377,7 +408,7 @@
         "asset_mirror": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a",
         "media_type": "image/tiff; application=geotiff; profile=cloud-optimized",
         "crs": "EPSG:32630",
-        "required_assets": ["B04", "B08", "B11", "B12", "SCL"],
+        "required_assets": ["B04", "B08", "B8A", "B11", "B12", "SCL"],
         "selected_item_ids": [
           "S2C_MSIL2A_20250712T112141_N0511_R037_T30UVC_20250712T145316 / S2C_T30UVC_20250712T112136_L2A",
           "S2B_MSIL2A_20260712T112109_N0512_R037_T30UVC_20260712T133747 / S2B_T30UVC_20260712T112112_L2A",
@@ -549,12 +580,6 @@
   ],
   "hard_gaps": [],
   "deferred_enhancements": [
-    {
-      "enhancement_id": "blorenge-common-cl18-boundary",
-      "launch_impact": "none",
-      "required_evidence": "Maintained CL18 boundary plus written public display, transformation and derivative-reuse terms.",
-      "presentation_constraint": "Do not label or imply that the Blorenge SSSI boundary is the legal boundary of Blorenge Common CL18."
-    },
     {
       "enhancement_id": "complete-incident-authority-record",
       "launch_impact": "none",

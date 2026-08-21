@@ -44,7 +44,7 @@
       "media_type": "application/geo+json",
       "visibility": "public",
       "accessible_description": "Machine-readable Blorenge SSSI boundary with source identifiers.",
-      "qa": { "minimum_bytes": 100, "minimum_features": 1, "required_fields": ["sssi_name", "sssi_code"] }
+      "qa": { "minimum_bytes": 100, "maximum_bytes": 1048576, "minimum_features": 1, "required_fields": ["sssi_name", "sssi_code"] }
     },
     {
       "asset_id": "blorenge-sssi-csv",
@@ -54,7 +54,7 @@
       "media_type": "text/csv",
       "visibility": "public",
       "accessible_description": "Non-map table of the Blorenge SSSI source record.",
-      "qa": { "minimum_bytes": 20, "minimum_rows": 1, "required_fields": ["sssi_name", "sssi_code"] }
+      "qa": { "minimum_bytes": 20, "maximum_bytes": 262144, "minimum_rows": 1, "required_fields": ["sssi_name", "sssi_code"] }
     }
   ],
   "datasets": [
