@@ -10,4 +10,6 @@ dist/
 coverage/
 *.log
 *.tsbuildinfo
+__pycache__/
+*.pyc
 .DS_Store

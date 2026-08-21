@@ -285,6 +285,21 @@ test("the launch registry and example recipe satisfy the final contracts", async
   assert.equal(loaded.recipe.outputs.some((output) => output.profile === "accessible_csv"), true);
 });
 
+test("the factual release-two recipe pins the expanded AOI and component contracts", async () => {
+  const loaded = await loadContracts({
+    registryPath: path.join(repositoryRoot, "data/launch/source-registry.json"),
+    recipePath: path.join(repositoryRoot, "data/launch/publication-recipe-2026-08-21.json")
+  });
+  assert.equal(loaded.recipe.release_id, "release-blorenge-2026-08-21.1");
+  assert.equal(loaded.recipe.supersedes, "release-blorenge-2026-08-13.6");
+  assert.equal(loaded.recipe.spatial_contract.core_version, "2026-08-21.1");
+  assert.equal(loaded.recipe.inputs.filter((item) => item.input_id.startsWith("lidar-") && item.input_id !== "lidar-catalogue").length, 163);
+  assert.equal(loaded.recipe.inputs.filter((item) => item.input_id.endsWith("-nir20")).length, 3);
+  assert.equal(loaded.recipe.outputs.find((item) => item.asset_id === "ndvi-cog").qa.maximum_bytes, 32 * 1024 * 1024);
+  assert.equal(loaded.recipe.outputs.find((item) => item.asset_id === "ndmi-pmtiles").qa.maximum_bytes, 8 * 1024 * 1024);
+  assert.equal(loaded.recipe.quality_gates[0].assertions.length, 7);
+});
+
 test("acquisition, build, archive verification and reproduction preserve exact lineage", async (context) => {
   const root = await mkdtemp(path.join(tmpdir(), "bca-geodata-test-"));
   context.after(() => rm(root, { recursive: true }));

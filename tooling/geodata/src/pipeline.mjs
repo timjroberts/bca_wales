@@ -834,7 +834,9 @@ async function crossReleaseGate(recipe, outputs, releaseRoot) {
     return { hardFailures, warnings };
   }
   const baseline = await readJson(path.resolve(repositoryRoot, baselinePath));
-  const baselineOutputs = new Map((baseline.outputs ?? []).map((output) => [output.id, output]));
+  const baselineOutputs = new Map((baseline.outputs ?? baseline.assets ?? []).map(
+    (output) => [output.id ?? output.asset_id, output]
+  ));
   for (const output of outputs) {
     const previous = baselineOutputs.get(output.id);
     if (!previous) {

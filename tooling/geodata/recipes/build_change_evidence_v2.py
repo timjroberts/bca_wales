@@ -4,6 +4,7 @@
 
 import argparse
 import csv
+import hashlib
 import json
 import os
 from collections import Counter
@@ -164,21 +165,35 @@ def serialise(values):
     return output
 
 
-def write_cog(path, reference, bands, descriptions):
+def write_cog(path, reference, bands, descriptions, domain):
+    rows, columns = np.where(domain)
+    if rows.size == 0 or columns.size == 0:
+        raise RuntimeError("Output domain is empty")
+    row_start, row_stop = int(rows.min()), int(rows.max()) + 1
+    column_start, column_stop = int(columns.min()), int(columns.max()) + 1
+    transform = reference.GetGeoTransform()
+    cropped_transform = (
+        transform[0] + column_start * transform[1] + row_start * transform[2],
+        transform[1],
+        transform[2],
+        transform[3] + column_start * transform[4] + row_start * transform[5],
+        transform[4],
+        transform[5],
+    )
     temporary = f"{path}.working.tif"
     dataset = gdal.GetDriverByName("GTiff").Create(
         temporary,
-        reference.RasterXSize,
-        reference.RasterYSize,
+        column_stop - column_start,
+        row_stop - row_start,
         len(bands),
         gdal.GDT_Float32,
         options=["TILED=YES", "COMPRESS=ZSTD", "BIGTIFF=IF_SAFER"],
     )
     dataset.SetProjection(reference.GetProjection())
-    dataset.SetGeoTransform(reference.GetGeoTransform())
+    dataset.SetGeoTransform(cropped_transform)
     for index, (values, description) in enumerate(zip(bands, descriptions), start=1):
         band = dataset.GetRasterBand(index)
-        band.WriteArray(serialise(values))
+        band.WriteArray(serialise(values[row_start:row_stop, column_start:column_stop]))
         band.SetDescription(description)
         band.SetNoDataValue(NODATA)
     dataset = None
@@ -197,14 +212,34 @@ def component_summary(product, values, observed, domain, reference, dates, formu
         {"bin": label, "pixel_count": int(count), "area_ha": round(float(count) * pixel_area_ha, 3)}
         for label, count in zip(labels, counts)
     ]
+    names = {
+        "NDVI": {
+            "en": "Vegetation greenness index change (NDVI)",
+            "cy": "Newid mynegai gwyrddni llystyfiant (NDVI)",
+        },
+        "NDMI": {
+            "en": "Moisture-sensitive index change (NDMI)",
+            "cy": "Newid mynegai sy’n sensitif i leithder (NDMI)",
+        },
+    }
+    colours = {
+        "NDVI": ["#762A83", "#AF8DC3", "#E7D4E8", "#F7F7F7", "#D9F0D3", "#7FBF7B", "#1B7837"],
+        "NDMI": ["#8C510A", "#D8B365", "#F6E8C3", "#F5F5F5", "#C7EAE5", "#5AB4AC", "#01665E"],
+    }
     return {
         "product": product,
+        "names": names[product],
         "formula": formula,
         "bands": bands,
         "dates": dates,
         "units": "index points",
         "resolution_m": abs(transform[1]),
-        "render_scale": {"minimum": -0.5, "maximum": 0.5, "stored_values_are_clamped": False},
+        "render_scale": {
+            "stops": [-0.5, -0.25, -0.1, 0.0, 0.1, 0.25, 0.5],
+            "colours": colours[product],
+            "stored_values_are_clamped": False,
+            "not_observed": "labelled grey hatch",
+        },
         "observed_pixels": int(observed.sum()),
         "not_observed_pixels": int((domain & ~observed).sum()),
         "observed_area_ha": round(float(observed.sum()) * pixel_area_ha, 3),
@@ -213,6 +248,7 @@ def component_summary(product, values, observed, domain, reference, dates, formu
         "maximum": float(np.max(finite)),
         "percentiles": {str(value): float(np.percentile(finite, value)) for value in [5, 25, 50, 75, 95]},
         "bins": bins,
+        "attribution": "Contains modified Copernicus Sentinel data 2025–2026; processing by Blorenge Commoners Association.",
         "limitations": [
             "The signed difference does not establish cause, fire damage, severity, habitat condition, recovery, dryness or wetness.",
             "Rainfall, phenology, grazing, management and residual observation effects may contribute.",
@@ -240,6 +276,31 @@ def load_effis(path):
     raise RuntimeError("EFFIS feature 592404 was not present in the controlled snapshot")
 
 
+def geometry_sha256(geometry):
+    return hashlib.sha256(bytes(geometry.ExportToWkb())).hexdigest()
+
+
+def effis_comparison(previous_path, current_geometry, current_properties):
+    previous_geometry, _, previous_properties = load_effis(previous_path)
+    changed = sorted(
+        key for key in set(previous_properties) | set(current_properties)
+        if previous_properties.get(key) != current_properties.get(key)
+    )
+    return {
+        "previous": {
+            "provider_area_ha": previous_properties.get("AREA_HA"),
+            "provider_lastupdate": previous_properties.get("LASTUPDATE"),
+            "geometry_sha256": geometry_sha256(previous_geometry),
+        },
+        "current": {
+            "provider_area_ha": current_properties.get("AREA_HA"),
+            "provider_lastupdate": current_properties.get("LASTUPDATE"),
+            "geometry_sha256": geometry_sha256(current_geometry),
+        },
+        "changed_attributes": changed,
+    }
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--core", required=True)
@@ -247,10 +308,12 @@ def main():
     parser.add_argument("--prefire", nargs=6, required=True, metavar=("RED", "NIR10", "NIR20", "SWIR1", "SWIR2", "SCL"))
     parser.add_argument("--post", nargs=6, required=True, metavar=("RED", "NIR10", "NIR20", "SWIR1", "SWIR2", "SCL"))
     parser.add_argument("--effis", required=True)
+    parser.add_argument("--previous-effis", required=True)
     parser.add_argument("--combined-cog", required=True)
     parser.add_argument("--ndvi-cog", required=True)
     parser.add_argument("--ndmi-cog", required=True)
     parser.add_argument("--effis-out", required=True)
+    parser.add_argument("--effis-summary", required=True)
     parser.add_argument("--combined-csv", required=True)
     parser.add_argument("--ndvi-csv", required=True)
     parser.add_argument("--ndvi-json", required=True)
@@ -264,7 +327,7 @@ def main():
     reference10 = gdal.Open(args.post[0])
     aoi20 = rasterize(reference20, aoi, aoi_srs)
     aoi10 = rasterize(reference10, aoi, aoi_srs)
-    roles = [("seasonal_baseline", "2025-07-12", args.baseline), ("before_first_report", "2026-07-12", args.prefire), ("comparison", "2026-08-11", args.post)]
+    roles = [("seasonal_baseline", "2025-07-12", args.baseline), ("before_first_report", "2026-07-12", args.prefire), ("first_suitable_after_report", "2026-08-11", args.post)]
     scenes20 = [(role, date, scene_values(paths, reference20, aoi20)) for role, date, paths in roles]
     scenes10 = [(role, date, scene_values(paths, reference10, aoi10)) for role, date, paths in roles]
 
@@ -328,9 +391,9 @@ def main():
     if coverage["effis_combined_comparable_percent"] < EFFIS_MINIMUM:
         raise RuntimeError(f"EFFIS comparability gate failed; reselection decision required: {coverage}")
 
-    write_cog(args.combined_cog, reference20, [combined_dnbr, combined_dndvi, combined_dndmi, evidence_state, observation_count], ["dNBR", "delta_NDVI", "delta_NDMI", "evidence_state", "observation_count"])
-    write_cog(args.ndvi_cog, reference10, [delta_ndvi], ["delta_NDVI"])
-    write_cog(args.ndmi_cog, reference20, [delta_ndmi], ["delta_NDMI"])
+    write_cog(args.combined_cog, reference20, [combined_dnbr, combined_dndvi, combined_dndmi, evidence_state, observation_count], ["dNBR", "delta_NDVI", "delta_NDMI", "evidence_state", "observation_count"], aoi20)
+    write_cog(args.ndvi_cog, reference10, [delta_ndvi], ["delta_NDVI"], aoi10)
+    write_cog(args.ndmi_cog, reference20, [delta_ndmi], ["delta_NDMI"], aoi20)
 
     dates = ["2025-07-12", "2026-08-11"]
     ndvi_summary = component_summary("NDVI", delta_ndvi, comparable_ndvi, aoi10, reference10, dates, "(B8 - B4) / (B8 + B4)", ["B8", "B4"])
@@ -350,14 +413,35 @@ def main():
 
     wgs84 = osr.SpatialReference()
     wgs84.ImportFromEPSG(4326)
-    effis_wgs84 = transform_geometry(effis_geometry, effis_srs, wgs84)
+    aoi_effis = transform_geometry(aoi, aoi_srs, effis_srs)
+    clipped_effis = effis_geometry.Intersection(aoi_effis)
+    if clipped_effis.IsEmpty():
+        raise RuntimeError("EFFIS feature 592404 does not intersect the release AOI")
+    effis_wgs84 = transform_geometry(clipped_effis, effis_srs, wgs84)
+    effis_change = effis_comparison(args.previous_effis, effis_geometry, effis_properties)
     effis_feature = {
         "type": "Feature",
-        "properties": {**effis_properties, "layer_id": "effis-provisional-boundary", "provider_feature_id": "592404", "classification": "provisional_provider", "provider": "European Union, Copernicus EFFIS", "limitation": "Not an authority, legal or surveyed perimeter; provider dates are not authority incident times."},
+        "properties": {**effis_properties, "layer_id": "effis-provisional-boundary", "provider_feature_id": "592404", "classification": "provisional_provider", "provider": "European Union, Copernicus EFFIS", "display_geometry": "Provider feature clipped only for display to the release AOI; the complete provider snapshot is retained in acquisition lineage.", "limitation": "Not an authority, legal or surveyed perimeter; provider dates are not authority incident times."},
         "geometry": json.loads(effis_wgs84.ExportToJson()),
     }
     with open(args.effis_out, "x", encoding="utf-8") as handle:
         json.dump({"type": "FeatureCollection", "features": [effis_feature]}, handle, separators=(",", ":"))
+    with open(args.effis_summary, "x", encoding="utf-8") as handle:
+        json.dump({
+            "layer": {
+                "name_en": "EFFIS provisional provider boundary",
+                "name_cy": "Ffin dros dro y darparwr EFFIS",
+            },
+            "provider_feature": effis_properties,
+            "comparison_with_release_one": effis_change,
+            "display_geometry": effis_feature["properties"]["display_geometry"],
+            "attribution": "European Union, Copernicus EFFIS; clipped and reformatted by Blorenge Commoners Association.",
+            "limitations": [
+                "Not an authority, legal or surveyed perimeter.",
+                "Provider dates are not authority incident times.",
+                "Spatial overlap does not validate or establish the cause of raster change or thermal anomalies.",
+            ],
+        }, handle, separators=(",", ":"))
 
     report = {
         "spatial_contract": {"core_label": core_properties["name"], "core_version": core_properties["version"], "buffer_distance_m": 2000, "buffer_crs": "EPSG:27700", "clip_mode": "exact"},
@@ -367,6 +451,23 @@ def main():
         "mask": {"invalid_scl_classes": INVALID_SCL, "dilation_native_pixels": 1, "dilation_m": 20},
         "combined_thresholds": {"dNBR": "> 0.10", "delta_NDVI": "< -0.08", "delta_NDMI_higher_confidence": "< -0.05"},
         "components": {"ndvi": ndvi_summary, "ndmi": ndmi_summary},
+        "evidence_state_summary": [
+            {"state": label, "pixel_count": count, "area_ha_rounded": round(count * pixel_area_ha)}
+            for label, count in state_rows
+        ],
+        "effis": {
+            "provider_feature_id": "592404",
+            "comparison_with_release_one": effis_change,
+            "limitation": "Independent provisional provider boundary; not an authority, legal or surveyed perimeter and not validation of any raster or thermal anomaly.",
+        },
+        "landsat_corroboration": "Retained as separate 30 m corroboration in lineage and not fused into the Sentinel-derived raster.",
+        "limitations": [
+            "Observed change is not proof of ecological recovery or habitat condition.",
+            "Component NDVI and NDMI differences do not establish cause, fire damage, severity, dryness or wetness.",
+            "No exact, legal, surveyed or incident-authority perimeter is available.",
+            "The evidence-state thresholds are not locally calibrated severity classes.",
+            "Pixels failing the full mask are Not observed, never zero or no change.",
+        ],
     }
     with open(args.summary, "x", encoding="utf-8") as handle:
         json.dump(report, handle, separators=(",", ":"))
