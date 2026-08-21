@@ -125,10 +125,14 @@ function finiteNumber(value, label, { minimum = -Infinity, maximum = Infinity } 
 }
 
 function acquisitionTime(row) {
-  if (!/^\d{4}$/.test(row.acq_time) || !/^\d{4}-\d{2}-\d{2}$/.test(row.acq_date)) {
+  if (!/^\d{1,4}$/.test(row.acq_time) || !/^\d{4}-\d{2}-\d{2}$/.test(row.acq_date)) {
     throw new Error("acquisition date/time has an unexpected format");
   }
-  const timestamp = new Date(`${row.acq_date}T${row.acq_time.slice(0, 2)}:${row.acq_time.slice(2)}:00Z`);
+  const paddedTime = row.acq_time.padStart(4, "0");
+  const hours = Number(paddedTime.slice(0, 2));
+  const minutes = Number(paddedTime.slice(2));
+  if (hours > 23 || minutes > 59) throw new Error("acquisition time is outside the UTC clock range");
+  const timestamp = new Date(`${row.acq_date}T${paddedTime.slice(0, 2)}:${paddedTime.slice(2)}:00Z`);
   if (!Number.isFinite(timestamp.getTime())) throw new Error("acquisition date/time is invalid");
   return timestamp;
 }

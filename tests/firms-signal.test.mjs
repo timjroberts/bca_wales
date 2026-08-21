@@ -75,6 +75,16 @@ test("source-to-satellite mismatch fails closed", () => {
   );
 });
 
+test("FIRMS early-UTC times may omit leading zeroes without changing raw identity inputs", () => {
+  const row = {
+    latitude: "51.8", longitude: "-3", bright_ti4: "320", scan: "0.4", track: "0.4",
+    acq_date: "2026-07-20", acq_time: "35", satellite: "N20", instrument: "VIIRS",
+    confidence: "low", version: "2.0NRT", bright_ti5: "290", frp: "1", daynight: "N"
+  };
+  const normalized = normalizeRow(row, "VIIRS_NOAA20_NRT", square, new Date("2026-07-21T00:00:00Z"));
+  assert.equal(normalized.observed_at, "2026-07-20T00:35:00.000Z");
+});
+
 test("haversine comparison is symmetric and appropriately local", () => {
   const left = { latitude: 51.8, longitude: -3 };
   const right = { latitude: 51.8, longitude: -2.99 };
