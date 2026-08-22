@@ -27,6 +27,7 @@ test("the single explorer route keeps map controls, shareable state and source d
   const mapTools = await read("apps/web/app/MapTools.tsx");
   const activeFire = await read("apps/web/app/activeFire.ts");
   const activeFirePanel = await read("apps/web/app/ActiveFirePanel.tsx");
+  const releaseAvailability = await read("apps/web/app/releaseAvailability.mjs");
   const applicationMode = await read("apps/web/app/MapApplicationMode.tsx");
   assert.match(explorer, /Blorenge Landscape Explorer/);
   assert.match(explorer, /Explore the Blorenge landscape and see how it changes over time/);
@@ -65,6 +66,10 @@ test("the single explorer route keeps map controls, shareable state and source d
   assert.match(activeFire, /unexpected asset origin/);
   assert.match(activeFirePanel, /Absence of detections is not evidence that no fire exists/);
   assert.match(activeFirePanel, /Show this filtered history on the map/);
+  assert.match(explorer, /loadReleaseAvailability/);
+  assert.match(explorer, /releaseAvailability\.health === "current"/);
+  assert.match(releaseAvailability, /document\?\.status === "withdrawn"/);
+  assert.match(releaseAvailability, /document\.manifest_sha256 !== expectedManifestSha256/);
   assert.match(activeFirePanel, /Download the complete accessible 30-day history/);
   assert.doesNotMatch(explorer, /MapOverlayPrototype|PrototypeSwitcher|prototypeVariant/);
   assert.doesNotMatch(mapTools, /PROTOTYPE|VariantA|VariantB|VariantC/);

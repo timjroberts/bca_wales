@@ -35,7 +35,12 @@ const homepage = await fetchPreview("/");
 const homepageBody = await homepage.text();
 assert.match(homepageBody, /Blorenge Landscape Explorer/);
 assert.match(homepageBody, /Explore the Blorenge landscape and see how it changes over time/);
-assert.match(homepageBody, /Download accessible evidence states \(CSV\)/);
+assert.match(homepageBody, /Checking the current landscape evidence release/);
+assert.doesNotMatch(
+  homepageBody,
+  /Download accessible evidence states \(CSV\)/,
+  "the server-rendered page must fail closed until the browser verifies the current release pointer"
+);
 
 const evidencePage = await fetch(new URL("/evidence/", `${origin}/`), { redirect: "manual" });
 assert.equal(evidencePage.status, 404, "/evidence/ must use the normal not-found response");
