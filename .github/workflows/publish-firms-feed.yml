@@ -1,0 +1,64 @@
+name: Publish FIRMS thermal-anomaly feed
+
+on:
+  schedule:
+    - cron: "23 1,7,13,19 * * *"
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: Publish, withdraw, or restore the operational feed
+        required: true
+        default: publish
+        type: choice
+        options: [publish, withdraw, restore]
+      reason:
+        description: Required reason for withdrawal
+        required: false
+        type: string
+      withdrawal_key:
+        description: Immutable withdrawal record key required for restore
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-firms-feed
+  cancel-in-progress: false
+
+jobs:
+  operate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    environment: production
+    env:
+      FIRMS_MAP_KEY: ${{ secrets.FIRMS_MAP_KEY }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_R2_ACCESS_KEY_ID: ${{ secrets.CLOUDFLARE_R2_ACCESS_KEY_ID }}
+      CLOUDFLARE_R2_SECRET_ACCESS_KEY: ${{ secrets.CLOUDFLARE_R2_SECRET_ACCESS_KEY }}
+      OPERATION: ${{ inputs.operation || 'publish' }}
+      WITHDRAWAL_REASON: ${{ inputs.reason }}
+      WITHDRAWAL_KEY: ${{ inputs.withdrawal_key }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Validate operational publisher
+        run: node --test tests/firms-feed.test.mjs tests/firms-signal.test.mjs
+      - name: Require protected credentials
+        run: test -n "$FIRMS_MAP_KEY" && test -n "$CLOUDFLARE_ACCOUNT_ID" && test -n "$CLOUDFLARE_R2_ACCESS_KEY_ID" && test -n "$CLOUDFLARE_R2_SECRET_ACCESS_KEY"
+      - name: Publish verified feed snapshot
+        if: env.OPERATION == 'publish'
+        run: npm run firms:publish
+      - name: Withdraw feed
+        if: env.OPERATION == 'withdraw'
+        run: npm run firms:manage -- withdraw --reason "$WITHDRAWAL_REASON"
+      - name: Restore verified feed
+        if: env.OPERATION == 'restore'
+        run: npm run firms:manage -- restore --withdrawal "$WITHDRAWAL_KEY"

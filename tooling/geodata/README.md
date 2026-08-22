@@ -44,3 +44,35 @@ the new manifest records the retained-input operation explicitly.
 `stage` uploads and verifies only versioned assets and their final immutable
 manifest. It never reads or writes `releases/current.json`; a later manual
 `publish` re-verifies the same bytes before changing that pointer.
+
+## Expanded-AOI and raster contracts
+
+Superseding recipes can include `spatial_contract`. It pins the canonical core
+input id, version and SHA-256; records the metric buffer CRS and distance; and
+enumerates every AOI-dependent input and dataset that must be rebuilt. The
+orchestrator rejects a core checksum that differs from the recipe input,
+rejects unknown members, verifies every listed dataset output transitively
+depends on the core input, and disables retained acquisition when the contract
+requires fresh AOI-dependent inputs. Release two uses canonical
+`Blorenge.geojson` version `2026-08-21.1`, transformed to `EPSG:27700` and
+buffered by exactly 2000 m.
+
+Recipe `quality_gates` evaluate named values in a JSON report artifact after
+the offline graph runs. A missing report, missing value or failed `eq`, `gte`
+or `lte` assertion becomes a hard publication-gate failure. Use these for
+expanded-AOI scene validity, product comparability and EFFIS-coverage gates;
+do not encode those thresholds only in prose.
+
+Output QA supports `maximum_bytes` and, for COGs, `expected_crs`,
+`expected_resolution_m`, `resolution_tolerance_m`, `expected_band_count` and
+`expected_band_descriptions`. The release-two NDVI/NDMI contract uses these to
+hold public component COGs to 32 MiB, native 10 m and 20 m resolution, and one
+named analytical band. Component PMTiles use an 8 MiB ceiling.
+
+`build_change_evidence_v2.py` is a new versioned transformation entry point.
+It leaves the launch builder unchanged for release-one auditability, derives
+the exact core-plus-2-km AOI, applies the common Sentinel-2 mask, fails before
+writing outputs when the 95% scene, 90% product or 95% EFFIS comparability gate
+fails, and writes separate lossless NDVI/NDMI COGs plus accessible CSV/JSON
+distribution summaries. It requires B04, B08, B8A, B11, B12 and SCL for each
+selected Sentinel-2 scene.

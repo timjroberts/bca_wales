@@ -286,7 +286,15 @@ function localRunner(releaseRoot) {
       const rows = document.features.map((feature) => `${feature.properties.name},${feature.properties.code}`);
       await writeFile(host(argv[2]), `name,code\n${rows.join("\n")}\n`);
     } else if (tool === "pmtiles") return { stdout: "archive valid\n", stderr: "" };
-    else if (tool === "gdalinfo") return { stdout: JSON.stringify({ metadata: { IMAGE_STRUCTURE: { LAYOUT: "COG" } } }), stderr: "" };
+    else if (tool === "gdalinfo") return {
+      stdout: JSON.stringify({
+        metadata: { IMAGE_STRUCTURE: { LAYOUT: "COG" } },
+        coordinateSystem: { id: { authority: "EPSG", code: 32630 } },
+        geoTransform: [0, 10, 0, 0, 0, -10],
+        bands: [{ description: "delta_NDVI" }]
+      }),
+      stderr: ""
+    };
     else throw new Error(`Unexpected tool ${tool}`);
     return { stdout: "", stderr: "" };
   };
@@ -299,6 +307,21 @@ test("the launch registry and example recipe satisfy the final contracts", async
   });
   assert.equal(loaded.registry.schema_version, "1.0.0");
   assert.equal(loaded.recipe.outputs.some((output) => output.profile === "accessible_csv"), true);
+});
+
+test("the factual release-two recipe pins the expanded AOI and component contracts", async () => {
+  const loaded = await loadContracts({
+    registryPath: path.join(repositoryRoot, "data/launch/source-registry.json"),
+    recipePath: path.join(repositoryRoot, "data/launch/publication-recipe-2026-08-21.json")
+  });
+  assert.equal(loaded.recipe.release_id, "release-blorenge-2026-08-21.5");
+  assert.equal(loaded.recipe.supersedes, "release-blorenge-2026-08-13.6");
+  assert.equal(loaded.recipe.spatial_contract.core_version, "2026-08-21.1");
+  assert.equal(loaded.recipe.inputs.filter((item) => item.input_id.startsWith("lidar-") && item.input_id !== "lidar-catalogue").length, 163);
+  assert.equal(loaded.recipe.inputs.filter((item) => item.input_id.endsWith("-nir20")).length, 3);
+  assert.equal(loaded.recipe.outputs.find((item) => item.asset_id === "ndvi-cog").qa.maximum_bytes, 32 * 1024 * 1024);
+  assert.equal(loaded.recipe.outputs.find((item) => item.asset_id === "ndmi-pmtiles").qa.maximum_bytes, 8 * 1024 * 1024);
+  assert.equal(loaded.recipe.quality_gates[0].assertions.length, 7);
 });
 
 test("acquisition, build, archive verification and reproduction preserve exact lineage", async (context) => {
@@ -386,6 +409,116 @@ test("PMTiles v3 and COG output checks use package-aware verification", async (c
   }, cog, runner, root);
   assert.deepEqual(pmtilesResult.hardFailures, []);
   assert.deepEqual(cogResult.hardFailures, []);
+});
+
+test("COG and byte-ceiling contracts fail closed on analytical drift", async (context) => {
+  const root = await mkdtemp(path.join(tmpdir(), "bca-raster-contract-test-"));
+  context.after(() => rm(root, { recursive: true }));
+  await mkdir(path.join(root, "outputs"));
+  const cog = path.join(root, "outputs/component.tif");
+  await writeFile(cog, Buffer.concat([Buffer.from([0x49, 0x49, 0x2a, 0x00]), Buffer.alloc(32)]));
+  const result = await inspectOutput({
+    asset_id: "ndvi-cog",
+    profile: "cog",
+    qa: {
+      minimum_bytes: 4,
+      maximum_bytes: 32,
+      expected_crs: "EPSG:27700",
+      expected_resolution_m: 20,
+      expected_band_count: 2,
+      expected_band_descriptions: ["delta_NDVI", "validity"]
+    }
+  }, cog, localRunner(root), root);
+  assert.equal(result.hardFailures.some((failure) => failure.includes("exceeds 32")), true);
+  assert.equal(result.hardFailures.some((failure) => failure.includes("expected 2 bands")), true);
+  assert.equal(result.hardFailures.some((failure) => failure.includes("pixel resolution")), true);
+  assert.equal(result.hardFailures.some((failure) => failure.includes("CRS does not match")), true);
+});
+
+test("recipe quality assertions are evaluated from recorded JSON artifacts", async (context) => {
+  const root = await mkdtemp(path.join(tmpdir(), "bca-quality-gate-test-"));
+  context.after(() => rm(root, { recursive: true }));
+  const contracts = await fixture(root);
+  const recipe = await readJson(contracts.recipePath);
+  recipe.quality_gates = [{
+    gate_id: "expanded-aoi-scene-qa",
+    report_artifact_id: "public-geojson",
+    assertions: [{
+      path: "features.0.properties.name",
+      operator: "eq",
+      value: "A different core",
+      message: "The expanded-AOI scene contract must pass before promotion"
+    }]
+  }];
+  await writeFile(contracts.recipePath, JSON.stringify(recipe));
+  const acquired = await acquireRelease({
+    ...contracts,
+    workspaceRoot: path.join(root, "work"),
+    codeCommit: commit,
+    clock
+  });
+  const built = await buildRelease({
+    releaseRoot: acquired.releaseRoot,
+    clock,
+    runner: localRunner(acquired.releaseRoot)
+  });
+  assert.equal(built.qa.result, "fail");
+  assert.equal(built.qa.hard_failures.some((failure) => failure.includes("expanded-aoi-scene-qa")), true);
+});
+
+test("spatial contracts pin the canonical core checksum and every AOI-dependent dataset", async (context) => {
+  const root = await mkdtemp(path.join(tmpdir(), "bca-spatial-contract-test-"));
+  context.after(() => rm(root, { recursive: true }));
+  const contracts = await fixture(root);
+  const recipe = await readJson(contracts.recipePath);
+  const sourceBytes = await readFile(path.join(root, "source.geojson"));
+  const sourceSha = createHash("sha256").update(sourceBytes).digest("hex");
+  recipe.inputs[0].expected_sha256 = sourceSha;
+  recipe.spatial_contract = {
+    core_input_id: "source-one-input",
+    core_label: "BCA-area of interest",
+    core_version: "2026-08-21.1",
+    core_sha256: sourceSha,
+    buffer_distance_m: 2000,
+    buffer_crs: "EPSG:27700",
+    clip_mode: "exact",
+    aoi_dependent_input_ids: ["source-one-input"],
+    aoi_dependent_dataset_ids: ["published-one"],
+    rebuild_aoi_dependent_inputs: true
+  };
+  await writeFile(contracts.recipePath, JSON.stringify(recipe));
+  const loaded = await loadContracts(contracts);
+  assert.equal(loaded.recipe.spatial_contract.buffer_distance_m, 2000);
+
+  const acquired = await acquireRelease({
+    ...contracts,
+    workspaceRoot: path.join(root, "work"),
+    codeCommit: commit,
+    clock
+  });
+  const retained = await reuseAcquisition({
+    archiveRoot: acquired.releaseRoot,
+    ...contracts,
+    workspaceRoot: path.join(root, "retained-same-spatial-contract"),
+    codeCommit: commit,
+    clock
+  });
+  assert.equal(retained.manifest.qa_events.at(-1).code, "MATCHED_SPATIAL_ACQUISITION_RETAINED");
+
+  recipe.spatial_contract.buffer_distance_m = 2500;
+  await writeFile(contracts.recipePath, JSON.stringify(recipe));
+  await assert.rejects(reuseAcquisition({
+    archiveRoot: acquired.releaseRoot,
+    ...contracts,
+    workspaceRoot: path.join(root, "retained"),
+    codeCommit: commit,
+    clock
+  }), /requires a fresh matching acquisition of AOI-dependent inputs/);
+
+  recipe.spatial_contract.buffer_distance_m = 2000;
+  recipe.spatial_contract.core_sha256 = "0".repeat(64);
+  await writeFile(contracts.recipePath, JSON.stringify(recipe));
+  await assert.rejects(loadContracts(contracts), /core checksum must match/);
 });
 
 test("publication changes the current pointer only after verified immutable uploads", async (context) => {

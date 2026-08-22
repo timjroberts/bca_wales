@@ -1,0 +1,495 @@
+{
+  "aoi_sha256": "9261061e51b3b06287e1906c94a6f3380f8e782987980c22af8d79f878bbe557",
+  "generated_at": "2026-08-21T19:05:25.943Z",
+  "outputs": {
+    "observations_sha256": "968487f25bce6ad17cebcb6ec3478c8eb549319ee8c4ecc60d6a108f5d9f3ba7",
+    "report_json_sha256": "b4d014685831e92dffb2dc3946e69b3b774f3b6a791beaf2d6320794b1d86c5b",
+    "report_markdown_sha256": "7c1297b37a73f5a827a3fa4c71961a652a9f4f95b23e84a493103aefc48f92fc"
+  },
+  "requests": [
+    {
+      "attempt": 1,
+      "bytes": 98,
+      "endpoint_template": "https://firms.modaps.eosdis.nasa.gov/mapserver/mapkey_status/?MAP_KEY={MAP_KEY}",
+      "id": "mapkey-status-start",
+      "latency_ms": 431,
+      "raw_path": ".firms-validation/evidence/raw/mapkey-status-start.json.bin",
+      "response": {
+        "content_length": null,
+        "content_type": "application/json",
+        "etag": null,
+        "last_modified": null,
+        "status": 200
+      },
+      "retrieved_at": "2026-08-21T19:05:18.401Z",
+      "sha256": "aaeb6879fc1b2b44469db93519aa97b6c821054143e187579267b9b119a354de"
+    },
+    {
+      "attempt": 1,
+      "bytes": 404,
+      "endpoint_template": "https://firms.modaps.eosdis.nasa.gov/api/data_availability/csv/{MAP_KEY}/all",
+      "id": "data-availability",
+      "latency_ms": 422,
+      "raw_path": ".firms-validation/evidence/raw/data-availability.csv.bin",
+      "response": {
+        "content_length": null,
+        "content_type": "text/plain;charset=UTF-8",
+        "etag": null,
+        "last_modified": null,
+        "status": 200
+      },
+      "retrieved_at": "2026-08-21T19:05:18.824Z",
+      "sha256": "b7f90e1a8d2fad191c75505fab16e14b68b4e92eb04c3f6d074be5e24cd0cf77"
+    },
+    {
+      "attempt": 1,
+      "bytes": 122,
+      "endpoint_template": "https://firms.modaps.eosdis.nasa.gov/api/area/csv/{MAP_KEY}/VIIRS_NOAA21_NRT/-3.1141917,51.6800228,-2.9576185,51.8374011/5/2026-06-15",
+      "id": "quiet-VIIRS_NOAA21_NRT-2026-06-15",
+      "latency_ms": 248,
+      "raw_path": ".firms-validation/evidence/raw/quiet/VIIRS_NOAA21_NRT/2026-06-15-5.csv.bin",
+      "response": {
+        "content_length": null,
+        "content_type": "text/plain;charset=UTF-8",
+        "etag": null,
+        "last_modified": null,
+        "status": 200
+      },
+      "retrieved_at": "2026-08-21T19:05:19.074Z",
+      "row_count": 0,
+      "sha256": "2b11a44667d05367ecf77651b95fd3d34c545c7ec154856094b91245e41ae697"
+    },
+    {
+      "attempt": 1,
+      "bytes": 122,
+      "endpoint_template": "https://firms.modaps.eosdis.nasa.gov/api/area/csv/{MAP_KEY}/VIIRS_NOAA21_NRT/-3.1141917,51.6800228,-2.9576185,51.8374011/5/2026-06-20",
+      "id": "quiet-VIIRS_NOAA21_NRT-2026-06-20",
+      "latency_ms": 358,
+      "raw_path": ".firms-validation/evidence/raw/quiet/VIIRS_NOAA21_NRT/2026-06-20-5.csv.bin",
+      "response": {
+        "content_length": null,
+        "content_type": "text/plain;charset=UTF-8",
+        "etag": null,
+        "last_modified": null,
+        "status": 200
+      },
+      "retrieved_at": "2026-08-21T19:05:19.433Z",
+      "row_count": 0,
+      "sha256": "2b11a44667d05367ecf77651b95fd3d34c545c7ec154856094b91245e41ae697"
+    },
+    {
+      "attempt": 1,
+      "bytes": 122,
+      "endpoint_template": "https://firms.modaps.eosdis.nasa.gov/api/area/csv/{MAP_KEY}/VIIRS_NOAA21_NRT/-3.1141917,51.6800228,-2.9576185,51.8374011/5/2026-06-25",
+      "id": "quiet-VIIRS_NOAA21_NRT-2026-06-25",
+      "latency_ms": 274,
+      "raw_path": ".firms-validation/evidence/raw/quiet/VIIRS_NOAA21_NRT/2026-06-25-5.csv.bin",
+      "response": {
+        "content_length": null,
+        "content_type": "text/plain;charset=UTF-8",
+        "etag": null,
+        "last_modified": null,
+        "status": 200
+      },
+      "retrieved_at": "2026-08-21T19:05:19.709Z",
+      "row_count": 0,
+      "sha256": "2b11a44667d05367ecf77651b95fd3d34c545c7ec154856094b91245e41ae697"
+    },
+    {
+      "attempt": 1,
+      "bytes": 122,
+      "endpoint_template": "https://firms.modaps.eosdis.nasa.gov/api/area/csv/{MAP_KEY}/VIIRS_NOAA21_NRT/-3.1141917,51.6800228,-2.9576185,51.8374011/5/2026-06-30",
+      "id": "quiet-VIIRS_NOAA21_NRT-2026-06-30",
+      "latency_ms": 228,
+      "raw_path": ".firms-validation/evidence/raw/quiet/VIIRS_NOAA21_NRT/2026-06-30-5.csv.bin",
+      "response": {
+        "content_length": null,
+        "content_type": "text/plain;charset=UTF-8",
+        "etag": null,
+        "last_modified": null,
+        "status": 200
+      },
+      "retrieved_at": "2026-08-21T19:05:19.937Z",
+      "row_count": 0,
+      "sha256": "2b11a44667d05367ecf77651b95fd3d34c545c7ec154856094b91245e41ae697"
+    },
+    {
+      "attempt": 1,
+      "bytes": 122,
+      "endpoint_template": "https://firms.modaps.eosdis.nasa.gov/api/area/csv/{MAP_KEY}/VIIRS_NOAA21_NRT/-3.1141917,51.6800228,-2.9576185,51.8374011/5/2026-07-05",
+      "id": "quiet-VIIRS_NOAA21_NRT-2026-07-05",
+      "latency_ms": 317,
+      "raw_path": ".firms-validation/evidence/raw/quiet/VIIRS_NOAA21_NRT/2026-07-05-5.csv.bin",
+      "response": {
+        "content_length": null,
+        "content_type": "text/plain;charset=UTF-8",
+        "etag": null,
+        "last_modified": null,
+        "status": 200
+      },
+      "retrieved_at": "2026-08-21T19:05:20.256Z",
+      "row_count": 0,
+      "sha256": "2b11a44667d05367ecf77651b95fd3d34c545c7ec154856094b91245e41ae697"
+    },
+    {
+      "attempt": 1,
+      "bytes": 205,
+      "endpoint_template": "https://firms.modaps.eosdis.nasa.gov/api/area/csv/{MAP_KEY}/VIIRS_NOAA21_NRT/-3.1141917,51.6800228,-2.9576185,51.8374011/5/2026-07-10",
+      "id": "quiet-VIIRS_NOAA21_NRT-2026-07-10",
+      "latency_ms": 275,
+      "raw_path": ".firms-validation/evidence/raw/quiet/VIIRS_NOAA21_NRT/2026-07-10-5.csv.bin",
+      "response": {
+        "content_length": null,
+        "content_type": "text/plain;charset=UTF-8",
+        "etag": null,
+        "last_modified": null,
+        "status": 200
+      },
+      "retrieved_at": "2026-08-21T19:05:20.532Z",
+      "row_count": 1,
+      "sha256": "b8cd58c5621165dad034993f13089b81953efecfc3f74523f1bc91d8e46d4b15"
+    },
+    {
+      "attempt": 1,
+      "bytes": 122,
+      "endpoint_template": "https://firms.modaps.eosdis.nasa.gov/api/area/csv/{MAP_KEY}/VIIRS_NOAA20_NRT/-3.1141917,51.6800228,-2.9576185,51.8374011/5/2026-06-15",
+      "id": "quiet-VIIRS_NOAA20_NRT-2026-06-15",
+      "latency_ms": 237,
+      "raw_path": ".firms-validation/evidence/raw/quiet/VIIRS_NOAA20_NRT/2026-06-15-5.csv.bin",
+      "response": {
+        "content_length": null,
+        "content_type": "text/plain;charset=UTF-8",
+        "etag": null,
+        "last_modified": null,
+        "status": 200
+      },
+      "retrieved_at": "2026-08-21T19:05:20.772Z",
+      "row_count": 0,
+      "sha256": "2b11a44667d05367ecf77651b95fd3d34c545c7ec154856094b91245e41ae697"
+    },
+    {
+      "attempt": 1,
+      "bytes": 122,
+      "endpoint_template": "https://firms.modaps.eosdis.nasa.gov/api/area/csv/{MAP_KEY}/VIIRS_NOAA20_NRT/-3.1141917,51.6800228,-2.9576185,51.8374011/5/2026-06-20",
+      "id": "quiet-VIIRS_NOAA20_NRT-2026-06-20",
+      "latency_ms": 339,
+      "raw_path": ".firms-validation/evidence/raw/quiet/VIIRS_NOAA20_NRT/2026-06-20-5.csv.bin",
+      "response": {
+        "content_length": null,
+        "content_type": "text/plain;charset=UTF-8",
+        "etag": null,
+        "last_modified": null,
+        "status": 200
+      },
+      "retrieved_at": "2026-08-21T19:05:21.112Z",
+      "row_count": 0,
+      "sha256": "2b11a44667d05367ecf77651b95fd3d34c545c7ec154856094b91245e41ae697"
+    },
+    {
+      "attempt": 1,
+      "bytes": 122,
+      "endpoint_template": "https://firms.modaps.eosdis.nasa.gov/api/area/csv/{MAP_KEY}/VIIRS_NOAA20_NRT/-3.1141917,51.6800228,-2.9576185,51.8374011/5/2026-06-25",
+      "id": "quiet-VIIRS_NOAA20_NRT-2026-06-25",
+      "latency_ms": 309,
+      "raw_path": ".firms-validation/evidence/raw/quiet/VIIRS_NOAA20_NRT/2026-06-25-5.csv.bin",
+      "response": {
+        "content_length": null,
+        "content_type": "text/plain;charset=UTF-8",
+        "etag": null,
+        "last_modified": null,
+        "status": 200
+      },
+      "retrieved_at": "2026-08-21T19:05:21.422Z",
+      "row_count": 0,
+      "sha256": "2b11a44667d05367ecf77651b95fd3d34c545c7ec154856094b91245e41ae697"
+    },
+    {
+      "attempt": 1,
+      "bytes": 122,
+      "endpoint_template": "https://firms.modaps.eosdis.nasa.gov/api/area/csv/{MAP_KEY}/VIIRS_NOAA20_NRT/-3.1141917,51.6800228,-2.9576185,51.8374011/5/2026-06-30",
+      "id": "quiet-VIIRS_NOAA20_NRT-2026-06-30",
+      "latency_ms": 279,
+      "raw_path": ".firms-validation/evidence/raw/quiet/VIIRS_NOAA20_NRT/2026-06-30-5.csv.bin",
+      "response": {
+        "content_length": null,
+        "content_type": "text/plain;charset=UTF-8",
+        "etag": null,
+        "last_modified": null,
+        "status": 200
+      },
+      "retrieved_at": "2026-08-21T19:05:21.703Z",
+      "row_count": 0,
+      "sha256": "2b11a44667d05367ecf77651b95fd3d34c545c7ec154856094b91245e41ae697"
+    },
+    {
+      "attempt": 1,
+      "bytes": 122,
+      "endpoint_template": "https://firms.modaps.eosdis.nasa.gov/api/area/csv/{MAP_KEY}/VIIRS_NOAA20_NRT/-3.1141917,51.6800228,-2.9576185,51.8374011/5/2026-07-05",
+      "id": "quiet-VIIRS_NOAA20_NRT-2026-07-05",
+      "latency_ms": 295,
+      "raw_path": ".firms-validation/evidence/raw/quiet/VIIRS_NOAA20_NRT/2026-07-05-5.csv.bin",
+      "response": {
+        "content_length": null,
+        "content_type": "text/plain;charset=UTF-8",
+        "etag": null,
+        "last_modified": null,
+        "status": 200
+      },
+      "retrieved_at": "2026-08-21T19:05:21.999Z",
+      "row_count": 0,
+      "sha256": "2b11a44667d05367ecf77651b95fd3d34c545c7ec154856094b91245e41ae697"
+    },
+    {
+      "attempt": 1,
+      "bytes": 122,
+      "endpoint_template": "https://firms.modaps.eosdis.nasa.gov/api/area/csv/{MAP_KEY}/VIIRS_NOAA20_NRT/-3.1141917,51.6800228,-2.9576185,51.8374011/5/2026-07-10",
+      "id": "quiet-VIIRS_NOAA20_NRT-2026-07-10",
+      "latency_ms": 294,
+      "raw_path": ".firms-validation/evidence/raw/quiet/VIIRS_NOAA20_NRT/2026-07-10-5.csv.bin",
+      "response": {
+        "content_length": null,
+        "content_type": "text/plain;charset=UTF-8",
+        "etag": null,
+        "last_modified": null,
+        "status": 200
+      },
+      "retrieved_at": "2026-08-21T19:05:22.293Z",
+      "row_count": 0,
+      "sha256": "2b11a44667d05367ecf77651b95fd3d34c545c7ec154856094b91245e41ae697"
+    },
+    {
+      "attempt": 1,
+      "bytes": 122,
+      "endpoint_template": "https://firms.modaps.eosdis.nasa.gov/api/area/csv/{MAP_KEY}/VIIRS_NOAA21_NRT/-3.1141917,51.6800228,-2.9576185,51.8374011/5/2026-07-15",
+      "id": "event-VIIRS_NOAA21_NRT-2026-07-15",
+      "latency_ms": 323,
+      "raw_path": ".firms-validation/evidence/raw/event/VIIRS_NOAA21_NRT/2026-07-15-5.csv.bin",
+      "response": {
+        "content_length": null,
+        "content_type": "text/plain;charset=UTF-8",
+        "etag": null,
+        "last_modified": null,
+        "status": 200
+      },
+      "retrieved_at": "2026-08-21T19:05:22.617Z",
+      "row_count": 0,
+      "sha256": "2b11a44667d05367ecf77651b95fd3d34c545c7ec154856094b91245e41ae697"
+    },
+    {
+      "attempt": 1,
+      "bytes": 7740,
+      "endpoint_template": "https://firms.modaps.eosdis.nasa.gov/api/area/csv/{MAP_KEY}/VIIRS_NOAA21_NRT/-3.1141917,51.6800228,-2.9576185,51.8374011/5/2026-07-20",
+      "id": "event-VIIRS_NOAA21_NRT-2026-07-20",
+      "latency_ms": 287,
+      "raw_path": ".firms-validation/evidence/raw/event/VIIRS_NOAA21_NRT/2026-07-20-5.csv.bin",
+      "response": {
+        "content_length": null,
+        "content_type": "text/plain;charset=UTF-8",
+        "etag": null,
+        "last_modified": null,
+        "status": 200
+      },
+      "retrieved_at": "2026-08-21T19:05:22.905Z",
+      "row_count": 92,
+      "sha256": "c7018c9783b27a94fa9cf52707a432286938b41118677f7ffe0a59b26079eee1"
+    },
+    {
+      "attempt": 1,
+      "bytes": 1117,
+      "endpoint_template": "https://firms.modaps.eosdis.nasa.gov/api/area/csv/{MAP_KEY}/VIIRS_NOAA21_NRT/-3.1141917,51.6800228,-2.9576185,51.8374011/5/2026-07-25",
+      "id": "event-VIIRS_NOAA21_NRT-2026-07-25",
+      "latency_ms": 236,
+      "raw_path": ".firms-validation/evidence/raw/event/VIIRS_NOAA21_NRT/2026-07-25-5.csv.bin",
+      "response": {
+        "content_length": null,
+        "content_type": "text/plain;charset=UTF-8",
+        "etag": null,
+        "last_modified": null,
+        "status": 200
+      },
+      "retrieved_at": "2026-08-21T19:05:23.154Z",
+      "row_count": 12,
+      "sha256": "ce1747f7b52cd0c95a779522b32f9a9fc8ed78f880a77c823d496c9c1612b83c"
+    },
+    {
+      "attempt": 1,
+      "bytes": 122,
+      "endpoint_template": "https://firms.modaps.eosdis.nasa.gov/api/area/csv/{MAP_KEY}/VIIRS_NOAA21_NRT/-3.1141917,51.6800228,-2.9576185,51.8374011/5/2026-07-30",
+      "id": "event-VIIRS_NOAA21_NRT-2026-07-30",
+      "latency_ms": 303,
+      "raw_path": ".firms-validation/evidence/raw/event/VIIRS_NOAA21_NRT/2026-07-30-5.csv.bin",
+      "response": {
+        "content_length": null,
+        "content_type": "text/plain;charset=UTF-8",
+        "etag": null,
+        "last_modified": null,
+        "status": 200
+      },
+      "retrieved_at": "2026-08-21T19:05:23.458Z",
+      "row_count": 0,
+      "sha256": "2b11a44667d05367ecf77651b95fd3d34c545c7ec154856094b91245e41ae697"
+    },
+    {
+      "attempt": 1,
+      "bytes": 122,
+      "endpoint_template": "https://firms.modaps.eosdis.nasa.gov/api/area/csv/{MAP_KEY}/VIIRS_NOAA20_NRT/-3.1141917,51.6800228,-2.9576185,51.8374011/5/2026-07-15",
+      "id": "event-VIIRS_NOAA20_NRT-2026-07-15",
+      "latency_ms": 311,
+      "raw_path": ".firms-validation/evidence/raw/event/VIIRS_NOAA20_NRT/2026-07-15-5.csv.bin",
+      "response": {
+        "content_length": null,
+        "content_type": "text/plain;charset=UTF-8",
+        "etag": null,
+        "last_modified": null,
+        "status": 200
+      },
+      "retrieved_at": "2026-08-21T19:05:23.770Z",
+      "row_count": 0,
+      "sha256": "2b11a44667d05367ecf77651b95fd3d34c545c7ec154856094b91245e41ae697"
+    },
+    {
+      "attempt": 1,
+      "bytes": 8128,
+      "endpoint_template": "https://firms.modaps.eosdis.nasa.gov/api/area/csv/{MAP_KEY}/VIIRS_NOAA20_NRT/-3.1141917,51.6800228,-2.9576185,51.8374011/5/2026-07-20",
+      "id": "event-VIIRS_NOAA20_NRT-2026-07-20",
+      "latency_ms": 266,
+      "raw_path": ".firms-validation/evidence/raw/event/VIIRS_NOAA20_NRT/2026-07-20-5.csv.bin",
+      "response": {
+        "content_length": null,
+        "content_type": "text/plain;charset=UTF-8",
+        "etag": null,
+        "last_modified": null,
+        "status": 200
+      },
+      "retrieved_at": "2026-08-21T19:05:24.037Z",
+      "row_count": 97,
+      "sha256": "13bdc44b9892ea0df60e5b6c10cb74064bd68f79df588728da4697e4f2b21053"
+    },
+    {
+      "attempt": 1,
+      "bytes": 2282,
+      "endpoint_template": "https://firms.modaps.eosdis.nasa.gov/api/area/csv/{MAP_KEY}/VIIRS_NOAA20_NRT/-3.1141917,51.6800228,-2.9576185,51.8374011/5/2026-07-25",
+      "id": "event-VIIRS_NOAA20_NRT-2026-07-25",
+      "latency_ms": 239,
+      "raw_path": ".firms-validation/evidence/raw/event/VIIRS_NOAA20_NRT/2026-07-25-5.csv.bin",
+      "response": {
+        "content_length": null,
+        "content_type": "text/plain;charset=UTF-8",
+        "etag": null,
+        "last_modified": null,
+        "status": 200
+      },
+      "retrieved_at": "2026-08-21T19:05:24.279Z",
+      "row_count": 26,
+      "sha256": "3d08ce084136f7b5bdce95995ffc5fbd4947daab923184cea45de8d2485371d2"
+    },
+    {
+      "attempt": 1,
+      "bytes": 122,
+      "endpoint_template": "https://firms.modaps.eosdis.nasa.gov/api/area/csv/{MAP_KEY}/VIIRS_NOAA20_NRT/-3.1141917,51.6800228,-2.9576185,51.8374011/5/2026-07-30",
+      "id": "event-VIIRS_NOAA20_NRT-2026-07-30",
+      "latency_ms": 276,
+      "raw_path": ".firms-validation/evidence/raw/event/VIIRS_NOAA20_NRT/2026-07-30-5.csv.bin",
+      "response": {
+        "content_length": null,
+        "content_type": "text/plain;charset=UTF-8",
+        "etag": null,
+        "last_modified": null,
+        "status": 200
+      },
+      "retrieved_at": "2026-08-21T19:05:24.557Z",
+      "row_count": 0,
+      "sha256": "2b11a44667d05367ecf77651b95fd3d34c545c7ec154856094b91245e41ae697"
+    },
+    {
+      "attempt": 1,
+      "bytes": 122,
+      "endpoint_template": "https://firms.modaps.eosdis.nasa.gov/api/area/csv/{MAP_KEY}/VIIRS_NOAA21_NRT/-3.1141917,51.6800228,-2.9576185,51.8374011/5",
+      "id": "current-VIIRS_NOAA21_NRT",
+      "latency_ms": 322,
+      "raw_path": ".firms-validation/evidence/raw/current/VIIRS_NOAA21_NRT/recent-5.csv.bin",
+      "response": {
+        "content_length": null,
+        "content_type": "text/plain;charset=UTF-8",
+        "etag": null,
+        "last_modified": null,
+        "status": 200
+      },
+      "retrieved_at": "2026-08-21T19:05:24.881Z",
+      "row_count": 0,
+      "sha256": "2b11a44667d05367ecf77651b95fd3d34c545c7ec154856094b91245e41ae697"
+    },
+    {
+      "attempt": 1,
+      "bytes": 122,
+      "endpoint_template": "https://firms.modaps.eosdis.nasa.gov/api/area/csv/{MAP_KEY}/VIIRS_NOAA20_NRT/-3.1141917,51.6800228,-2.9576185,51.8374011/5",
+      "id": "current-VIIRS_NOAA20_NRT",
+      "latency_ms": 402,
+      "raw_path": ".firms-validation/evidence/raw/current/VIIRS_NOAA20_NRT/recent-5.csv.bin",
+      "response": {
+        "content_length": null,
+        "content_type": "text/plain;charset=UTF-8",
+        "etag": null,
+        "last_modified": null,
+        "status": 200
+      },
+      "retrieved_at": "2026-08-21T19:05:25.283Z",
+      "row_count": 0,
+      "sha256": "2b11a44667d05367ecf77651b95fd3d34c545c7ec154856094b91245e41ae697"
+    },
+    {
+      "attempt": 1,
+      "bytes": 7740,
+      "endpoint_template": "https://firms.modaps.eosdis.nasa.gov/api/area/csv/{MAP_KEY}/VIIRS_NOAA21_NRT/-3.1141917,51.6800228,-2.9576185,51.8374011/5/2026-07-20",
+      "id": "repeat-VIIRS_NOAA21_NRT-2026-07-20",
+      "latency_ms": 243,
+      "raw_path": ".firms-validation/evidence/raw/repeat/VIIRS_NOAA21_NRT/2026-07-20-5.csv.bin",
+      "response": {
+        "content_length": null,
+        "content_type": "text/plain;charset=UTF-8",
+        "etag": null,
+        "last_modified": null,
+        "status": 200
+      },
+      "retrieved_at": "2026-08-21T19:05:25.527Z",
+      "row_count": 92,
+      "sha256": "c7018c9783b27a94fa9cf52707a432286938b41118677f7ffe0a59b26079eee1"
+    },
+    {
+      "attempt": 1,
+      "bytes": 8128,
+      "endpoint_template": "https://firms.modaps.eosdis.nasa.gov/api/area/csv/{MAP_KEY}/VIIRS_NOAA20_NRT/-3.1141917,51.6800228,-2.9576185,51.8374011/5/2026-07-20",
+      "id": "repeat-VIIRS_NOAA20_NRT-2026-07-20",
+      "latency_ms": 301,
+      "raw_path": ".firms-validation/evidence/raw/repeat/VIIRS_NOAA20_NRT/2026-07-20-5.csv.bin",
+      "response": {
+        "content_length": null,
+        "content_type": "text/plain;charset=UTF-8",
+        "etag": null,
+        "last_modified": null,
+        "status": 200
+      },
+      "retrieved_at": "2026-08-21T19:05:25.831Z",
+      "row_count": 97,
+      "sha256": "13bdc44b9892ea0df60e5b6c10cb74064bd68f79df588728da4697e4f2b21053"
+    },
+    {
+      "attempt": 1,
+      "bytes": 16,
+      "endpoint_template": "https://firms.modaps.eosdis.nasa.gov/api/area/csv/{INVALID_MAP_KEY}/VIIRS_NOAA21_NRT/{BBOX}/1/2026-07-20",
+      "id": "invalid-key-failure-shape",
+      "latency_ms": 98,
+      "raw_path": ".firms-validation/evidence/raw/failure-shapes/invalid-key.bin",
+      "response": {
+        "content_length": null,
+        "content_type": "text/plain;charset=UTF-8",
+        "etag": null,
+        "last_modified": null,
+        "status": 400
+      },
+      "retrieved_at": "2026-08-21T19:05:25.934Z",
+      "sha256": "9382ea9009e0297d5f4bfb4f71e0d826b58484630511a98052ceadd9474a9362"
+    }
+  ],
+  "schema_version": "1.0.0"
+}

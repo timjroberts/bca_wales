@@ -1,0 +1,3395 @@
+{
+  "schema_version": "1.0.0",
+  "recipe_id": "blorenge-second-release",
+  "recipe_version": "2.0.4",
+  "release_id": "release-blorenge-2026-08-21.5",
+  "dataset_version": "2026-08-21.5",
+  "registry_id": "blorenge-launch",
+  "public_asset_origin": "https://assets.bca.wales",
+  "supersedes": "release-blorenge-2026-08-13.6",
+  "spatial_contract": {
+    "core_input_id": "bca-area-core",
+    "core_label": "BCA-area of interest",
+    "core_version": "2026-08-21.1",
+    "core_sha256": "825404bb2e7fb85620d874b900a0884e3dc5f0107c26b5491dca665f90f77d73",
+    "buffer_distance_m": 2000,
+    "buffer_crs": "EPSG:27700",
+    "clip_mode": "exact",
+    "aoi_dependent_input_ids": [
+      "nrw-sssi",
+      "nrw-national-park",
+      "nrw-main-rivers",
+      "nrw-phase1-habitat",
+      "lidar-catalogue",
+      "lidar-10-323207",
+      "lidar-10-323208",
+      "lidar-10-323209",
+      "lidar-10-323210",
+      "lidar-10-324202",
+      "lidar-10-324203",
+      "lidar-10-324204",
+      "lidar-10-324205",
+      "lidar-10-324206",
+      "lidar-10-324207",
+      "lidar-10-324208",
+      "lidar-10-324209",
+      "lidar-10-324210",
+      "lidar-10-325200",
+      "lidar-10-325201",
+      "lidar-10-325202",
+      "lidar-10-325203",
+      "lidar-10-325204",
+      "lidar-10-325205",
+      "lidar-10-325206",
+      "lidar-10-325207",
+      "lidar-10-325208",
+      "lidar-10-325209",
+      "lidar-10-325210",
+      "lidar-10-326200",
+      "lidar-10-326201",
+      "lidar-10-326202",
+      "lidar-10-326203",
+      "lidar-10-326204",
+      "lidar-10-326205",
+      "lidar-10-326206",
+      "lidar-10-326207",
+      "lidar-10-326208",
+      "lidar-10-326209",
+      "lidar-10-326210",
+      "lidar-10-327200",
+      "lidar-10-327201",
+      "lidar-10-327202",
+      "lidar-10-327203",
+      "lidar-10-327204",
+      "lidar-10-327205",
+      "lidar-10-327206",
+      "lidar-10-327207",
+      "lidar-10-327208",
+      "lidar-10-327209",
+      "lidar-10-327210",
+      "lidar-10-328200",
+      "lidar-10-328201",
+      "lidar-10-328202",
+      "lidar-10-328203",
+      "lidar-10-328204",
+      "lidar-10-328205",
+      "lidar-10-328206",
+      "lidar-10-328207",
+      "lidar-10-328208",
+      "lidar-10-328209",
+      "lidar-10-328210",
+      "lidar-10-329200",
+      "lidar-10-329201",
+      "lidar-10-329202",
+      "lidar-10-329203",
+      "lidar-10-329204",
+      "lidar-10-329205",
+      "lidar-10-329206",
+      "lidar-10-329207",
+      "lidar-10-329208",
+      "lidar-10-329209",
+      "lidar-10-329210",
+      "lidar-10-330200",
+      "lidar-10-330201",
+      "lidar-10-330202",
+      "lidar-10-330203",
+      "lidar-10-330204",
+      "lidar-10-330205",
+      "lidar-10-330206",
+      "lidar-10-330207",
+      "lidar-10-330208",
+      "lidar-10-330209",
+      "lidar-10-330210",
+      "lidar-10-331200",
+      "lidar-10-331201",
+      "lidar-10-331202",
+      "lidar-10-331203",
+      "lidar-10-331204",
+      "lidar-10-331205",
+      "lidar-10-331206",
+      "lidar-10-331207",
+      "lidar-10-331208",
+      "lidar-10-331209",
+      "lidar-10-331210",
+      "lidar-10-332200",
+      "lidar-10-332201",
+      "lidar-10-332202",
+      "lidar-10-332203",
+      "lidar-10-332204",
+      "lidar-10-332205",
+      "lidar-10-332206",
+      "lidar-10-332207",
+      "lidar-10-332208",
+      "lidar-10-332209",
+      "lidar-10-332210",
+      "lidar-10-333201",
+      "lidar-10-333202",
+      "lidar-10-333203",
+      "lidar-10-333204",
+      "lidar-10-333205",
+      "lidar-10-333206",
+      "lidar-10-333207",
+      "lidar-10-333208",
+      "lidar-10-333209",
+      "lidar-20-323211",
+      "lidar-20-323212",
+      "lidar-20-324211",
+      "lidar-20-324212",
+      "lidar-20-324213",
+      "lidar-20-324214",
+      "lidar-20-325211",
+      "lidar-20-325212",
+      "lidar-20-325213",
+      "lidar-20-325214",
+      "lidar-20-326211",
+      "lidar-20-326212",
+      "lidar-20-326213",
+      "lidar-20-326214",
+      "lidar-20-326215",
+      "lidar-20-327211",
+      "lidar-20-327212",
+      "lidar-20-327213",
+      "lidar-20-327214",
+      "lidar-20-327215",
+      "lidar-20-328211",
+      "lidar-20-328212",
+      "lidar-20-328213",
+      "lidar-20-328214",
+      "lidar-20-328215",
+      "lidar-20-329211",
+      "lidar-20-329212",
+      "lidar-20-329213",
+      "lidar-20-329214",
+      "lidar-20-329215",
+      "lidar-20-330211",
+      "lidar-20-330212",
+      "lidar-20-330213",
+      "lidar-20-330214",
+      "lidar-20-330215",
+      "lidar-20-331211",
+      "lidar-20-331212",
+      "lidar-20-331213",
+      "lidar-20-331214",
+      "lidar-20-332211",
+      "lidar-20-332212",
+      "lidar-20-332213",
+      "lidar-5-326199",
+      "lidar-5-327198",
+      "lidar-5-327199",
+      "lidar-5-328198",
+      "lidar-5-328199",
+      "lidar-5-329198",
+      "lidar-5-329199",
+      "lidar-5-330198",
+      "lidar-5-330199",
+      "lidar-5-331199",
+      "lidar-5-332199",
+      "s2-baseline-red",
+      "s2-baseline-nir",
+      "s2-baseline-nir20",
+      "s2-baseline-swir1",
+      "s2-baseline-swir2",
+      "s2-baseline-scl",
+      "s2-prefire-red",
+      "s2-prefire-nir",
+      "s2-prefire-nir20",
+      "s2-prefire-swir1",
+      "s2-prefire-swir2",
+      "s2-prefire-scl",
+      "s2-post-red",
+      "s2-post-nir",
+      "s2-post-nir20",
+      "s2-post-swir1",
+      "s2-post-swir2",
+      "s2-post-scl",
+      "landsat-baseline-red",
+      "landsat-baseline-nir",
+      "landsat-baseline-swir1",
+      "landsat-baseline-swir2",
+      "landsat-baseline-qa",
+      "landsat-post-red",
+      "landsat-post-nir",
+      "landsat-post-swir1",
+      "landsat-post-swir2",
+      "landsat-post-qa",
+      "effis-bounded"
+    ],
+    "aoi_dependent_dataset_ids": [
+      "landscape-context",
+      "terrain",
+      "observed-change",
+      "ndvi-change",
+      "ndmi-change",
+      "effis-event"
+    ],
+    "rebuild_aoi_dependent_inputs": true
+  },
+  "quality_gates": [
+    {
+      "gate_id": "expanded-aoi-change-coverage",
+      "report_artifact_id": "change-report",
+      "assertions": [
+        {
+          "path": "observations.seasonal_baseline.valid_aoi_percent",
+          "operator": "gte",
+          "value": 95,
+          "message": "Seasonal baseline must be at least 95% valid over the expanded AOI."
+        },
+        {
+          "path": "observations.before_first_report.valid_aoi_percent",
+          "operator": "gte",
+          "value": 95,
+          "message": "Before-first-report scene must be at least 95% valid over the expanded AOI."
+        },
+        {
+          "path": "observations.first_suitable_after_report.valid_aoi_percent",
+          "operator": "gte",
+          "value": 95,
+          "message": "Post-report comparison scene must be at least 95% valid over the expanded AOI."
+        },
+        {
+          "path": "coverage.ndvi_comparable_percent",
+          "operator": "gte",
+          "value": 90,
+          "message": "NDVI must be at least 90% comparable over the expanded AOI."
+        },
+        {
+          "path": "coverage.ndmi_comparable_percent",
+          "operator": "gte",
+          "value": 90,
+          "message": "NDMI must be at least 90% comparable over the expanded AOI."
+        },
+        {
+          "path": "coverage.combined_comparable_percent",
+          "operator": "gte",
+          "value": 90,
+          "message": "Combined evidence must be at least 90% comparable over the expanded AOI."
+        },
+        {
+          "path": "coverage.effis_combined_comparable_percent",
+          "operator": "gte",
+          "value": 95,
+          "message": "Combined evidence must be at least 95% comparable over the EFFIS feature."
+        }
+      ]
+    }
+  ],
+  "inputs": [
+    {
+      "input_id": "bca-area-core",
+      "dataset_id": "bca-area-of-interest",
+      "source": "Blorenge.geojson",
+      "destination": "quarantine/bca/Blorenge.geojson",
+      "media_type": "application/geo+json",
+      "maximum_bytes": 1048576,
+      "expected_sha256": "825404bb2e7fb85620d874b900a0884e3dc5f0107c26b5491dca665f90f77d73"
+    },
+    {
+      "input_id": "nrw-sssi",
+      "dataset_id": "nrw-sssi",
+      "source": ".geodata-staging/release-two/nrw-sssi.geojson",
+      "destination": "quarantine/nrw/sssi.geojson",
+      "media_type": "application/geo+json",
+      "maximum_bytes": 200000,
+      "expected_sha256": "ba012d9ebdd84ef0361d8fda57120395df70f669c51e20a9715f75b7d9c6e4a6"
+    },
+    {
+      "input_id": "nrw-national-park",
+      "dataset_id": "nrw-national-park",
+      "source": ".geodata-staging/release-two/nrw-national-park.geojson",
+      "destination": "quarantine/nrw/national-park.geojson",
+      "media_type": "application/geo+json",
+      "maximum_bytes": 3000000,
+      "expected_sha256": "26628f8df387a7491806e1765285616ab124cd808212feb44f61e338e296bccc"
+    },
+    {
+      "input_id": "nrw-main-rivers",
+      "dataset_id": "nrw-main-rivers",
+      "source": ".geodata-staging/release-two/nrw-main-rivers.geojson",
+      "destination": "quarantine/nrw/main-rivers.geojson",
+      "media_type": "application/geo+json",
+      "maximum_bytes": 2000000,
+      "expected_sha256": "e3de54678b7abdf3d4f285b351a9c02fb36504f97ebc977eab9abd3123a8a74c"
+    },
+    {
+      "input_id": "nrw-phase1-habitat",
+      "dataset_id": "nrw-phase1-vegetation-voronoi",
+      "source": ".geodata-staging/release-two/nrw-phase1-habitat.geojson",
+      "destination": "quarantine/nrw/phase1-habitat.geojson",
+      "media_type": "application/geo+json",
+      "maximum_bytes": 16777216,
+      "expected_sha256": "ce8b0343b54413945028274728a432634cd827be8fdf7fa660a3081da5c55a33"
+    },
+    {
+      "input_id": "osm-wales",
+      "dataset_id": "osm-wales-geofabrik",
+      "source": ".geodata-work/release-blorenge-2026-08-13.6/quarantine/osm/wales-260812.osm.pbf",
+      "destination": "quarantine/osm/wales-260812.osm.pbf",
+      "media_type": "application/vnd.openstreetmap.data+pbf",
+      "maximum_bytes": 200000000,
+      "expected_sha256": "c98afb597889786c4423eab7d9723bb6d4576d76ef811052a9ef5bd6238446d8"
+    },
+    {
+      "input_id": "lidar-catalogue",
+      "dataset_id": "wg-lidar-tile-catalogue",
+      "source": ".geodata-staging/release-two/lidar-catalogue.geojson",
+      "destination": "quarantine/lidar/catalogue-expanded-aoi.geojson",
+      "media_type": "application/geo+json",
+      "maximum_bytes": 104857600,
+      "expected_sha256": "e54d7bb80b8518e406b12c4410004ad277d3dbc8ec2b8a5abdeac2e8e1b424ec"
+    },
+    {
+      "input_id": "lidar-10-323207",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_323207_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_323207_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "75946ceb40535c5a96ed4262aaae37164f616cea3e3c4bac489bba0b5388d089"
+    },
+    {
+      "input_id": "lidar-10-323208",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_323208_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_323208_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "e89d2a880606398ac5fa858b9d3090b17b6f697ee182918bfc507676ab4479af"
+    },
+    {
+      "input_id": "lidar-10-323209",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_323209_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_323209_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "52b899d7d947027b1250da21f767702c7fccd2f6b68870a9fa44ee2b61761709"
+    },
+    {
+      "input_id": "lidar-10-323210",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_323210_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_323210_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "6ab0083df155cd91b0f17791f66e09fe2889aeac539030d67cb260fe5527122c"
+    },
+    {
+      "input_id": "lidar-10-324202",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_324202_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_324202_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "3d51d567a881a10257838a324042e92b8d4f74a03918306b6718fb21cbf5b82d"
+    },
+    {
+      "input_id": "lidar-10-324203",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_324203_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_324203_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "111b115f933dfa055ddf6f58cfd9bddcadaa3355b9f565e48352d42a13e79c72"
+    },
+    {
+      "input_id": "lidar-10-324204",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_324204_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_324204_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "37080d93add44313901187cfb9b660829ee11a6b7a881cb555735bbf04d4886c"
+    },
+    {
+      "input_id": "lidar-10-324205",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_324205_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_324205_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "da1637c6854bfc41aa71467cbc851bc0ad81f8cc13f9fed8addaf9e641dbc9d0"
+    },
+    {
+      "input_id": "lidar-10-324206",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_324206_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_324206_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "47b13d7b13acb64496fbc1b55dbac41a5f5d7bcba1d58efc473cfd92976205e6"
+    },
+    {
+      "input_id": "lidar-10-324207",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_324207_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_324207_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "20e0d216d5ddf9da062f63fba3202d9504e4b78f75862d2ca32a7fb8f28091a4"
+    },
+    {
+      "input_id": "lidar-10-324208",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_324208_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_324208_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "032f4448988f4712950086bfad339aa1faf6bc6ef31ab477499bc9074f6ee586"
+    },
+    {
+      "input_id": "lidar-10-324209",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_324209_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_324209_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "b01066cb1819969fead5afc26599d90d4c8f5e2bbb56cfc5e76d5e4f8aa4cd3a"
+    },
+    {
+      "input_id": "lidar-10-324210",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_324210_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_324210_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "b0e0fb8702e475e612efc3f7926d700683f6aabfa5a5f1268d073f6f47e80df1"
+    },
+    {
+      "input_id": "lidar-10-325200",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_325200_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_325200_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "f974655ffa6851670f992fa925ddd9fc86b58b9482aef9c4987e414a13db63bc"
+    },
+    {
+      "input_id": "lidar-10-325201",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_325201_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_325201_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "e9762e0bdc0dd67cf89670e9fc3213406c4117d681e67bfb011562c62d870742"
+    },
+    {
+      "input_id": "lidar-10-325202",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_325202_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_325202_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "caed33af222df5cd6123f76d822e0c2c8ea8b3d7219d675f69a0ccb7e9632000"
+    },
+    {
+      "input_id": "lidar-10-325203",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_325203_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_325203_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "5f94b088c63c4c225faf073bd7d971fc15e4f501904804a4c0348041a04f2241"
+    },
+    {
+      "input_id": "lidar-10-325204",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_325204_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_325204_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "9c2849dec5a1df407e9944b5cc2300feb16bef02f022965e97369b56c138d5a6"
+    },
+    {
+      "input_id": "lidar-10-325205",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_325205_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_325205_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "59fa02e2e40538a27bc247176bf7f524eb80ffe3324f076c40cd0867571c5111"
+    },
+    {
+      "input_id": "lidar-10-325206",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_325206_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_325206_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "00b7fb620ad91c20c6f914e88a49bfaacb112df6148d86abad17b7961a48dabd"
+    },
+    {
+      "input_id": "lidar-10-325207",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_325207_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_325207_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "d66c274546c9b2974ca40a5c4d8d5e509977cb5595e2867bc1f7c69b3392b848"
+    },
+    {
+      "input_id": "lidar-10-325208",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_325208_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_325208_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "04a48458cd86f301012df3cd0afe7dc311fabbb9ae19242f232dc4cb40b1dbe2"
+    },
+    {
+      "input_id": "lidar-10-325209",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_325209_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_325209_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "5d40cba248f76453be7114fde4efacc5f6241683f1df322c4bbfc568b502867e"
+    },
+    {
+      "input_id": "lidar-10-325210",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_325210_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_325210_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "7f8b214285bf494f66b40ef3f8083dc77679fef1f4e1baf6c242e3c487e2dda6"
+    },
+    {
+      "input_id": "lidar-10-326200",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_326200_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_326200_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "7697227d1d78b8057711f74fa75a3534ecc404c8b6b08eab3a2fae5b3c73a494"
+    },
+    {
+      "input_id": "lidar-10-326201",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_326201_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_326201_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "cded76d4a99897628e8b3b62e2633b88858cac1b125f92b76dd610916108d2bf"
+    },
+    {
+      "input_id": "lidar-10-326202",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_326202_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_326202_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "2f823de15e1b055e5230c9220df6064bc43db7ad23107580566296655d3217a1"
+    },
+    {
+      "input_id": "lidar-10-326203",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_326203_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_326203_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "533c93c0d0ddb8a380f4b9ba185abd34078d44e178d75dffb6f69e7bdaa7d12b"
+    },
+    {
+      "input_id": "lidar-10-326204",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_326204_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_326204_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "4ad9ba83a1b24e36efd44bcbf162dfbad4f8db6a93140f52374d63bd20374251"
+    },
+    {
+      "input_id": "lidar-10-326205",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_326205_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_326205_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "2ec78a3b0af21538618b26facd13ec684c3ddd49ada88a344bac84b3e60b2ac4"
+    },
+    {
+      "input_id": "lidar-10-326206",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_326206_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_326206_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "e45a1215f0dc9525506e3ce0d3b214f9af1d9d11a215a478c32a2c22b71741fb"
+    },
+    {
+      "input_id": "lidar-10-326207",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_326207_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_326207_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "5a0b84d93baef2d5c58761358c28baca0ba67ac651d9cd91e68533934ba8bc7e"
+    },
+    {
+      "input_id": "lidar-10-326208",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_326208_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_326208_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "a04864fd1f985e5b8173812f2bf756f5e6580d3a481e1080393b022ac6b6e9a0"
+    },
+    {
+      "input_id": "lidar-10-326209",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_326209_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_326209_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "959b8aa6fc57007308f39f7048aed7c7862cd9317ab92a05d52b6454c264f219"
+    },
+    {
+      "input_id": "lidar-10-326210",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_326210_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_326210_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "deb1310a004ade46f62248d6ffdafa6e400c0245b2f88576dac14f43cfbcdbe5"
+    },
+    {
+      "input_id": "lidar-10-327200",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_327200_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_327200_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "e7652e206215686e4c6c8446a58fff05dec23c5618c7bdf422d8fe369ba152c4"
+    },
+    {
+      "input_id": "lidar-10-327201",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_327201_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_327201_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "22b39db339ae83107d90a7a99f205b5ab0fa0aa3789235b5e1b558f197d4a847"
+    },
+    {
+      "input_id": "lidar-10-327202",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_327202_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_327202_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "f547b92e64e7f7361d70a1b7ae830ab24a67714bdbe8f46e40c51bc91bbbf0bb"
+    },
+    {
+      "input_id": "lidar-10-327203",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_327203_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_327203_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "d03d26aa963af5bb9a85e8f8ae7680575f547873e5b944ad5357ca897fbaf00b"
+    },
+    {
+      "input_id": "lidar-10-327204",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_327204_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_327204_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "7ea4d1884645fa4114393c657ea66c5f82663c31461ff2467877ee6390483697"
+    },
+    {
+      "input_id": "lidar-10-327205",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_327205_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_327205_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "5d9d0fbaf7631987ef5912a8d9538eda47d112a741b7ff5249656bc5c72f4f08"
+    },
+    {
+      "input_id": "lidar-10-327206",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_327206_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_327206_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "c7655edbf869a5fd2ac12403f2355ce1b77b4b59367961c1ef92ea36c0314c99"
+    },
+    {
+      "input_id": "lidar-10-327207",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_327207_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_327207_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "05dbd27c0dbf4196eb8d77568d629adb73ca4a2a864fde56c7ee7d10bbc38aa6"
+    },
+    {
+      "input_id": "lidar-10-327208",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_327208_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_327208_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "2db56ab5e00f3202bf66f313d049d0fd0c1a26186f3793aa4c11859e2554fe36"
+    },
+    {
+      "input_id": "lidar-10-327209",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_327209_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_327209_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "49fefe7e93a50495d741eea6e91a3987294b9001099067569de4206a1fe88b99"
+    },
+    {
+      "input_id": "lidar-10-327210",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_327210_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_327210_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "ecf7420e04244f9f14aac64830c2391027f362944e2792f09735b2429501cf22"
+    },
+    {
+      "input_id": "lidar-10-328200",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_328200_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_328200_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "b9f55b0db23ba95baa28dded430a276ea94de54435902024d32ebf1fa01f9ca1"
+    },
+    {
+      "input_id": "lidar-10-328201",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_328201_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_328201_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "055594a66ae357f082ae7179612752052c80bf7da2c85aa7d2bfa2161a3df30c"
+    },
+    {
+      "input_id": "lidar-10-328202",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_328202_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_328202_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "7801f780e7e974eb7f3ec5baaf700bc7791716aff08249fb943fafb905471783"
+    },
+    {
+      "input_id": "lidar-10-328203",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_328203_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_328203_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "41dd3d7813521ee4394d0960f671f59232b63c1ba34ca540be3fcb175188ede9"
+    },
+    {
+      "input_id": "lidar-10-328204",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_328204_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_328204_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "d15f2b97f0974269b25014cbd30c69bc3a9829381d7de67863d71a160da6da8c"
+    },
+    {
+      "input_id": "lidar-10-328205",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_328205_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_328205_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "a70ef8cf4073800f947862667a6d41f140e8ca9f4eb23abc0adac2d9bfc04b34"
+    },
+    {
+      "input_id": "lidar-10-328206",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_328206_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_328206_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "5ff05babe421515f4a142d16b13d8aef691390e3ce420fb16423e5813224d2e5"
+    },
+    {
+      "input_id": "lidar-10-328207",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_328207_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_328207_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "e93005558aa475c7ffe60c82b3cf101cf0fb7754eff731b8efa7f59834d1088a"
+    },
+    {
+      "input_id": "lidar-10-328208",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_328208_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_328208_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "90b606e4785eac25d589c6f2c3201afb7d05e6a2aeab13b34af37ce72bdc0955"
+    },
+    {
+      "input_id": "lidar-10-328209",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_328209_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_328209_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "d5fd786e4e267fb1518b71bd89c0eef3844aaea3f119fabe9a7bbfdbaab2d08e"
+    },
+    {
+      "input_id": "lidar-10-328210",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_328210_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_328210_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "043d6a61f521bb29fefc383d405efde59d9b480bdf51e2615d668e5cef85d1bc"
+    },
+    {
+      "input_id": "lidar-10-329200",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_329200_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_329200_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "ce000e12326e205ee27cf7a3f83a851d0f8cfce0d28f447137ae12d07c4451c5"
+    },
+    {
+      "input_id": "lidar-10-329201",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_329201_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_329201_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "daf74518ee486747f1e9a9eb8dde0705576e60e48433acc1e4ed438463049469"
+    },
+    {
+      "input_id": "lidar-10-329202",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_329202_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_329202_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "46d7d37d96c82ea008e8de4e1438acdfa60c6af3b86a3339e24f4c2a30b85121"
+    },
+    {
+      "input_id": "lidar-10-329203",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_329203_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_329203_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "1e3d5566f8e077eea3c812c0d61b32d2e46da671cad82559200f060c00aa9f63"
+    },
+    {
+      "input_id": "lidar-10-329204",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_329204_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_329204_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "839602440300de3f08fdb3b8a88780be777b759636e99873d1730bb06be95e90"
+    },
+    {
+      "input_id": "lidar-10-329205",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_329205_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_329205_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "5460acd859ee82d7bec9498de0ad48f1896cadc96bb9b0cc530fd3f1008e84b6"
+    },
+    {
+      "input_id": "lidar-10-329206",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_329206_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_329206_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "fbf46c35db61f2fb48e98fbd8faa7443dbc6bf3ad008c5ab3d5ce8197175db12"
+    },
+    {
+      "input_id": "lidar-10-329207",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_329207_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_329207_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "cea17bf528175f9f87ee7e3592f702701772a054ca8ef4228d743c648ab0441d"
+    },
+    {
+      "input_id": "lidar-10-329208",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_329208_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_329208_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "edf3dfae577375b09daa8a8591280d8f74351358cd2d4523145e885047f05f13"
+    },
+    {
+      "input_id": "lidar-10-329209",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_329209_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_329209_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "99a38a0ad568372a840f0b8179a8f3555e63c9960907c45e0962ac78e2d6e70a"
+    },
+    {
+      "input_id": "lidar-10-329210",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_329210_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_329210_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "8c441412b3b50f0ab1e278f11d6fbc92a84cb4250db7e08974c0bbd907a15e44"
+    },
+    {
+      "input_id": "lidar-10-330200",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_330200_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_330200_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "4e08017223517a9700e3eb4567b00eb069fb197cec21ca117d9572c3defebbb1"
+    },
+    {
+      "input_id": "lidar-10-330201",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_330201_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_330201_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "d94f1f250e38a26559369cd8dfceab9d473d2af3656269cb254254dff01b5bb2"
+    },
+    {
+      "input_id": "lidar-10-330202",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_330202_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_330202_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "822b5f354a3371c58cf5256b13f666234d1ed91d4fe004a9877c8a63a35acc4b"
+    },
+    {
+      "input_id": "lidar-10-330203",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_330203_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_330203_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "7f4e910cc8305ab782a25499604436bb83911704eadf23ab3e54b648eb9b192e"
+    },
+    {
+      "input_id": "lidar-10-330204",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_330204_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_330204_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "c3066fe63feca08368eede394321d3288d9ce53f9ba0e0a90575d5b35cb0f4b0"
+    },
+    {
+      "input_id": "lidar-10-330205",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_330205_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_330205_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "874d2ba41aec81984f05c5a793147f5ee8b23114927079221f79d1083b33728d"
+    },
+    {
+      "input_id": "lidar-10-330206",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_330206_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_330206_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "3b20867c9f77fb96dd4440b1f72fabc8fe31d38a82632635887fe50140c6d168"
+    },
+    {
+      "input_id": "lidar-10-330207",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_330207_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_330207_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "abf93cd34be695c76f925946f674dc3476ed88bed5f0cc273d320e8b53220c22"
+    },
+    {
+      "input_id": "lidar-10-330208",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_330208_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_330208_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "0f759bce67930202447188e9771f8fabe1e11dbd16231476a7b1bbcd582e6582"
+    },
+    {
+      "input_id": "lidar-10-330209",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_330209_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_330209_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "fac09a7049b3bcec8d67d66ec26a97cc786a53d71dc5a6566fa2bc1ec5b69330"
+    },
+    {
+      "input_id": "lidar-10-330210",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_330210_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_330210_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "58fa0182e69ba1945b58e3f629bfb63cc09b5585126586eb91bc53fc34f8e53c"
+    },
+    {
+      "input_id": "lidar-10-331200",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_331200_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_331200_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "3046fb3d8ad52b085634815c8084fac8f2314ca943a252218466c2ae04f68d7d"
+    },
+    {
+      "input_id": "lidar-10-331201",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_331201_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_331201_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "1a7d17e8e6064db596c2ac0fae33a00845ef619901508b5382edae065fde83f6"
+    },
+    {
+      "input_id": "lidar-10-331202",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_331202_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_331202_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "364c6055bb78471597b5be0e3edfeb3336828c6f7d031572caca01b12aea0222"
+    },
+    {
+      "input_id": "lidar-10-331203",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_331203_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_331203_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "3c5622fb70e2749a9ce119a1863962ccfdb3b82392f96e1d7a80f015cf253156"
+    },
+    {
+      "input_id": "lidar-10-331204",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_331204_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_331204_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "8450e0402ea1d44a7c61de7a190c7c4c726c8a44488a52e8202134f1bc87525e"
+    },
+    {
+      "input_id": "lidar-10-331205",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_331205_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_331205_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "7fb461ff93bb14d723ef7bcbdac3466711987dc0f76a9b5125d045be20ae47bf"
+    },
+    {
+      "input_id": "lidar-10-331206",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_331206_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_331206_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "79248e080718d7eb5b7e3313e6848567b5edcf3d35ca8aa81155f6d04e16d193"
+    },
+    {
+      "input_id": "lidar-10-331207",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_331207_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_331207_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "dae91ce18dba723cb724f92e42d05e22d472db58ac4f4578e38b047454f6ad70"
+    },
+    {
+      "input_id": "lidar-10-331208",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_331208_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_331208_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "ca24886f68c8bfd4421b53bdf1a6642db096fb4e5ae06805341549ee9334b90e"
+    },
+    {
+      "input_id": "lidar-10-331209",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_331209_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_331209_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "9446c81e4c7ade2756b5aee0ebdec4878403a41d7482d54a1031fc6a57b358b2"
+    },
+    {
+      "input_id": "lidar-10-331210",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_331210_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_331210_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "6396b124ccaba9aa7edde751779cf07bad75e9189e2bd5e138a80b3e030362d2"
+    },
+    {
+      "input_id": "lidar-10-332200",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_332200_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_332200_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "e0bd19a415080bd75648fd359ca36d31d109b65ab21855b1791a26078f03b67c"
+    },
+    {
+      "input_id": "lidar-10-332201",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_332201_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_332201_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "d53fe899d4470931b82ba30f2154d828c07a363d44577e9d8e9d6146a4ce0b5c"
+    },
+    {
+      "input_id": "lidar-10-332202",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_332202_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_332202_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "3880cbea6cd6e970127ecabebe7c46fbe0932b41dceb7ad81597f10a06ea8c8d"
+    },
+    {
+      "input_id": "lidar-10-332203",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_332203_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_332203_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "2f8d4fc5ad8b4ca9582b841a6529db3f3653064b388f9419edb940fafb49020e"
+    },
+    {
+      "input_id": "lidar-10-332204",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_332204_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_332204_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "7ed304ee35b99fb5bd775b43f07551b0cfa8ec5760b4b352e8fb5f82b9d76e3f"
+    },
+    {
+      "input_id": "lidar-10-332205",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_332205_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_332205_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "fa8c668938ccc687bf36ab65bea9cd0e38d6b2cc4fcd6bdbacdf81fc9e229f87"
+    },
+    {
+      "input_id": "lidar-10-332206",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_332206_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_332206_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "e0f38539ca28e335e8dbbb7625e114bd25c811fbf28a81614f74d5f32c4294d6"
+    },
+    {
+      "input_id": "lidar-10-332207",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_332207_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_332207_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "3e8f6c8623adeaed7f3d88ed9588c930847816515bc1fa80e0180d18c2a61ff2"
+    },
+    {
+      "input_id": "lidar-10-332208",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_332208_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_332208_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "ec9eb06e131aabbfff4f855a4594e5475fc7c5baa52909958da8750a7299b6cd"
+    },
+    {
+      "input_id": "lidar-10-332209",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_332209_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_332209_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "314c969fd404d6cd27ee3ded1562846f0c4e17c0fe07e548542ac2d504d8d81e"
+    },
+    {
+      "input_id": "lidar-10-332210",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_332210_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_332210_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "ffbaea835ac5fdf74976bd50b2d23bb5b9bcd528adf613ba96430af58e3f2f7f"
+    },
+    {
+      "input_id": "lidar-10-333201",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_333201_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_333201_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "e5a58a37770de8530cd7ae0cca2ab7fd3cfde119c7d2df75cd74cfad283aa823"
+    },
+    {
+      "input_id": "lidar-10-333202",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_333202_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_333202_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "226902dc8b599d4f6f8ddae5d1904da9955517155525530b4ddc25b87cfba0e5"
+    },
+    {
+      "input_id": "lidar-10-333203",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_333203_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_333203_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "0ab66fecd432ddfedcf268a97622a4b7d152b9f3194a17e544ce61969fcd8c92"
+    },
+    {
+      "input_id": "lidar-10-333204",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_333204_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_333204_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "8a9ef5b45af3659d9a9db5691058d415f8c6709ab9941418cdc6887a986c8a3f"
+    },
+    {
+      "input_id": "lidar-10-333205",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_333205_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_333205_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "947662b2d1653ea3bb0dabc3de6c1bf904f8e38da4d065c10e2946b3b2b48c42"
+    },
+    {
+      "input_id": "lidar-10-333206",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_333206_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_333206_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "c8158c69f3cc2d8417831fd304acb9f023d97b4fd206f68e21556c754c074c68"
+    },
+    {
+      "input_id": "lidar-10-333207",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_333207_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_333207_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "cbb6bca2c0f8d936c7241142c4023676226f33e63b288b12f6407c2ca112a5f7"
+    },
+    {
+      "input_id": "lidar-10-333208",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_333208_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_333208_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "c79185e12b7b51ad689097d4d418415f790f91695510e4047a4f23d8d262ed8f"
+    },
+    {
+      "input_id": "lidar-10-333209",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_10_333209_20210227dtm.tif",
+      "destination": "quarantine/lidar/wg_del_10_333209_20210227dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "2c0c2697926a7e7503ac2db9ccae2eaf7507debf0c254a6a451b721b83cafce9"
+    },
+    {
+      "input_id": "lidar-20-323211",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_20_323211_20220112dtm.tif",
+      "destination": "quarantine/lidar/wg_del_20_323211_20220112dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "01fc0376a4a58c0938283d74e7dcce359272f1e1871b886e1850f75d5ed006de"
+    },
+    {
+      "input_id": "lidar-20-323212",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_20_323212_20220112dtm.tif",
+      "destination": "quarantine/lidar/wg_del_20_323212_20220112dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "f2aedcae1fdd7c2274287b189b0be7da9456fe281a0e0e202158752268309d4e"
+    },
+    {
+      "input_id": "lidar-20-324211",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_20_324211_20220112dtm.tif",
+      "destination": "quarantine/lidar/wg_del_20_324211_20220112dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "b9833b0063aea7f5f6a6d543ce781f0d8feb246c78c074f07cb61568e424a914"
+    },
+    {
+      "input_id": "lidar-20-324212",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_20_324212_20220112dtm.tif",
+      "destination": "quarantine/lidar/wg_del_20_324212_20220112dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "bde7be890e98e9f6d9ca22e161f6cd5507f8efe3eeac04eee1e1497aba3a85d5"
+    },
+    {
+      "input_id": "lidar-20-324213",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_20_324213_20220112dtm.tif",
+      "destination": "quarantine/lidar/wg_del_20_324213_20220112dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "25da0203aa363be6c973a6860131500416ae5e451a048935622331ce96fb727c"
+    },
+    {
+      "input_id": "lidar-20-324214",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_20_324214_20220112dtm.tif",
+      "destination": "quarantine/lidar/wg_del_20_324214_20220112dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "f76922d1008cfccced260170a6a4324c04e89b12b40b7cb3afa8386d310c7cc5"
+    },
+    {
+      "input_id": "lidar-20-325211",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_20_325211_20220112dtm.tif",
+      "destination": "quarantine/lidar/wg_del_20_325211_20220112dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "86614c91b7782a0d890c9bcf4f215e5c9b8b8807dd9ac435e8b245359718d32c"
+    },
+    {
+      "input_id": "lidar-20-325212",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_20_325212_20220112dtm.tif",
+      "destination": "quarantine/lidar/wg_del_20_325212_20220112dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "b20f68edab688d538c2868810bc9a94b907b34e30f09ea56b4386fcbb3bb0f54"
+    },
+    {
+      "input_id": "lidar-20-325213",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_20_325213_20220112dtm.tif",
+      "destination": "quarantine/lidar/wg_del_20_325213_20220112dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "388a3c9af96d5757ed3413a194820dea618c39204e25622f83d8c8fe82fa65a1"
+    },
+    {
+      "input_id": "lidar-20-325214",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_20_325214_20220112dtm.tif",
+      "destination": "quarantine/lidar/wg_del_20_325214_20220112dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "68c2d80e76b1aea99bdee4aa4a3beb8e0827fe11e7710bb44bcb829ebe6be16b"
+    },
+    {
+      "input_id": "lidar-20-326211",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_20_326211_20220112dtm.tif",
+      "destination": "quarantine/lidar/wg_del_20_326211_20220112dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "c75d634d2cf2ec26be8020893d0546afe2d8a8fd00f30f59285851e89f703923"
+    },
+    {
+      "input_id": "lidar-20-326212",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_20_326212_20220112dtm.tif",
+      "destination": "quarantine/lidar/wg_del_20_326212_20220112dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "94fbfc788030b60daf003007714ed699735e78be2f4cbeac16bb2b007e0c7d21"
+    },
+    {
+      "input_id": "lidar-20-326213",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_20_326213_20220112dtm.tif",
+      "destination": "quarantine/lidar/wg_del_20_326213_20220112dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "4621ca74a3a32af2d7e4c2db834133e2cfcd7b1dd35a4b5b2378de9b0c3a85f4"
+    },
+    {
+      "input_id": "lidar-20-326214",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_20_326214_20220112dtm.tif",
+      "destination": "quarantine/lidar/wg_del_20_326214_20220112dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "e25edfe6fc0f4f3573da00709af4e8c3c70ef6d3c1cf1a9822563a2b48a86fcd"
+    },
+    {
+      "input_id": "lidar-20-326215",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_20_326215_20220112dtm.tif",
+      "destination": "quarantine/lidar/wg_del_20_326215_20220112dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "510dacb4c004ebffdc5e7e39fca9c42eb0dcc7621e8719c3c2fb4cd0cbff91fd"
+    },
+    {
+      "input_id": "lidar-20-327211",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_20_327211_20220112dtm.tif",
+      "destination": "quarantine/lidar/wg_del_20_327211_20220112dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "3b3326bf1f5bbc8fde96bbba9b142e39526ca18867656f25e13668583d0de6c0"
+    },
+    {
+      "input_id": "lidar-20-327212",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_20_327212_20220112dtm.tif",
+      "destination": "quarantine/lidar/wg_del_20_327212_20220112dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "0700169709e20bc01834f52f4869d56298fce6981006d214528a563dba683044"
+    },
+    {
+      "input_id": "lidar-20-327213",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_20_327213_20220112dtm.tif",
+      "destination": "quarantine/lidar/wg_del_20_327213_20220112dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "f5c7213b631f36895d15d1d23e6246c0a9f8253726a47621f29b0e714e7cf6ec"
+    },
+    {
+      "input_id": "lidar-20-327214",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_20_327214_20220112dtm.tif",
+      "destination": "quarantine/lidar/wg_del_20_327214_20220112dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "15bce918ff3dc962e6ee6bf4dc05f8e2bf9bb48538bc5b9faeb8fc4a729c7665"
+    },
+    {
+      "input_id": "lidar-20-327215",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_20_327215_20220112dtm.tif",
+      "destination": "quarantine/lidar/wg_del_20_327215_20220112dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "7f3dd58d02c3879548ab3827f591121732aadb89c1ad7661793ab81146e7e1d2"
+    },
+    {
+      "input_id": "lidar-20-328211",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_20_328211_20220112dtm.tif",
+      "destination": "quarantine/lidar/wg_del_20_328211_20220112dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "ce77aa7931f11c9f5e4a2c5307065032988779578e32f629c658e5b03707a49b"
+    },
+    {
+      "input_id": "lidar-20-328212",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_20_328212_20220112dtm.tif",
+      "destination": "quarantine/lidar/wg_del_20_328212_20220112dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "322ad9bb62f36e37526275cd8510b7b8b3e0008ddd947b907a08de5a5d309814"
+    },
+    {
+      "input_id": "lidar-20-328213",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_20_328213_20220112dtm.tif",
+      "destination": "quarantine/lidar/wg_del_20_328213_20220112dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "1a89e74001ca7e4f82e2060120244fdb3a935ad29be1eaa0d3f0afc672ac4045"
+    },
+    {
+      "input_id": "lidar-20-328214",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_20_328214_20220112dtm.tif",
+      "destination": "quarantine/lidar/wg_del_20_328214_20220112dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "2ad23567915711f2a18a27a5cb8b779644696387117c2ab02bf142a9ffd42ce2"
+    },
+    {
+      "input_id": "lidar-20-328215",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_20_328215_20220112dtm.tif",
+      "destination": "quarantine/lidar/wg_del_20_328215_20220112dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "c928ec3d74b7135e419748a6fc81c22a58a16d3e39999346d222f4b774ff0286"
+    },
+    {
+      "input_id": "lidar-20-329211",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_20_329211_20220112dtm.tif",
+      "destination": "quarantine/lidar/wg_del_20_329211_20220112dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "48bfc5479ad77d54b105b92604b54c3759b42fef372494b6ea92a47ffbc722c3"
+    },
+    {
+      "input_id": "lidar-20-329212",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_20_329212_20220112dtm.tif",
+      "destination": "quarantine/lidar/wg_del_20_329212_20220112dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "3a3470d992878e557d36ba52a17dc0b13e94004f9bd82caa43156c99c5b63869"
+    },
+    {
+      "input_id": "lidar-20-329213",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_20_329213_20220112dtm.tif",
+      "destination": "quarantine/lidar/wg_del_20_329213_20220112dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "0737bf207c9121b3186ea8e64b7aa6ffdcc9a84b9fa4404690afedaa519291ea"
+    },
+    {
+      "input_id": "lidar-20-329214",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_20_329214_20220112dtm.tif",
+      "destination": "quarantine/lidar/wg_del_20_329214_20220112dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "745e145abb708034ae3b4895ecea8e7e2516b5e995909c8892fff1b534b37cc0"
+    },
+    {
+      "input_id": "lidar-20-329215",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_20_329215_20220112dtm.tif",
+      "destination": "quarantine/lidar/wg_del_20_329215_20220112dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "2cd74027b7630e835b3d60796b7f8a54f9fb674604821b11d62c66a4f4cbd246"
+    },
+    {
+      "input_id": "lidar-20-330211",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_20_330211_20220112dtm.tif",
+      "destination": "quarantine/lidar/wg_del_20_330211_20220112dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "724feb1fbb33f6be4561ddcbb9393b53c0443b7855caf70b89d9fe4da2e9155c"
+    },
+    {
+      "input_id": "lidar-20-330212",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_20_330212_20220112dtm.tif",
+      "destination": "quarantine/lidar/wg_del_20_330212_20220112dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "7665f6c7b8e2e78df896e961ae7362d6263b5452606eda7409bf66c522fb4ea5"
+    },
+    {
+      "input_id": "lidar-20-330213",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_20_330213_20220112dtm.tif",
+      "destination": "quarantine/lidar/wg_del_20_330213_20220112dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "ef0c6e3efe4ca5885fafba3e57c3543b763ce091a0c13f56d3ad6f82a9b5b6b1"
+    },
+    {
+      "input_id": "lidar-20-330214",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_20_330214_20220112dtm.tif",
+      "destination": "quarantine/lidar/wg_del_20_330214_20220112dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "bdbff74d1c2e8b93994ddb428e5cb0e9ecf036a82db291127600acecf09bdd8a"
+    },
+    {
+      "input_id": "lidar-20-330215",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_20_330215_20220112dtm.tif",
+      "destination": "quarantine/lidar/wg_del_20_330215_20220112dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "bb253841ac82e0a564294372e148e533c2d0072e9b70cd4e6cfaa08258c67d61"
+    },
+    {
+      "input_id": "lidar-20-331211",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_20_331211_20220112dtm.tif",
+      "destination": "quarantine/lidar/wg_del_20_331211_20220112dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "e7b000f2d38041f8a6830c548363cfa66d88642c0b775f58e82b4702500dab04"
+    },
+    {
+      "input_id": "lidar-20-331212",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_20_331212_20220112dtm.tif",
+      "destination": "quarantine/lidar/wg_del_20_331212_20220112dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "bef986c1e1a0a3892bdaebc613538c8cbe6f4590bf7d58215194e1a4ba347494"
+    },
+    {
+      "input_id": "lidar-20-331213",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_20_331213_20220112dtm.tif",
+      "destination": "quarantine/lidar/wg_del_20_331213_20220112dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "78131ace6c25d8ba22280879d76fcbdcdf44d8429d9b44b7a43ae494d929b57d"
+    },
+    {
+      "input_id": "lidar-20-331214",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_20_331214_20220112dtm.tif",
+      "destination": "quarantine/lidar/wg_del_20_331214_20220112dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "f34f5a2f4b603d28e71cdc81051be787b1c16c9caa5435227c740fbdb6790e13"
+    },
+    {
+      "input_id": "lidar-20-332211",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_20_332211_20220112dtm.tif",
+      "destination": "quarantine/lidar/wg_del_20_332211_20220112dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "46545341129bd8087c3646da38ef70d5d036bf5d00ee75bcc1bf1399a881d5fd"
+    },
+    {
+      "input_id": "lidar-20-332212",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_20_332212_20220112dtm.tif",
+      "destination": "quarantine/lidar/wg_del_20_332212_20220112dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "7c4aabf9c4ed4994eb30fb0a5437f54652b6a3325eccf386c97087c3673c2121"
+    },
+    {
+      "input_id": "lidar-20-332213",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_20_332213_20220112dtm.tif",
+      "destination": "quarantine/lidar/wg_del_20_332213_20220112dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "64c4ba924d7dbbe56ebec15c1b388645afd3aa909f4032df440fb117eadb3ff1"
+    },
+    {
+      "input_id": "lidar-5-326199",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_5_326199_20201224dtm.tif",
+      "destination": "quarantine/lidar/wg_del_5_326199_20201224dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "98b2d102a0efddc43dc6f58ad1c928a71bfe7e4fe43eeb3b9c953d89b36c384f"
+    },
+    {
+      "input_id": "lidar-5-327198",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_5_327198_20201224dtm.tif",
+      "destination": "quarantine/lidar/wg_del_5_327198_20201224dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "5a96e035b84ae89c6fc8a7b1426ca26a7021d401556a739c03290c1f2caa26f7"
+    },
+    {
+      "input_id": "lidar-5-327199",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_5_327199_20201224dtm.tif",
+      "destination": "quarantine/lidar/wg_del_5_327199_20201224dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "54184a976f51f38abd72a355df49c828095071feb8a5b8ba6d81660dd36b987c"
+    },
+    {
+      "input_id": "lidar-5-328198",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_5_328198_20201224dtm.tif",
+      "destination": "quarantine/lidar/wg_del_5_328198_20201224dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "5e14cfbea54b506c6042aa432a366b1f497e7ed897b4323c59ea7b1e10223d57"
+    },
+    {
+      "input_id": "lidar-5-328199",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_5_328199_20201224dtm.tif",
+      "destination": "quarantine/lidar/wg_del_5_328199_20201224dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "c0556d4f9b6dd83bc9c6aaedbf2a06e82bfaf23e99a62f234c14b2a8e8133ca9"
+    },
+    {
+      "input_id": "lidar-5-329198",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_5_329198_20201224dtm.tif",
+      "destination": "quarantine/lidar/wg_del_5_329198_20201224dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "b550cee9884d708a2b45ef368f5b14cde70dd21cb2053e1364bfe4cc6c197278"
+    },
+    {
+      "input_id": "lidar-5-329199",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_5_329199_20201224dtm.tif",
+      "destination": "quarantine/lidar/wg_del_5_329199_20201224dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "cbe4e3e170f8ce670e53f883493f44d95a8a63902f24dd0daa2baeecff3f5c5d"
+    },
+    {
+      "input_id": "lidar-5-330198",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_5_330198_20201224dtm.tif",
+      "destination": "quarantine/lidar/wg_del_5_330198_20201224dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "5f69b795e5f20f71fe585524afe3c1912bf43abc0d752ce9994fb92a6151036e"
+    },
+    {
+      "input_id": "lidar-5-330199",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_5_330199_20201224dtm.tif",
+      "destination": "quarantine/lidar/wg_del_5_330199_20201224dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "2b7679ff6bbba3247532c4fa9a8b294c204fb9fc51afcef41541eba13eae72e8"
+    },
+    {
+      "input_id": "lidar-5-331199",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_5_331199_20201224dtm.tif",
+      "destination": "quarantine/lidar/wg_del_5_331199_20201224dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "e72eccf971faeff0c7a28889a19952f213bfaeadd8bce8d9010e4ec11047e6c6"
+    },
+    {
+      "input_id": "lidar-5-332199",
+      "dataset_id": "wg-lidar-dtm-2020-2023",
+      "source": "https://dmwproductionblob.blob.core.windows.net/lidar-zips/2020-22/dtm/wg_del_5_332199_20201224dtm.tif",
+      "destination": "quarantine/lidar/wg_del_5_332199_20201224dtm.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 33554432,
+      "expected_sha256": "b9b6b9f95d2cd119666107b3f33a22596abf3a742cb5ec8fc6a2ea4e046bebf1"
+    },
+    {
+      "input_id": "s2-baseline-red",
+      "dataset_id": "copernicus-sentinel-2-l2a",
+      "source": "https://e84-earth-search-sentinel-data.s3.us-west-2.amazonaws.com/sentinel-2-c1-l2a/30/U/VC/2025/7/S2C_T30UVC_20250712T112136_L2A/B04.tif",
+      "destination": "quarantine/sentinel/s2-baseline/B04.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 260000000,
+      "expected_sha256": "12f9ce808052f014bc7f2ef7c92e01fc7f6a1884ea56c7f2bbc79d0e9e4b1aba"
+    },
+    {
+      "input_id": "s2-baseline-nir",
+      "dataset_id": "copernicus-sentinel-2-l2a",
+      "source": "https://e84-earth-search-sentinel-data.s3.us-west-2.amazonaws.com/sentinel-2-c1-l2a/30/U/VC/2025/7/S2C_T30UVC_20250712T112136_L2A/B08.tif",
+      "destination": "quarantine/sentinel/s2-baseline/B08.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 260000000,
+      "expected_sha256": "6c91a2b1da08c8dc059bb6d0298cacfdae91003b8dfc8d4ab3cf14eab6265a8b"
+    },
+    {
+      "input_id": "s2-baseline-nir20",
+      "dataset_id": "copernicus-sentinel-2-l2a",
+      "source": "https://e84-earth-search-sentinel-data.s3.us-west-2.amazonaws.com/sentinel-2-c1-l2a/30/U/VC/2025/7/S2C_T30UVC_20250712T112136_L2A/B8A.tif",
+      "destination": "quarantine/sentinel/s2-baseline/B8A.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 268435456,
+      "expected_sha256": "ff48a89bd446d274af47a76e853b60c71fb9df79c22a09a285427a494c987582"
+    },
+    {
+      "input_id": "s2-baseline-swir1",
+      "dataset_id": "copernicus-sentinel-2-l2a",
+      "source": "https://e84-earth-search-sentinel-data.s3.us-west-2.amazonaws.com/sentinel-2-c1-l2a/30/U/VC/2025/7/S2C_T30UVC_20250712T112136_L2A/B11.tif",
+      "destination": "quarantine/sentinel/s2-baseline/B11.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 260000000,
+      "expected_sha256": "d1d749c26fc89926d750d7c106ec0128de599b5732234edb764a13afcf4dcd77"
+    },
+    {
+      "input_id": "s2-baseline-swir2",
+      "dataset_id": "copernicus-sentinel-2-l2a",
+      "source": "https://e84-earth-search-sentinel-data.s3.us-west-2.amazonaws.com/sentinel-2-c1-l2a/30/U/VC/2025/7/S2C_T30UVC_20250712T112136_L2A/B12.tif",
+      "destination": "quarantine/sentinel/s2-baseline/B12.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 260000000,
+      "expected_sha256": "857318b2b342321179255415cb6246a418b8cd2e8b876e9414f8458600c8e88d"
+    },
+    {
+      "input_id": "s2-baseline-scl",
+      "dataset_id": "copernicus-sentinel-2-l2a",
+      "source": "https://e84-earth-search-sentinel-data.s3.us-west-2.amazonaws.com/sentinel-2-c1-l2a/30/U/VC/2025/7/S2C_T30UVC_20250712T112136_L2A/SCL.tif",
+      "destination": "quarantine/sentinel/s2-baseline/SCL.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 260000000,
+      "expected_sha256": "16c7af1b9f23404843e27b41340ec5c1f8a2e8a692d379cacb31a57181c50160"
+    },
+    {
+      "input_id": "s2-prefire-red",
+      "dataset_id": "copernicus-sentinel-2-l2a",
+      "source": "https://e84-earth-search-sentinel-data.s3.us-west-2.amazonaws.com/sentinel-2-c1-l2a/30/U/VC/2026/7/S2B_T30UVC_20260712T112112_L2A/B04.tif",
+      "destination": "quarantine/sentinel/s2-prefire/B04.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 260000000,
+      "expected_sha256": "8a6f1cc800eb41fb97857311bea79b3ce2981b32c4be1a374275c11763ccfedb"
+    },
+    {
+      "input_id": "s2-prefire-nir",
+      "dataset_id": "copernicus-sentinel-2-l2a",
+      "source": "https://e84-earth-search-sentinel-data.s3.us-west-2.amazonaws.com/sentinel-2-c1-l2a/30/U/VC/2026/7/S2B_T30UVC_20260712T112112_L2A/B08.tif",
+      "destination": "quarantine/sentinel/s2-prefire/B08.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 260000000,
+      "expected_sha256": "ede4f363fa57e22fee6f01589ae96badd27332be2a4b1af51f20753a01aff5ba"
+    },
+    {
+      "input_id": "s2-prefire-nir20",
+      "dataset_id": "copernicus-sentinel-2-l2a",
+      "source": "https://e84-earth-search-sentinel-data.s3.us-west-2.amazonaws.com/sentinel-2-c1-l2a/30/U/VC/2026/7/S2B_T30UVC_20260712T112112_L2A/B8A.tif",
+      "destination": "quarantine/sentinel/s2-prefire/B8A.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 268435456,
+      "expected_sha256": "fa478ca113bf99f6bb7c163f8b14d7a1d8ab162000e120c3900c7e6a7138325b"
+    },
+    {
+      "input_id": "s2-prefire-swir1",
+      "dataset_id": "copernicus-sentinel-2-l2a",
+      "source": "https://e84-earth-search-sentinel-data.s3.us-west-2.amazonaws.com/sentinel-2-c1-l2a/30/U/VC/2026/7/S2B_T30UVC_20260712T112112_L2A/B11.tif",
+      "destination": "quarantine/sentinel/s2-prefire/B11.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 260000000,
+      "expected_sha256": "c31dd8b86553a82fe124805d8bba6b47572e1a34e58578dbda213b791f6cf78f"
+    },
+    {
+      "input_id": "s2-prefire-swir2",
+      "dataset_id": "copernicus-sentinel-2-l2a",
+      "source": "https://e84-earth-search-sentinel-data.s3.us-west-2.amazonaws.com/sentinel-2-c1-l2a/30/U/VC/2026/7/S2B_T30UVC_20260712T112112_L2A/B12.tif",
+      "destination": "quarantine/sentinel/s2-prefire/B12.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 260000000,
+      "expected_sha256": "5a90a501e58caa2164874c1c1f0dc009f98828d19431a43c568650cbdf976685"
+    },
+    {
+      "input_id": "s2-prefire-scl",
+      "dataset_id": "copernicus-sentinel-2-l2a",
+      "source": "https://e84-earth-search-sentinel-data.s3.us-west-2.amazonaws.com/sentinel-2-c1-l2a/30/U/VC/2026/7/S2B_T30UVC_20260712T112112_L2A/SCL.tif",
+      "destination": "quarantine/sentinel/s2-prefire/SCL.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 260000000,
+      "expected_sha256": "4f1e3fc0950f76a3c428f0bf2dfcb0a13f307fd53108a815b3a7be9b83a357e7"
+    },
+    {
+      "input_id": "s2-post-red",
+      "dataset_id": "copernicus-sentinel-2-l2a",
+      "source": "https://e84-earth-search-sentinel-data.s3.us-west-2.amazonaws.com/sentinel-2-c1-l2a/30/U/VC/2026/8/S2B_T30UVC_20260811T112205_L2A/B04.tif",
+      "destination": "quarantine/sentinel/s2-post/B04.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 260000000,
+      "expected_sha256": "9be588fc6a4d9cb91782224d35ba5514ef7258e2c01e672969ef9bfbbc4fb90e"
+    },
+    {
+      "input_id": "s2-post-nir",
+      "dataset_id": "copernicus-sentinel-2-l2a",
+      "source": "https://e84-earth-search-sentinel-data.s3.us-west-2.amazonaws.com/sentinel-2-c1-l2a/30/U/VC/2026/8/S2B_T30UVC_20260811T112205_L2A/B08.tif",
+      "destination": "quarantine/sentinel/s2-post/B08.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 260000000,
+      "expected_sha256": "ffbd44a350782bbd30e3a9eff1a18832873ca6b328e8b818f9faeb3c247e5916"
+    },
+    {
+      "input_id": "s2-post-nir20",
+      "dataset_id": "copernicus-sentinel-2-l2a",
+      "source": "https://e84-earth-search-sentinel-data.s3.us-west-2.amazonaws.com/sentinel-2-c1-l2a/30/U/VC/2026/8/S2B_T30UVC_20260811T112205_L2A/B8A.tif",
+      "destination": "quarantine/sentinel/s2-post/B8A.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 268435456,
+      "expected_sha256": "ae8bef05bd61404255a5b2f62e4f0269a2a8c5dcf8774185189a61fbfd7687c6"
+    },
+    {
+      "input_id": "s2-post-swir1",
+      "dataset_id": "copernicus-sentinel-2-l2a",
+      "source": "https://e84-earth-search-sentinel-data.s3.us-west-2.amazonaws.com/sentinel-2-c1-l2a/30/U/VC/2026/8/S2B_T30UVC_20260811T112205_L2A/B11.tif",
+      "destination": "quarantine/sentinel/s2-post/B11.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 260000000,
+      "expected_sha256": "2dec43eee86f00ef9603588745641bfd4c65d1908ce87e7eb07484c4e994899b"
+    },
+    {
+      "input_id": "s2-post-swir2",
+      "dataset_id": "copernicus-sentinel-2-l2a",
+      "source": "https://e84-earth-search-sentinel-data.s3.us-west-2.amazonaws.com/sentinel-2-c1-l2a/30/U/VC/2026/8/S2B_T30UVC_20260811T112205_L2A/B12.tif",
+      "destination": "quarantine/sentinel/s2-post/B12.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 260000000,
+      "expected_sha256": "9600f116bab6abe0491808a73428c91fa5328582ea856774cc0b1fb5f8961f9d"
+    },
+    {
+      "input_id": "s2-post-scl",
+      "dataset_id": "copernicus-sentinel-2-l2a",
+      "source": "https://e84-earth-search-sentinel-data.s3.us-west-2.amazonaws.com/sentinel-2-c1-l2a/30/U/VC/2026/8/S2B_T30UVC_20260811T112205_L2A/SCL.tif",
+      "destination": "quarantine/sentinel/s2-post/SCL.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 260000000,
+      "expected_sha256": "6b0e087dde7182d38cde38eef10da49a20223ee080b952a07a6e3d1be856b640"
+    },
+    {
+      "input_id": "landsat-baseline-red",
+      "dataset_id": "usgs-landsat-c2-l2-sr",
+      "source": "planetary:https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2025/203/024/LC09_L2SP_203024_20250708_20250710_02_T1/LC09_L2SP_203024_20250708_20250710_02_T1_SR_B4.TIF",
+      "destination": "quarantine/landsat/landsat-baseline/LC09_L2SP_203024_20250708_20250710_02_T1_SR_B4.TIF",
+      "media_type": "image/tiff",
+      "maximum_bytes": 250000000,
+      "expected_sha256": "bc1937375259ebbd1fb9f4e340e7c59880d60785a3147612e22724f170b6b5ba"
+    },
+    {
+      "input_id": "landsat-baseline-nir",
+      "dataset_id": "usgs-landsat-c2-l2-sr",
+      "source": "planetary:https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2025/203/024/LC09_L2SP_203024_20250708_20250710_02_T1/LC09_L2SP_203024_20250708_20250710_02_T1_SR_B5.TIF",
+      "destination": "quarantine/landsat/landsat-baseline/LC09_L2SP_203024_20250708_20250710_02_T1_SR_B5.TIF",
+      "media_type": "image/tiff",
+      "maximum_bytes": 250000000,
+      "expected_sha256": "1e62baff3559a783b8c675907d278aa512db01b00c255dbf83911515bc7a4b1b"
+    },
+    {
+      "input_id": "landsat-baseline-swir1",
+      "dataset_id": "usgs-landsat-c2-l2-sr",
+      "source": "planetary:https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2025/203/024/LC09_L2SP_203024_20250708_20250710_02_T1/LC09_L2SP_203024_20250708_20250710_02_T1_SR_B6.TIF",
+      "destination": "quarantine/landsat/landsat-baseline/LC09_L2SP_203024_20250708_20250710_02_T1_SR_B6.TIF",
+      "media_type": "image/tiff",
+      "maximum_bytes": 250000000,
+      "expected_sha256": "e2f12c63528a673f3d0e49fc3bccded7839bd99d2aad3049fc5e0c4df1572d09"
+    },
+    {
+      "input_id": "landsat-baseline-swir2",
+      "dataset_id": "usgs-landsat-c2-l2-sr",
+      "source": "planetary:https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2025/203/024/LC09_L2SP_203024_20250708_20250710_02_T1/LC09_L2SP_203024_20250708_20250710_02_T1_SR_B7.TIF",
+      "destination": "quarantine/landsat/landsat-baseline/LC09_L2SP_203024_20250708_20250710_02_T1_SR_B7.TIF",
+      "media_type": "image/tiff",
+      "maximum_bytes": 250000000,
+      "expected_sha256": "d2c73427f17dcb493ac0254cf32e4f93baa9b0391eb83e85f688a4b6f67b4d6d"
+    },
+    {
+      "input_id": "landsat-baseline-qa",
+      "dataset_id": "usgs-landsat-c2-l2-sr",
+      "source": "planetary:https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2025/203/024/LC09_L2SP_203024_20250708_20250710_02_T1/LC09_L2SP_203024_20250708_20250710_02_T1_QA_PIXEL.TIF",
+      "destination": "quarantine/landsat/landsat-baseline/LC09_L2SP_203024_20250708_20250710_02_T1_QA_PIXEL.TIF",
+      "media_type": "image/tiff",
+      "maximum_bytes": 250000000,
+      "expected_sha256": "4decd322e20a99cf07a4dfec87469b89f55b2df572a9a7c5942551dbba8859fa"
+    },
+    {
+      "input_id": "landsat-post-red",
+      "dataset_id": "usgs-landsat-c2-l2-sr",
+      "source": "planetary:https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2026/203/024/LC09_L2SP_203024_20260727_20260728_02_T1/LC09_L2SP_203024_20260727_20260728_02_T1_SR_B4.TIF",
+      "destination": "quarantine/landsat/landsat-post/LC09_L2SP_203024_20260727_20260728_02_T1_SR_B4.TIF",
+      "media_type": "image/tiff",
+      "maximum_bytes": 250000000,
+      "expected_sha256": "15f3ce948f860f3327b5a712d1c57eb84f10871166271ff3c1ebb0f4745d5d55"
+    },
+    {
+      "input_id": "landsat-post-nir",
+      "dataset_id": "usgs-landsat-c2-l2-sr",
+      "source": "planetary:https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2026/203/024/LC09_L2SP_203024_20260727_20260728_02_T1/LC09_L2SP_203024_20260727_20260728_02_T1_SR_B5.TIF",
+      "destination": "quarantine/landsat/landsat-post/LC09_L2SP_203024_20260727_20260728_02_T1_SR_B5.TIF",
+      "media_type": "image/tiff",
+      "maximum_bytes": 250000000,
+      "expected_sha256": "def5d2ede0cce26d39fa8e05a1f3233748ee2bc19289d8c65550c5388e15de00"
+    },
+    {
+      "input_id": "landsat-post-swir1",
+      "dataset_id": "usgs-landsat-c2-l2-sr",
+      "source": "planetary:https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2026/203/024/LC09_L2SP_203024_20260727_20260728_02_T1/LC09_L2SP_203024_20260727_20260728_02_T1_SR_B6.TIF",
+      "destination": "quarantine/landsat/landsat-post/LC09_L2SP_203024_20260727_20260728_02_T1_SR_B6.TIF",
+      "media_type": "image/tiff",
+      "maximum_bytes": 250000000,
+      "expected_sha256": "142af0c8f89b2b6bc1d7ca682bf74d5da48fc4444505154894cc8bc146ba46d0"
+    },
+    {
+      "input_id": "landsat-post-swir2",
+      "dataset_id": "usgs-landsat-c2-l2-sr",
+      "source": "planetary:https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2026/203/024/LC09_L2SP_203024_20260727_20260728_02_T1/LC09_L2SP_203024_20260727_20260728_02_T1_SR_B7.TIF",
+      "destination": "quarantine/landsat/landsat-post/LC09_L2SP_203024_20260727_20260728_02_T1_SR_B7.TIF",
+      "media_type": "image/tiff",
+      "maximum_bytes": 250000000,
+      "expected_sha256": "af102cd405137d226a634bbc25376553a5770318b3a96726012665971c251a70"
+    },
+    {
+      "input_id": "landsat-post-qa",
+      "dataset_id": "usgs-landsat-c2-l2-sr",
+      "source": "planetary:https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2026/203/024/LC09_L2SP_203024_20260727_20260728_02_T1/LC09_L2SP_203024_20260727_20260728_02_T1_QA_PIXEL.TIF",
+      "destination": "quarantine/landsat/landsat-post/LC09_L2SP_203024_20260727_20260728_02_T1_QA_PIXEL.TIF",
+      "media_type": "image/tiff",
+      "maximum_bytes": 250000000,
+      "expected_sha256": "6b820dbb30143c02b544686fc90e3cbb78d53dc89ad7f8cc26fa28b5b0a99c0a"
+    },
+    {
+      "input_id": "effis-bounded",
+      "dataset_id": "effis-current-burnt-areas",
+      "source": "https://maps.effis.emergency.copernicus.eu/effis?service=WFS&version=1.1.0&request=getfeature&typename=ms%3Amodis.ba.poly&outputformat=geojson&srsName=EPSG%3A4326&bbox=51.680022769546724,-3.1141917079035677,51.83740107116975,-2.9576185245017776,EPSG%3A4326",
+      "destination": "quarantine/effis/blorenge-expanded-aoi.geojson",
+      "media_type": "application/geo+json",
+      "maximum_bytes": 104857600,
+      "expected_sha256": "ad5e648111a6e8803e9f159463d65ecda66976783868f1b798c45d3d0f854778"
+    },
+    {
+      "input_id": "effis-release-one",
+      "dataset_id": "effis-current-burnt-areas",
+      "source": ".geodata-work/release-blorenge-2026-08-13.6/quarantine/effis/blorenge.geojson",
+      "destination": "quarantine/effis/release-one-blorenge.geojson",
+      "media_type": "application/geo+json",
+      "maximum_bytes": 104857600,
+      "expected_sha256": "651b441769bd485c5f45e48fefb777084c08b059be4eee61c9ecf122e03c3e6a"
+    }
+  ],
+  "intermediates": [
+    {
+      "artifact_id": "context-geojson",
+      "path": "private/context.geojson"
+    },
+    {
+      "artifact_id": "terrain-hillshade-tif",
+      "path": "private/terrain-hillshade.tif"
+    },
+    {
+      "artifact_id": "terrain-contours-geojson",
+      "path": "private/terrain-contours.geojson"
+    },
+    {
+      "artifact_id": "terrain-mbtiles",
+      "path": "private/terrain.mbtiles"
+    },
+    {
+      "artifact_id": "change-report",
+      "path": "private/change-report.json"
+    },
+    {
+      "artifact_id": "change-mbtiles",
+      "path": "private/change.mbtiles"
+    },
+    {
+      "artifact_id": "ndvi-render-tif",
+      "path": "private/ndvi-render.tif"
+    },
+    {
+      "artifact_id": "ndvi-mbtiles",
+      "path": "private/ndvi.mbtiles"
+    },
+    {
+      "artifact_id": "ndmi-render-tif",
+      "path": "private/ndmi-render.tif"
+    },
+    {
+      "artifact_id": "ndmi-mbtiles",
+      "path": "private/ndmi.mbtiles"
+    }
+  ],
+  "steps": [
+    {
+      "step_id": "build-context-v2",
+      "tool": "python3",
+      "argv": [
+        "/repo/tooling/geodata/recipes/build_launch_context_v2.py",
+        "--core",
+        "{artifact:bca-area-core}",
+        "--sssi",
+        "{artifact:nrw-sssi}",
+        "--park",
+        "{artifact:nrw-national-park}",
+        "--rivers",
+        "{artifact:nrw-main-rivers}",
+        "--habitat",
+        "{artifact:nrw-phase1-habitat}",
+        "--osm",
+        "{artifact:osm-wales}",
+        "--geojson",
+        "{artifact:context-geojson}",
+        "--summary",
+        "{artifact:context-summary}"
+      ],
+      "inputs": [
+        "bca-area-core",
+        "nrw-sssi",
+        "nrw-national-park",
+        "nrw-main-rivers",
+        "nrw-phase1-habitat",
+        "osm-wales"
+      ],
+      "outputs": [
+        "context-geojson",
+        "context-summary"
+      ]
+    },
+    {
+      "step_id": "tile-context-v2",
+      "tool": "tippecanoe",
+      "argv": [
+        "--force",
+        "--output",
+        "{artifact:context-pmtiles}",
+        "--minimum-zoom",
+        "8",
+        "--maximum-zoom",
+        "14",
+        "--drop-densest-as-needed",
+        "{artifact:context-geojson}"
+      ],
+      "inputs": [
+        "context-geojson"
+      ],
+      "outputs": [
+        "context-pmtiles"
+      ]
+    },
+    {
+      "step_id": "build-terrain-v2",
+      "tool": "python3",
+      "argv": [
+        "/repo/tooling/geodata/recipes/build_terrain_v2.py",
+        "--core",
+        "{artifact:bca-area-core}",
+        "--dtm",
+        "{artifact:terrain-dtm-cog}",
+        "--hillshade",
+        "{artifact:terrain-hillshade-tif}",
+        "--contours",
+        "{artifact:terrain-contours-geojson}",
+        "--summary",
+        "{artifact:terrain-summary}",
+        "--tiles",
+        "{artifact:lidar-10-323207}",
+        "{artifact:lidar-10-323208}",
+        "{artifact:lidar-10-323209}",
+        "{artifact:lidar-10-323210}",
+        "{artifact:lidar-10-324202}",
+        "{artifact:lidar-10-324203}",
+        "{artifact:lidar-10-324204}",
+        "{artifact:lidar-10-324205}",
+        "{artifact:lidar-10-324206}",
+        "{artifact:lidar-10-324207}",
+        "{artifact:lidar-10-324208}",
+        "{artifact:lidar-10-324209}",
+        "{artifact:lidar-10-324210}",
+        "{artifact:lidar-10-325200}",
+        "{artifact:lidar-10-325201}",
+        "{artifact:lidar-10-325202}",
+        "{artifact:lidar-10-325203}",
+        "{artifact:lidar-10-325204}",
+        "{artifact:lidar-10-325205}",
+        "{artifact:lidar-10-325206}",
+        "{artifact:lidar-10-325207}",
+        "{artifact:lidar-10-325208}",
+        "{artifact:lidar-10-325209}",
+        "{artifact:lidar-10-325210}",
+        "{artifact:lidar-10-326200}",
+        "{artifact:lidar-10-326201}",
+        "{artifact:lidar-10-326202}",
+        "{artifact:lidar-10-326203}",
+        "{artifact:lidar-10-326204}",
+        "{artifact:lidar-10-326205}",
+        "{artifact:lidar-10-326206}",
+        "{artifact:lidar-10-326207}",
+        "{artifact:lidar-10-326208}",
+        "{artifact:lidar-10-326209}",
+        "{artifact:lidar-10-326210}",
+        "{artifact:lidar-10-327200}",
+        "{artifact:lidar-10-327201}",
+        "{artifact:lidar-10-327202}",
+        "{artifact:lidar-10-327203}",
+        "{artifact:lidar-10-327204}",
+        "{artifact:lidar-10-327205}",
+        "{artifact:lidar-10-327206}",
+        "{artifact:lidar-10-327207}",
+        "{artifact:lidar-10-327208}",
+        "{artifact:lidar-10-327209}",
+        "{artifact:lidar-10-327210}",
+        "{artifact:lidar-10-328200}",
+        "{artifact:lidar-10-328201}",
+        "{artifact:lidar-10-328202}",
+        "{artifact:lidar-10-328203}",
+        "{artifact:lidar-10-328204}",
+        "{artifact:lidar-10-328205}",
+        "{artifact:lidar-10-328206}",
+        "{artifact:lidar-10-328207}",
+        "{artifact:lidar-10-328208}",
+        "{artifact:lidar-10-328209}",
+        "{artifact:lidar-10-328210}",
+        "{artifact:lidar-10-329200}",
+        "{artifact:lidar-10-329201}",
+        "{artifact:lidar-10-329202}",
+        "{artifact:lidar-10-329203}",
+        "{artifact:lidar-10-329204}",
+        "{artifact:lidar-10-329205}",
+        "{artifact:lidar-10-329206}",
+        "{artifact:lidar-10-329207}",
+        "{artifact:lidar-10-329208}",
+        "{artifact:lidar-10-329209}",
+        "{artifact:lidar-10-329210}",
+        "{artifact:lidar-10-330200}",
+        "{artifact:lidar-10-330201}",
+        "{artifact:lidar-10-330202}",
+        "{artifact:lidar-10-330203}",
+        "{artifact:lidar-10-330204}",
+        "{artifact:lidar-10-330205}",
+        "{artifact:lidar-10-330206}",
+        "{artifact:lidar-10-330207}",
+        "{artifact:lidar-10-330208}",
+        "{artifact:lidar-10-330209}",
+        "{artifact:lidar-10-330210}",
+        "{artifact:lidar-10-331200}",
+        "{artifact:lidar-10-331201}",
+        "{artifact:lidar-10-331202}",
+        "{artifact:lidar-10-331203}",
+        "{artifact:lidar-10-331204}",
+        "{artifact:lidar-10-331205}",
+        "{artifact:lidar-10-331206}",
+        "{artifact:lidar-10-331207}",
+        "{artifact:lidar-10-331208}",
+        "{artifact:lidar-10-331209}",
+        "{artifact:lidar-10-331210}",
+        "{artifact:lidar-10-332200}",
+        "{artifact:lidar-10-332201}",
+        "{artifact:lidar-10-332202}",
+        "{artifact:lidar-10-332203}",
+        "{artifact:lidar-10-332204}",
+        "{artifact:lidar-10-332205}",
+        "{artifact:lidar-10-332206}",
+        "{artifact:lidar-10-332207}",
+        "{artifact:lidar-10-332208}",
+        "{artifact:lidar-10-332209}",
+        "{artifact:lidar-10-332210}",
+        "{artifact:lidar-10-333201}",
+        "{artifact:lidar-10-333202}",
+        "{artifact:lidar-10-333203}",
+        "{artifact:lidar-10-333204}",
+        "{artifact:lidar-10-333205}",
+        "{artifact:lidar-10-333206}",
+        "{artifact:lidar-10-333207}",
+        "{artifact:lidar-10-333208}",
+        "{artifact:lidar-10-333209}",
+        "{artifact:lidar-20-323211}",
+        "{artifact:lidar-20-323212}",
+        "{artifact:lidar-20-324211}",
+        "{artifact:lidar-20-324212}",
+        "{artifact:lidar-20-324213}",
+        "{artifact:lidar-20-324214}",
+        "{artifact:lidar-20-325211}",
+        "{artifact:lidar-20-325212}",
+        "{artifact:lidar-20-325213}",
+        "{artifact:lidar-20-325214}",
+        "{artifact:lidar-20-326211}",
+        "{artifact:lidar-20-326212}",
+        "{artifact:lidar-20-326213}",
+        "{artifact:lidar-20-326214}",
+        "{artifact:lidar-20-326215}",
+        "{artifact:lidar-20-327211}",
+        "{artifact:lidar-20-327212}",
+        "{artifact:lidar-20-327213}",
+        "{artifact:lidar-20-327214}",
+        "{artifact:lidar-20-327215}",
+        "{artifact:lidar-20-328211}",
+        "{artifact:lidar-20-328212}",
+        "{artifact:lidar-20-328213}",
+        "{artifact:lidar-20-328214}",
+        "{artifact:lidar-20-328215}",
+        "{artifact:lidar-20-329211}",
+        "{artifact:lidar-20-329212}",
+        "{artifact:lidar-20-329213}",
+        "{artifact:lidar-20-329214}",
+        "{artifact:lidar-20-329215}",
+        "{artifact:lidar-20-330211}",
+        "{artifact:lidar-20-330212}",
+        "{artifact:lidar-20-330213}",
+        "{artifact:lidar-20-330214}",
+        "{artifact:lidar-20-330215}",
+        "{artifact:lidar-20-331211}",
+        "{artifact:lidar-20-331212}",
+        "{artifact:lidar-20-331213}",
+        "{artifact:lidar-20-331214}",
+        "{artifact:lidar-20-332211}",
+        "{artifact:lidar-20-332212}",
+        "{artifact:lidar-20-332213}",
+        "{artifact:lidar-5-326199}",
+        "{artifact:lidar-5-327198}",
+        "{artifact:lidar-5-327199}",
+        "{artifact:lidar-5-328198}",
+        "{artifact:lidar-5-328199}",
+        "{artifact:lidar-5-329198}",
+        "{artifact:lidar-5-329199}",
+        "{artifact:lidar-5-330198}",
+        "{artifact:lidar-5-330199}",
+        "{artifact:lidar-5-331199}",
+        "{artifact:lidar-5-332199}"
+      ],
+      "inputs": [
+        "bca-area-core",
+        "lidar-catalogue",
+        "lidar-10-323207",
+        "lidar-10-323208",
+        "lidar-10-323209",
+        "lidar-10-323210",
+        "lidar-10-324202",
+        "lidar-10-324203",
+        "lidar-10-324204",
+        "lidar-10-324205",
+        "lidar-10-324206",
+        "lidar-10-324207",
+        "lidar-10-324208",
+        "lidar-10-324209",
+        "lidar-10-324210",
+        "lidar-10-325200",
+        "lidar-10-325201",
+        "lidar-10-325202",
+        "lidar-10-325203",
+        "lidar-10-325204",
+        "lidar-10-325205",
+        "lidar-10-325206",
+        "lidar-10-325207",
+        "lidar-10-325208",
+        "lidar-10-325209",
+        "lidar-10-325210",
+        "lidar-10-326200",
+        "lidar-10-326201",
+        "lidar-10-326202",
+        "lidar-10-326203",
+        "lidar-10-326204",
+        "lidar-10-326205",
+        "lidar-10-326206",
+        "lidar-10-326207",
+        "lidar-10-326208",
+        "lidar-10-326209",
+        "lidar-10-326210",
+        "lidar-10-327200",
+        "lidar-10-327201",
+        "lidar-10-327202",
+        "lidar-10-327203",
+        "lidar-10-327204",
+        "lidar-10-327205",
+        "lidar-10-327206",
+        "lidar-10-327207",
+        "lidar-10-327208",
+        "lidar-10-327209",
+        "lidar-10-327210",
+        "lidar-10-328200",
+        "lidar-10-328201",
+        "lidar-10-328202",
+        "lidar-10-328203",
+        "lidar-10-328204",
+        "lidar-10-328205",
+        "lidar-10-328206",
+        "lidar-10-328207",
+        "lidar-10-328208",
+        "lidar-10-328209",
+        "lidar-10-328210",
+        "lidar-10-329200",
+        "lidar-10-329201",
+        "lidar-10-329202",
+        "lidar-10-329203",
+        "lidar-10-329204",
+        "lidar-10-329205",
+        "lidar-10-329206",
+        "lidar-10-329207",
+        "lidar-10-329208",
+        "lidar-10-329209",
+        "lidar-10-329210",
+        "lidar-10-330200",
+        "lidar-10-330201",
+        "lidar-10-330202",
+        "lidar-10-330203",
+        "lidar-10-330204",
+        "lidar-10-330205",
+        "lidar-10-330206",
+        "lidar-10-330207",
+        "lidar-10-330208",
+        "lidar-10-330209",
+        "lidar-10-330210",
+        "lidar-10-331200",
+        "lidar-10-331201",
+        "lidar-10-331202",
+        "lidar-10-331203",
+        "lidar-10-331204",
+        "lidar-10-331205",
+        "lidar-10-331206",
+        "lidar-10-331207",
+        "lidar-10-331208",
+        "lidar-10-331209",
+        "lidar-10-331210",
+        "lidar-10-332200",
+        "lidar-10-332201",
+        "lidar-10-332202",
+        "lidar-10-332203",
+        "lidar-10-332204",
+        "lidar-10-332205",
+        "lidar-10-332206",
+        "lidar-10-332207",
+        "lidar-10-332208",
+        "lidar-10-332209",
+        "lidar-10-332210",
+        "lidar-10-333201",
+        "lidar-10-333202",
+        "lidar-10-333203",
+        "lidar-10-333204",
+        "lidar-10-333205",
+        "lidar-10-333206",
+        "lidar-10-333207",
+        "lidar-10-333208",
+        "lidar-10-333209",
+        "lidar-20-323211",
+        "lidar-20-323212",
+        "lidar-20-324211",
+        "lidar-20-324212",
+        "lidar-20-324213",
+        "lidar-20-324214",
+        "lidar-20-325211",
+        "lidar-20-325212",
+        "lidar-20-325213",
+        "lidar-20-325214",
+        "lidar-20-326211",
+        "lidar-20-326212",
+        "lidar-20-326213",
+        "lidar-20-326214",
+        "lidar-20-326215",
+        "lidar-20-327211",
+        "lidar-20-327212",
+        "lidar-20-327213",
+        "lidar-20-327214",
+        "lidar-20-327215",
+        "lidar-20-328211",
+        "lidar-20-328212",
+        "lidar-20-328213",
+        "lidar-20-328214",
+        "lidar-20-328215",
+        "lidar-20-329211",
+        "lidar-20-329212",
+        "lidar-20-329213",
+        "lidar-20-329214",
+        "lidar-20-329215",
+        "lidar-20-330211",
+        "lidar-20-330212",
+        "lidar-20-330213",
+        "lidar-20-330214",
+        "lidar-20-330215",
+        "lidar-20-331211",
+        "lidar-20-331212",
+        "lidar-20-331213",
+        "lidar-20-331214",
+        "lidar-20-332211",
+        "lidar-20-332212",
+        "lidar-20-332213",
+        "lidar-5-326199",
+        "lidar-5-327198",
+        "lidar-5-327199",
+        "lidar-5-328198",
+        "lidar-5-328199",
+        "lidar-5-329198",
+        "lidar-5-329199",
+        "lidar-5-330198",
+        "lidar-5-330199",
+        "lidar-5-331199",
+        "lidar-5-332199"
+      ],
+      "outputs": [
+        "terrain-dtm-cog",
+        "terrain-hillshade-tif",
+        "terrain-contours-geojson",
+        "terrain-summary"
+      ]
+    },
+    {
+      "step_id": "terrain-mbtiles-v2",
+      "tool": "gdal_translate",
+      "argv": [
+        "-of",
+        "MBTILES",
+        "-co",
+        "TILE_FORMAT=PNG",
+        "{artifact:terrain-hillshade-tif}",
+        "{artifact:terrain-mbtiles}"
+      ],
+      "inputs": [
+        "terrain-hillshade-tif"
+      ],
+      "outputs": [
+        "terrain-mbtiles"
+      ]
+    },
+    {
+      "step_id": "terrain-raster-pmtiles-v2",
+      "tool": "pmtiles",
+      "argv": [
+        "convert",
+        "{artifact:terrain-mbtiles}",
+        "{artifact:terrain-pmtiles}"
+      ],
+      "inputs": [
+        "terrain-mbtiles"
+      ],
+      "outputs": [
+        "terrain-pmtiles"
+      ]
+    },
+    {
+      "step_id": "terrain-contours-pmtiles-v2",
+      "tool": "tippecanoe",
+      "argv": [
+        "--force",
+        "--output",
+        "{artifact:terrain-contours-pmtiles}",
+        "--minimum-zoom",
+        "8",
+        "--maximum-zoom",
+        "14",
+        "{artifact:terrain-contours-geojson}"
+      ],
+      "inputs": [
+        "terrain-contours-geojson"
+      ],
+      "outputs": [
+        "terrain-contours-pmtiles"
+      ]
+    },
+    {
+      "step_id": "build-change-evidence-v2",
+      "tool": "python3",
+      "argv": [
+        "/repo/tooling/geodata/recipes/build_change_evidence_v2.py",
+        "--core",
+        "{artifact:bca-area-core}",
+        "--baseline",
+        "{artifact:s2-baseline-red}",
+        "{artifact:s2-baseline-nir}",
+        "{artifact:s2-baseline-nir20}",
+        "{artifact:s2-baseline-swir1}",
+        "{artifact:s2-baseline-swir2}",
+        "{artifact:s2-baseline-scl}",
+        "--prefire",
+        "{artifact:s2-prefire-red}",
+        "{artifact:s2-prefire-nir}",
+        "{artifact:s2-prefire-nir20}",
+        "{artifact:s2-prefire-swir1}",
+        "{artifact:s2-prefire-swir2}",
+        "{artifact:s2-prefire-scl}",
+        "--post",
+        "{artifact:s2-post-red}",
+        "{artifact:s2-post-nir}",
+        "{artifact:s2-post-nir20}",
+        "{artifact:s2-post-swir1}",
+        "{artifact:s2-post-swir2}",
+        "{artifact:s2-post-scl}",
+        "--effis",
+        "{artifact:effis-bounded}",
+        "--previous-effis",
+        "{artifact:effis-release-one}",
+        "--combined-cog",
+        "{artifact:change-cog}",
+        "--ndvi-cog",
+        "{artifact:ndvi-cog}",
+        "--ndmi-cog",
+        "{artifact:ndmi-cog}",
+        "--effis-out",
+        "{artifact:effis-geojson}",
+        "--effis-summary",
+        "{artifact:effis-summary-json}",
+        "--combined-csv",
+        "{artifact:evidence-csv}",
+        "--ndvi-csv",
+        "{artifact:ndvi-summary-csv}",
+        "--ndvi-json",
+        "{artifact:ndvi-summary-json}",
+        "--ndmi-csv",
+        "{artifact:ndmi-summary-csv}",
+        "--ndmi-json",
+        "{artifact:ndmi-summary-json}",
+        "--summary",
+        "{artifact:change-report}"
+      ],
+      "inputs": [
+        "bca-area-core",
+        "s2-baseline-red",
+        "s2-baseline-nir",
+        "s2-baseline-nir20",
+        "s2-baseline-swir1",
+        "s2-baseline-swir2",
+        "s2-baseline-scl",
+        "s2-prefire-red",
+        "s2-prefire-nir",
+        "s2-prefire-nir20",
+        "s2-prefire-swir1",
+        "s2-prefire-swir2",
+        "s2-prefire-scl",
+        "s2-post-red",
+        "s2-post-nir",
+        "s2-post-nir20",
+        "s2-post-swir1",
+        "s2-post-swir2",
+        "s2-post-scl",
+        "landsat-baseline-red",
+        "landsat-baseline-nir",
+        "landsat-baseline-swir1",
+        "landsat-baseline-swir2",
+        "landsat-baseline-qa",
+        "landsat-post-red",
+        "landsat-post-nir",
+        "landsat-post-swir1",
+        "landsat-post-swir2",
+        "landsat-post-qa",
+        "effis-bounded",
+        "effis-release-one"
+      ],
+      "outputs": [
+        "change-cog",
+        "ndvi-cog",
+        "ndmi-cog",
+        "effis-geojson",
+        "effis-summary-json",
+        "evidence-csv",
+        "ndvi-summary-csv",
+        "ndvi-summary-json",
+        "ndmi-summary-csv",
+        "ndmi-summary-json",
+        "change-report"
+      ]
+    },
+    {
+      "step_id": "change-mbtiles-v2",
+      "tool": "gdal_translate",
+      "argv": [
+        "-b",
+        "4",
+        "-of",
+        "MBTILES",
+        "-ot",
+        "Byte",
+        "-scale",
+        "0",
+        "3",
+        "0",
+        "255",
+        "-co",
+        "TILE_FORMAT=PNG",
+        "{artifact:change-cog}",
+        "{artifact:change-mbtiles}"
+      ],
+      "inputs": [
+        "change-cog"
+      ],
+      "outputs": [
+        "change-mbtiles"
+      ]
+    },
+    {
+      "step_id": "change-raster-pmtiles-v2",
+      "tool": "pmtiles",
+      "argv": [
+        "convert",
+        "{artifact:change-mbtiles}",
+        "{artifact:change-pmtiles}"
+      ],
+      "inputs": [
+        "change-mbtiles"
+      ],
+      "outputs": [
+        "change-pmtiles"
+      ]
+    },
+    {
+      "step_id": "render-ndvi-v2",
+      "tool": "python3",
+      "argv": [
+        "/repo/tooling/geodata/recipes/render_change_component.py",
+        "--input",
+        "{artifact:ndvi-cog}",
+        "--core",
+        "{artifact:bca-area-core}",
+        "--product",
+        "NDVI",
+        "--output",
+        "{artifact:ndvi-render-tif}"
+      ],
+      "inputs": [
+        "bca-area-core",
+        "ndvi-cog"
+      ],
+      "outputs": [
+        "ndvi-render-tif"
+      ]
+    },
+    {
+      "step_id": "ndvi-mbtiles-v2",
+      "tool": "gdal_translate",
+      "argv": [
+        "-of",
+        "MBTILES",
+        "-co",
+        "TILE_FORMAT=PNG",
+        "{artifact:ndvi-render-tif}",
+        "{artifact:ndvi-mbtiles}"
+      ],
+      "inputs": [
+        "ndvi-render-tif"
+      ],
+      "outputs": [
+        "ndvi-mbtiles"
+      ]
+    },
+    {
+      "step_id": "ndvi-raster-pmtiles-v2",
+      "tool": "pmtiles",
+      "argv": [
+        "convert",
+        "{artifact:ndvi-mbtiles}",
+        "{artifact:ndvi-pmtiles}"
+      ],
+      "inputs": [
+        "ndvi-mbtiles"
+      ],
+      "outputs": [
+        "ndvi-pmtiles"
+      ]
+    },
+    {
+      "step_id": "render-ndmi-v2",
+      "tool": "python3",
+      "argv": [
+        "/repo/tooling/geodata/recipes/render_change_component.py",
+        "--input",
+        "{artifact:ndmi-cog}",
+        "--core",
+        "{artifact:bca-area-core}",
+        "--product",
+        "NDMI",
+        "--output",
+        "{artifact:ndmi-render-tif}"
+      ],
+      "inputs": [
+        "bca-area-core",
+        "ndmi-cog"
+      ],
+      "outputs": [
+        "ndmi-render-tif"
+      ]
+    },
+    {
+      "step_id": "ndmi-mbtiles-v2",
+      "tool": "gdal_translate",
+      "argv": [
+        "-of",
+        "MBTILES",
+        "-co",
+        "TILE_FORMAT=PNG",
+        "{artifact:ndmi-render-tif}",
+        "{artifact:ndmi-mbtiles}"
+      ],
+      "inputs": [
+        "ndmi-render-tif"
+      ],
+      "outputs": [
+        "ndmi-mbtiles"
+      ]
+    },
+    {
+      "step_id": "ndmi-raster-pmtiles-v2",
+      "tool": "pmtiles",
+      "argv": [
+        "convert",
+        "{artifact:ndmi-mbtiles}",
+        "{artifact:ndmi-pmtiles}"
+      ],
+      "inputs": [
+        "ndmi-mbtiles"
+      ],
+      "outputs": [
+        "ndmi-pmtiles"
+      ]
+    },
+    {
+      "step_id": "build-release-summary-v2",
+      "tool": "python3",
+      "argv": [
+        "/repo/tooling/geodata/recipes/build_release_summary_v2.py",
+        "--context",
+        "{artifact:context-summary}",
+        "--terrain",
+        "{artifact:terrain-summary}",
+        "--change",
+        "{artifact:change-report}",
+        "--release-id",
+        "release-blorenge-2026-08-21.5",
+        "--dataset-version",
+        "2026-08-21.5",
+        "--output",
+        "{artifact:release-summary}"
+      ],
+      "inputs": [
+        "context-summary",
+        "terrain-summary",
+        "change-report"
+      ],
+      "outputs": [
+        "release-summary"
+      ]
+    }
+  ],
+  "outputs": [
+    {
+      "asset_id": "context-pmtiles",
+      "dataset_id": "landscape-context",
+      "path": "outputs/context.pmtiles",
+      "profile": "vector_pmtiles",
+      "media_type": "application/vnd.pmtiles",
+      "visibility": "public",
+      "accessible_description": "Bilingual landscape context vector tiles including the visible BCA-area core.",
+      "qa": {
+        "minimum_bytes": 1000,
+        "maximum_bytes": 33554432
+      }
+    },
+    {
+      "asset_id": "context-summary",
+      "dataset_id": "landscape-context",
+      "path": "outputs/context-summary.json",
+      "profile": "accessible_json",
+      "media_type": "application/json",
+      "visibility": "public",
+      "accessible_description": "Accessible bilingual summary of the release-wide landscape context.",
+      "qa": {
+        "minimum_bytes": 500,
+        "maximum_bytes": 1048576,
+        "required_fields": [
+          "area_of_interest",
+          "layers",
+          "limitations"
+        ]
+      }
+    },
+    {
+      "asset_id": "terrain-dtm-cog",
+      "dataset_id": "terrain",
+      "path": "private/terrain-dtm.tif",
+      "profile": "cog",
+      "media_type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "visibility": "private",
+      "accessible_description": "Private reproducibility DTM for the exact expanded AOI.",
+      "qa": {
+        "minimum_bytes": 1000,
+        "maximum_bytes": 536870912,
+        "expected_crs": "EPSG:27700",
+        "expected_resolution_m": 10,
+        "expected_band_count": 1
+      }
+    },
+    {
+      "asset_id": "terrain-pmtiles",
+      "dataset_id": "terrain",
+      "path": "outputs/terrain.pmtiles",
+      "profile": "raster_pmtiles",
+      "media_type": "application/vnd.pmtiles",
+      "visibility": "public",
+      "accessible_description": "Terrain hillshade raster tiles.",
+      "qa": {
+        "minimum_bytes": 1000,
+        "maximum_bytes": 16777216
+      }
+    },
+    {
+      "asset_id": "terrain-contours-pmtiles",
+      "dataset_id": "terrain",
+      "path": "outputs/terrain-contours.pmtiles",
+      "profile": "vector_pmtiles",
+      "media_type": "application/vnd.pmtiles",
+      "visibility": "public",
+      "accessible_description": "Labelled 10 metre terrain contours.",
+      "qa": {
+        "minimum_bytes": 1000,
+        "maximum_bytes": 16777216
+      }
+    },
+    {
+      "asset_id": "terrain-summary",
+      "dataset_id": "terrain",
+      "path": "outputs/terrain-summary.json",
+      "profile": "accessible_json",
+      "media_type": "application/json",
+      "visibility": "public",
+      "accessible_description": "Accessible terrain source, coverage and elevation summary.",
+      "qa": {
+        "minimum_bytes": 300,
+        "maximum_bytes": 1048576,
+        "required_fields": [
+          "source",
+          "source_tile_count",
+          "capture_dates",
+          "spatial_contract",
+          "elevation_m",
+          "limitations"
+        ]
+      }
+    },
+    {
+      "asset_id": "change-cog",
+      "dataset_id": "observed-change",
+      "path": "private/observed-change.tif",
+      "profile": "cog",
+      "media_type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "visibility": "private",
+      "accessible_description": "Private combined evidence COG.",
+      "qa": {
+        "minimum_bytes": 1000,
+        "maximum_bytes": 67108864,
+        "expected_crs": "EPSG:32630",
+        "expected_resolution_m": 20,
+        "expected_band_count": 5,
+        "expected_band_descriptions": [
+          "dNBR",
+          "delta_NDVI",
+          "delta_NDMI",
+          "evidence_state",
+          "observation_count"
+        ]
+      }
+    },
+    {
+      "asset_id": "change-pmtiles",
+      "dataset_id": "observed-change",
+      "path": "outputs/observed-change.pmtiles",
+      "profile": "raster_pmtiles",
+      "media_type": "application/vnd.pmtiles",
+      "visibility": "public",
+      "accessible_description": "Combined observed surface and vegetation change overview.",
+      "qa": {
+        "minimum_bytes": 1000,
+        "maximum_bytes": 8388608
+      }
+    },
+    {
+      "asset_id": "evidence-csv",
+      "dataset_id": "observed-change",
+      "path": "outputs/evidence-states.csv.txt",
+      "profile": "accessible_csv",
+      "media_type": "text/csv",
+      "visibility": "public",
+      "accessible_description": "Accessible combined evidence-state counts and areas.",
+      "qa": {
+        "minimum_bytes": 100,
+        "maximum_bytes": 1048576,
+        "minimum_rows": 4,
+        "required_fields": [
+          "evidence_state",
+          "pixel_count",
+          "area_ha_rounded"
+        ]
+      }
+    },
+    {
+      "asset_id": "release-summary",
+      "dataset_id": "observed-change",
+      "path": "outputs/release-summary.json",
+      "profile": "accessible_json",
+      "media_type": "application/json",
+      "visibility": "public",
+      "accessible_description": "Accessible release-wide factual, provenance and limitation summary.",
+      "qa": {
+        "minimum_bytes": 1000,
+        "maximum_bytes": 2097152,
+        "required_fields": [
+          "release_id",
+          "dataset_version",
+          "area_of_interest",
+          "change_evidence",
+          "limitations"
+        ]
+      }
+    },
+    {
+      "asset_id": "ndvi-cog",
+      "dataset_id": "ndvi-change",
+      "path": "outputs/ndvi-change.tif",
+      "profile": "cog",
+      "media_type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "visibility": "public",
+      "accessible_description": "Lossless native 10 m signed NDVI difference COG for bounded range reads.",
+      "qa": {
+        "minimum_bytes": 1000,
+        "maximum_bytes": 33554432,
+        "expected_crs": "EPSG:32630",
+        "expected_resolution_m": 10,
+        "expected_band_count": 1,
+        "expected_band_descriptions": [
+          "delta_NDVI"
+        ]
+      }
+    },
+    {
+      "asset_id": "ndvi-pmtiles",
+      "dataset_id": "ndvi-change",
+      "path": "outputs/ndvi-change.pmtiles",
+      "profile": "raster_pmtiles",
+      "media_type": "application/vnd.pmtiles",
+      "visibility": "public",
+      "accessible_description": "Fixed-scale NDVI change display tiles with patterned Not observed pixels.",
+      "qa": {
+        "minimum_bytes": 1000,
+        "maximum_bytes": 8388608
+      }
+    },
+    {
+      "asset_id": "ndvi-summary-csv",
+      "dataset_id": "ndvi-change",
+      "path": "outputs/ndvi-change-summary.csv.txt",
+      "profile": "accessible_csv",
+      "media_type": "text/csv",
+      "visibility": "public",
+      "accessible_description": "Accessible fixed-bin NDVI counts and areas.",
+      "qa": {
+        "minimum_bytes": 100,
+        "maximum_bytes": 1048576,
+        "minimum_rows": 8,
+        "required_fields": [
+          "product",
+          "bin",
+          "pixel_count",
+          "area_ha",
+          "units",
+          "baseline_date",
+          "comparison_date"
+        ]
+      }
+    },
+    {
+      "asset_id": "ndvi-summary-json",
+      "dataset_id": "ndvi-change",
+      "path": "outputs/ndvi-change-summary.json",
+      "profile": "accessible_json",
+      "media_type": "application/json",
+      "visibility": "public",
+      "accessible_description": "Accessible bilingual NDVI method, dates, distribution, attribution and limitations.",
+      "qa": {
+        "minimum_bytes": 500,
+        "maximum_bytes": 1048576,
+        "required_fields": [
+          "product",
+          "names",
+          "formula",
+          "bands",
+          "dates",
+          "units",
+          "resolution_m",
+          "bins",
+          "limitations"
+        ]
+      }
+    },
+    {
+      "asset_id": "ndmi-cog",
+      "dataset_id": "ndmi-change",
+      "path": "outputs/ndmi-change.tif",
+      "profile": "cog",
+      "media_type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "visibility": "public",
+      "accessible_description": "Lossless native 20 m signed NDMI difference COG for bounded range reads.",
+      "qa": {
+        "minimum_bytes": 1000,
+        "maximum_bytes": 33554432,
+        "expected_crs": "EPSG:32630",
+        "expected_resolution_m": 20,
+        "expected_band_count": 1,
+        "expected_band_descriptions": [
+          "delta_NDMI"
+        ]
+      }
+    },
+    {
+      "asset_id": "ndmi-pmtiles",
+      "dataset_id": "ndmi-change",
+      "path": "outputs/ndmi-change.pmtiles",
+      "profile": "raster_pmtiles",
+      "media_type": "application/vnd.pmtiles",
+      "visibility": "public",
+      "accessible_description": "Fixed-scale NDMI change display tiles with patterned Not observed pixels.",
+      "qa": {
+        "minimum_bytes": 1000,
+        "maximum_bytes": 8388608
+      }
+    },
+    {
+      "asset_id": "ndmi-summary-csv",
+      "dataset_id": "ndmi-change",
+      "path": "outputs/ndmi-change-summary.csv.txt",
+      "profile": "accessible_csv",
+      "media_type": "text/csv",
+      "visibility": "public",
+      "accessible_description": "Accessible fixed-bin NDMI counts and areas.",
+      "qa": {
+        "minimum_bytes": 100,
+        "maximum_bytes": 1048576,
+        "minimum_rows": 8,
+        "required_fields": [
+          "product",
+          "bin",
+          "pixel_count",
+          "area_ha",
+          "units",
+          "baseline_date",
+          "comparison_date"
+        ]
+      }
+    },
+    {
+      "asset_id": "ndmi-summary-json",
+      "dataset_id": "ndmi-change",
+      "path": "outputs/ndmi-change-summary.json",
+      "profile": "accessible_json",
+      "media_type": "application/json",
+      "visibility": "public",
+      "accessible_description": "Accessible bilingual NDMI method, dates, distribution, attribution and limitations.",
+      "qa": {
+        "minimum_bytes": 500,
+        "maximum_bytes": 1048576,
+        "required_fields": [
+          "product",
+          "names",
+          "formula",
+          "bands",
+          "dates",
+          "units",
+          "resolution_m",
+          "bins",
+          "limitations"
+        ]
+      }
+    },
+    {
+      "asset_id": "effis-geojson",
+      "dataset_id": "effis-event",
+      "path": "outputs/effis-592404.geojson",
+      "profile": "geojson",
+      "media_type": "application/geo+json",
+      "visibility": "public",
+      "accessible_description": "Complete provider attributes with display geometry clipped to the expanded AOI.",
+      "qa": {
+        "minimum_bytes": 500,
+        "maximum_bytes": 1048576,
+        "minimum_features": 1,
+        "required_fields": [
+          "provider_feature_id",
+          "provider",
+          "classification",
+          "display_geometry",
+          "limitation"
+        ]
+      }
+    },
+    {
+      "asset_id": "effis-summary-json",
+      "dataset_id": "effis-event",
+      "path": "outputs/effis-592404-summary.json",
+      "profile": "accessible_json",
+      "media_type": "application/json",
+      "visibility": "public",
+      "accessible_description": "Accessible bilingual EFFIS provenance, release comparison and limitations.",
+      "qa": {
+        "minimum_bytes": 300,
+        "maximum_bytes": 1048576,
+        "required_fields": [
+          "layer",
+          "provider_feature",
+          "comparison_with_release_one",
+          "attribution",
+          "limitations"
+        ]
+      }
+    }
+  ],
+  "datasets": [
+    {
+      "dataset_id": "landscape-context",
+      "source_dataset_ids": [
+        "bca-area-of-interest",
+        "nrw-sssi",
+        "nrw-national-park",
+        "osm-wales-geofabrik",
+        "nrw-main-rivers",
+        "nrw-phase1-vegetation-voronoi"
+      ],
+      "evidence_version": "2026-08-21.5",
+      "title": "Expanded Blorenge landscape context / Cyd-destun tirwedd ehangach Blorenge",
+      "provider": "Blorenge Commoners Association, Natural Resources Wales, OpenStreetMap contributors and Geofabrik",
+      "licence": "BCA publication authority, OGL 3.0 and ODbL 1.0 by source",
+      "attribution": "Blorenge Commoners Association; contains NRW and Ordnance Survey information under the recorded attribution; © OpenStreetMap contributors; processed by Geofabrik.",
+      "classification": "contextual",
+      "observation_dates": [
+        "2026-07-30",
+        "2026-08-12",
+        "2026-08-21"
+      ],
+      "method": "Preserve the canonical BCA core, derive its exact 2 km AOI in EPSG:27700, and clip only allowlisted context fields to that AOI.",
+      "uncertainty": "Source dates and completeness vary; the BCA core is approximate and contextual paths do not establish legal status.",
+      "limitations": [
+        "The BCA-area is not the legal, official, surveyed or current CL18 boundary.",
+        "The SSSI remains an independent authoritative context layer.",
+        "Phase 1 habitat is historical."
+      ]
+    },
+    {
+      "dataset_id": "terrain",
+      "source_dataset_ids": [
+        "bca-area-of-interest",
+        "wg-lidar-tile-catalogue",
+        "wg-lidar-dtm-2020-2023"
+      ],
+      "evidence_version": "2026-08-21.5",
+      "title": "Expanded Blorenge terrain context / Cyd-destun tir ehangach Blorenge",
+      "provider": "Welsh Government; BCA processing",
+      "licence": "Open Government Licence 3.0 and BCA publication authority",
+      "attribution": "Welsh Government LiDAR; processed by Blorenge Commoners Association.",
+      "classification": "contextual",
+      "observation_dates": [
+        "2020-12-24",
+        "2020-12-25",
+        "2021-02-27",
+        "2022-01-12"
+      ],
+      "method": "Mosaic the 163 exact intersecting 1 m DTM tiles, average to 10 m inside the expanded AOI, then derive fixed hillshade and contours.",
+      "uncertainty": "Capture dates vary by tile and hillshade is a visualisation.",
+      "limitations": [
+        "Not produced specifically for flood modelling.",
+        "Terrain does not describe current surface cover."
+      ]
+    },
+    {
+      "dataset_id": "observed-change",
+      "source_dataset_ids": [
+        "bca-area-of-interest",
+        "copernicus-sentinel-2-l2a",
+        "usgs-landsat-c2-l2-sr"
+      ],
+      "evidence_version": "2026-08-21.5",
+      "title": "Observed surface and vegetation change / Newid arwyneb a llystyfiant a arsylwyd",
+      "provider": "European Union Copernicus programme, USGS and BCA processing",
+      "licence": "Copernicus Sentinel data legal notice, USGS public domain and BCA publication authority",
+      "attribution": "Contains modified Copernicus Sentinel data 2025–2026; Landsat imagery courtesy of the U.S. Geological Survey; processing by Blorenge Commoners Association.",
+      "classification": "derived",
+      "observation_dates": [
+        "2025-07-12",
+        "2026-07-12",
+        "2026-07-27",
+        "2026-08-11"
+      ],
+      "method": "Apply the common Sentinel mask, require three-observation comparability, calculate continuous dNBR/NDVI/NDMI and publish the conservative uncalibrated combined states; Landsat corroboration remains separate and unfused.",
+      "uncertainty": "Evidence states are not locally calibrated severity and do not establish pixel-level cause.",
+      "limitations": [
+        "Not proof of ecological condition or recovery.",
+        "No exact incident-authority perimeter is available.",
+        "Not observed is never no change."
+      ]
+    },
+    {
+      "dataset_id": "ndvi-change",
+      "source_dataset_ids": [
+        "bca-area-of-interest",
+        "copernicus-sentinel-2-l2a"
+      ],
+      "evidence_version": "2026-08-21.5",
+      "title": "Vegetation greenness index change (NDVI) / Newid mynegai gwyrddni llystyfiant (NDVI)",
+      "provider": "European Union Copernicus programme; BCA processing",
+      "licence": "Copernicus Sentinel data legal notice and BCA publication authority",
+      "attribution": "Contains modified Copernicus Sentinel data 2025–2026; processing by Blorenge Commoners Association.",
+      "classification": "derived",
+      "observation_dates": [
+        "2025-07-12",
+        "2026-08-11"
+      ],
+      "method": "Publish NDVI(2026-08-11) minus NDVI(2025-07-12) from native B8/B4 at 10 m after the common SCL mask.",
+      "uncertainty": "Rainfall, phenology, grazing, management and residual observation effects may contribute.",
+      "limitations": [
+        "Does not establish cause, fire damage, severity, habitat condition or recovery.",
+        "Not observed pixels fail one or both date masks."
+      ]
+    },
+    {
+      "dataset_id": "ndmi-change",
+      "source_dataset_ids": [
+        "bca-area-of-interest",
+        "copernicus-sentinel-2-l2a"
+      ],
+      "evidence_version": "2026-08-21.5",
+      "title": "Moisture-sensitive index change (NDMI) / Newid mynegai sy’n sensitif i leithder (NDMI)",
+      "provider": "European Union Copernicus programme; BCA processing",
+      "licence": "Copernicus Sentinel data legal notice and BCA publication authority",
+      "attribution": "Contains modified Copernicus Sentinel data 2025–2026; processing by Blorenge Commoners Association.",
+      "classification": "derived",
+      "observation_dates": [
+        "2025-07-12",
+        "2026-08-11"
+      ],
+      "method": "Publish NDMI(2026-08-11) minus NDMI(2025-07-12) from native B8A/B11 at 20 m after the common SCL mask.",
+      "uncertainty": "Rainfall, phenology, grazing, management and residual observation effects may contribute.",
+      "limitations": [
+        "Does not establish cause, fire damage, severity, dryness or wetness.",
+        "Not observed pixels fail one or both date masks."
+      ]
+    },
+    {
+      "dataset_id": "effis-event",
+      "source_dataset_ids": [
+        "bca-area-of-interest",
+        "effis-current-burnt-areas"
+      ],
+      "evidence_version": "2026-08-21.5",
+      "title": "EFFIS provisional provider boundary / Ffin dros dro y darparwr EFFIS",
+      "provider": "European Union, Copernicus EFFIS; BCA processing",
+      "licence": "CC BY 4.0 and BCA publication authority",
+      "attribution": "European Union, Copernicus EFFIS; clipped and reformatted by Blorenge Commoners Association.",
+      "classification": "provisional",
+      "observation_dates": [
+        "2026-07-20",
+        "2026-07-29"
+      ],
+      "method": "Reacquire complete provider feature 592404, preserve its fields and snapshot, compare it with release one, and clip only the display geometry to the expanded AOI.",
+      "uncertainty": "Provider dates and geometry are not incident-authority truth.",
+      "limitations": [
+        "Not an authority, legal or surveyed perimeter.",
+        "Does not validate raster change or thermal anomalies."
+      ]
+    }
+  ],
+  "cross_release_qa": {
+    "baseline_manifest": ".geodata-work/release-blorenge-2026-08-13.6/manifests/release.json",
+    "maximum_asset_growth_ratio": 10,
+    "maximum_feature_change_ratio": 10
+  }
+}

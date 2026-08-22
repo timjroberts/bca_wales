@@ -24,3 +24,5 @@ jobs:
         with:
           node-version-file: .nvmrc
       - run: node tooling/checks/check-production.mjs
+      - name: Check operational FIRMS feed freshness
+        run: npm run firms:monitor

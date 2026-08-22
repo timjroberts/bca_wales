@@ -45,6 +45,57 @@ function assertSemanticContracts(registry, recipe) {
   const datasetIds = uniqueBy(recipe.datasets, "dataset_id", "recipe datasets");
   const allArtifacts = new Set([...inputIds, ...intermediateIds, ...outputIds]);
 
+  if (registry.area_of_interest?.core_dataset_id) {
+    const coreSource = sources.get(registry.area_of_interest.core_dataset_id);
+    if (!coreSource) throw new Error(`Registry AOI references unknown source: ${registry.area_of_interest.core_dataset_id}`);
+    if (coreSource.acquisition.sha256 !== registry.area_of_interest.core_sha256 ||
+        coreSource.acquisition.version !== registry.area_of_interest.core_version) {
+      throw new Error("Registry AOI version/checksum does not match its canonical source contract");
+    }
+  }
+
+  if (recipe.spatial_contract) {
+    const spatial = recipe.spatial_contract;
+    if (!inputIds.has(spatial.core_input_id)) {
+      throw new Error(`Spatial contract core input is unknown: ${spatial.core_input_id}`);
+    }
+    const coreInput = recipe.inputs.find((input) => input.input_id === spatial.core_input_id);
+    if (coreInput.expected_sha256 !== spatial.core_sha256) {
+      throw new Error("Spatial contract core checksum must match the pinned recipe input checksum");
+    }
+    for (const inputId of spatial.aoi_dependent_input_ids) {
+      if (!inputIds.has(inputId)) throw new Error(`Spatial contract references unknown input: ${inputId}`);
+    }
+    for (const datasetId of spatial.aoi_dependent_dataset_ids) {
+      if (!datasetIds.has(datasetId)) throw new Error(`Spatial contract references unknown dataset: ${datasetId}`);
+    }
+    const producerInputs = new Map();
+    for (const step of recipe.steps) {
+      for (const outputId of step.outputs) producerInputs.set(outputId, step.inputs);
+    }
+    const dependsOnCore = (artifactId, seen = new Set()) => {
+      if (artifactId === spatial.core_input_id) return true;
+      if (seen.has(artifactId)) return false;
+      seen.add(artifactId);
+      return (producerInputs.get(artifactId) ?? []).some((inputId) => dependsOnCore(inputId, new Set(seen)));
+    };
+    for (const datasetId of spatial.aoi_dependent_dataset_ids) {
+      const datasetOutputs = recipe.outputs.filter((output) => output.dataset_id === datasetId);
+      if (datasetOutputs.length === 0) throw new Error(`${datasetId}: spatial contract dataset has no outputs`);
+      for (const output of datasetOutputs) {
+        if (!dependsOnCore(output.asset_id)) {
+          throw new Error(`${output.asset_id}: AOI-dependent output does not derive from ${spatial.core_input_id}`);
+        }
+      }
+    }
+  }
+  uniqueBy(recipe.quality_gates ?? [], "gate_id", "quality gates");
+  for (const gate of recipe.quality_gates ?? []) {
+    if (!allArtifacts.has(gate.report_artifact_id)) {
+      throw new Error(`${gate.gate_id}: unknown quality report artifact ${gate.report_artifact_id}`);
+    }
+  }
+
   for (const input of recipe.inputs) {
     if (!sources.has(input.dataset_id)) throw new Error(`Unknown source dataset: ${input.dataset_id}`);
     resolveInside("/release", input.destination);
@@ -53,6 +104,13 @@ function assertSemanticContracts(registry, recipe) {
   for (const output of recipe.outputs) {
     if (!datasetIds.has(output.dataset_id)) throw new Error(`Unknown release dataset: ${output.dataset_id}`);
     resolveInside("/release", output.path);
+    if (typeof output.qa.maximum_bytes === "number" && output.qa.maximum_bytes < output.qa.minimum_bytes) {
+      throw new Error(`${output.asset_id}: maximum bytes cannot be below minimum bytes`);
+    }
+    if (output.qa.expected_band_descriptions && output.qa.expected_band_count &&
+        output.qa.expected_band_descriptions.length !== output.qa.expected_band_count) {
+      throw new Error(`${output.asset_id}: expected band descriptions must match expected band count`);
+    }
   }
   for (const dataset of recipe.datasets) {
     for (const sourceId of dataset.source_dataset_ids) {
@@ -395,6 +453,14 @@ export async function reuseAcquisition({
   if (archived.registry_id !== registry.registry_id) {
     throw new Error(`Retained inputs use registry ${archived.registry_id}, not ${registry.registry_id}`);
   }
+  if (recipe.spatial_contract?.rebuild_aoi_dependent_inputs) {
+    const archivedRecipe = await readJson(path.join(archiveRoot, "snapshots/publication-recipe.json"));
+    if (canonicalJson(archivedRecipe.spatial_contract) !== canonicalJson(recipe.spatial_contract)) {
+      throw new Error(
+        `Spatial contract changed and requires a fresh matching acquisition of AOI-dependent inputs: ${recipe.spatial_contract.aoi_dependent_input_ids.join(", ")}`
+      );
+    }
+  }
 
   await mkdir(workspaceRoot, { recursive: true });
   const releaseRoot = path.join(workspaceRoot, recipe.release_id);
@@ -472,8 +538,10 @@ export async function reuseAcquisition({
 
   qaEvents.push({
     severity: "information",
-    code: "RETAINED_INPUTS_REUSED",
-    message: `${inputs.length} exact, checksum-verified provider inputs were retained from ${archived.release_id}; original retrieval metadata is preserved.`
+    code: recipe.spatial_contract?.rebuild_aoi_dependent_inputs
+      ? "MATCHED_SPATIAL_ACQUISITION_RETAINED"
+      : "RETAINED_INPUTS_REUSED",
+    message: `${inputs.length} exact, checksum-verified provider inputs were retained from ${archived.release_id}; original retrieval metadata is preserved${recipe.spatial_contract?.rebuild_aoi_dependent_inputs ? " and the complete spatial contract is unchanged" : ""}.`
   });
   const manifest = {
     schema_version: "1.0.0",
@@ -614,6 +682,9 @@ export async function inspectOutput(output, file, runner, releaseRoot) {
   if (artifact.bytes < output.qa.minimum_bytes) {
     hardFailures.push(`${output.asset_id}: ${artifact.bytes} bytes is below ${output.qa.minimum_bytes}`);
   }
+  if (typeof output.qa.maximum_bytes === "number" && artifact.bytes > output.qa.maximum_bytes) {
+    hardFailures.push(`${output.asset_id}: ${artifact.bytes} bytes exceeds ${output.qa.maximum_bytes}`);
+  }
 
   if (output.profile === "geojson") {
     const document = JSON.parse(await readFile(file, "utf8"));
@@ -639,6 +710,11 @@ export async function inspectOutput(output, file, runner, releaseRoot) {
     const document = JSON.parse(await readFile(file, "utf8"));
     details.row_count = Array.isArray(document) ? document.length : 1;
     if (details.row_count < (output.qa.minimum_rows ?? 0)) hardFailures.push(`${output.asset_id}: too few JSON records`);
+    const records = Array.isArray(document) ? document : [document];
+    const missing = (output.qa.required_fields ?? []).filter((field) =>
+      records.some((record) => valueAt(record, field) === undefined)
+    );
+    if (missing.length > 0) hardFailures.push(`${output.asset_id}: missing JSON fields ${missing.join(", ")}`);
   } else if (output.profile === "vector_pmtiles" || output.profile === "raster_pmtiles") {
     const header = Buffer.alloc(8);
     const handle = await import("node:fs/promises").then(({ open }) => open(file, "r"));
@@ -666,6 +742,29 @@ export async function inspectOutput(output, file, runner, releaseRoot) {
         if (info.metadata?.IMAGE_STRUCTURE?.LAYOUT !== "COG") {
           hardFailures.push(`${output.asset_id}: GDAL does not report COG layout`);
         }
+        if (typeof output.qa.expected_band_count === "number" && info.bands?.length !== output.qa.expected_band_count) {
+          hardFailures.push(`${output.asset_id}: expected ${output.qa.expected_band_count} bands, received ${info.bands?.length ?? 0}`);
+        }
+        if (output.qa.expected_band_descriptions) {
+          const actual = (info.bands ?? []).map((band) => band.description ?? "");
+          if (JSON.stringify(actual) !== JSON.stringify(output.qa.expected_band_descriptions)) {
+            hardFailures.push(`${output.asset_id}: band descriptions do not match the recipe contract`);
+          }
+        }
+        if (typeof output.qa.expected_resolution_m === "number") {
+          const actual = [Math.abs(info.geoTransform?.[1] ?? NaN), Math.abs(info.geoTransform?.[5] ?? NaN)];
+          const tolerance = output.qa.resolution_tolerance_m ?? 0.01;
+          if (actual.some((value) => !Number.isFinite(value) || Math.abs(value - output.qa.expected_resolution_m) > tolerance)) {
+            hardFailures.push(`${output.asset_id}: pixel resolution ${actual.join(" x ")} m does not match ${output.qa.expected_resolution_m} m`);
+          }
+        }
+        if (output.qa.expected_crs) {
+          const expectedCode = Number(output.qa.expected_crs.slice("EPSG:".length));
+          const identifier = info.coordinateSystem?.id;
+          if (identifier?.authority !== "EPSG" || Number(identifier.code) !== expectedCode) {
+            hardFailures.push(`${output.asset_id}: CRS does not match ${output.qa.expected_crs}`);
+          }
+        }
       } catch (error) {
         hardFailures.push(`${output.asset_id}: ${error.message}`);
       }
@@ -673,6 +772,34 @@ export async function inspectOutput(output, file, runner, releaseRoot) {
   }
 
   return { artifact: { ...artifact, ...details }, hardFailures, warnings };
+}
+
+function assertionPasses(actual, assertion) {
+  if (assertion.operator === "eq") return actual === assertion.value;
+  if (typeof actual !== "number" || typeof assertion.value !== "number") return false;
+  if (assertion.operator === "gte") return actual >= assertion.value;
+  if (assertion.operator === "lte") return actual <= assertion.value;
+  return false;
+}
+
+async function qualityGateFailures(recipe, paths) {
+  const failures = [];
+  for (const gate of recipe.quality_gates ?? []) {
+    let report;
+    try {
+      report = await readJson(paths.get(gate.report_artifact_id));
+    } catch (error) {
+      failures.push(`${gate.gate_id}: quality report could not be read: ${error.message}`);
+      continue;
+    }
+    for (const assertion of gate.assertions) {
+      const actual = valueAt(report, assertion.path);
+      if (!assertionPasses(actual, assertion)) {
+        failures.push(`${gate.gate_id}: ${assertion.message} (received ${JSON.stringify(actual)})`);
+      }
+    }
+  }
+  return failures;
 }
 
 async function licenceAndRegistryGate(registry, recipe, acquisition, releaseRoot) {
@@ -712,7 +839,9 @@ async function crossReleaseGate(recipe, outputs, releaseRoot) {
     return { hardFailures, warnings };
   }
   const baseline = await readJson(path.resolve(repositoryRoot, baselinePath));
-  const baselineOutputs = new Map((baseline.outputs ?? []).map((output) => [output.id, output]));
+  const baselineOutputs = new Map((baseline.outputs ?? baseline.assets ?? []).map(
+    (output) => [output.id ?? output.asset_id, output]
+  ));
   for (const output of outputs) {
     const previous = baselineOutputs.get(output.id);
     if (!previous) {
@@ -836,6 +965,7 @@ export async function buildRelease({
   const outputs = inspected.map((item) => item.artifact);
   const registryGate = await licenceAndRegistryGate(registry, recipe, acquisition, releaseRoot);
   const crossRelease = await crossReleaseGate(recipe, outputs, releaseRoot);
+  const contractFailures = await qualityGateFailures(recipe, paths);
   const acquisitionFailures = acquisition.qa_events
     .filter((event) => event.severity === "hard_fail")
     .map((event) => `${event.code}: ${event.message}`);
@@ -846,6 +976,7 @@ export async function buildRelease({
     ...registryGate.hardFailures,
     ...acquisitionFailures,
     ...inspected.flatMap((item) => item.hardFailures),
+    ...contractFailures,
     ...crossRelease.hardFailures
   ];
   const warnings = [

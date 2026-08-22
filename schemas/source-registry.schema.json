@@ -12,7 +12,12 @@
     "release_authority": { "type": "string", "minLength": 1 },
     "status": { "enum": ["candidate_blocked", "approved", "withdrawn"] },
     "status_reason": { "type": "string", "minLength": 1 },
-    "area_of_interest": { "type": "object" },
+    "area_of_interest": {
+      "anyOf": [
+        { "type": "object", "maxProperties": 0 },
+        { "$ref": "#/$defs/area_of_interest" }
+      ]
+    },
     "hard_gaps": { "type": "array", "items": { "type": "object" } },
     "deferred_enhancements": { "type": "array", "items": { "type": "object" } },
     "sources": {
@@ -99,6 +104,26 @@
   "$defs": {
     "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]+$" },
     "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
-    "output_profile": { "enum": ["geojson", "vector_pmtiles", "raster_pmtiles", "cog", "accessible_csv", "accessible_json"] }
+    "output_profile": { "enum": ["geojson", "vector_pmtiles", "raster_pmtiles", "cog", "accessible_csv", "accessible_json"] },
+    "area_of_interest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "core_dataset_id", "core_label", "core_version", "core_path", "core_sha256", "source_capture_path", "source_capture_sha256", "buffer_distance_m", "buffer_crs", "clip_mode", "rule", "limitations"],
+      "properties": {
+        "status": { "const": "validated_release_rule" },
+        "core_dataset_id": { "$ref": "#/$defs/id" },
+        "core_label": { "type": "string", "minLength": 1 },
+        "core_version": { "type": "string", "minLength": 1 },
+        "core_path": { "type": "string", "minLength": 1 },
+        "core_sha256": { "$ref": "#/$defs/sha256" },
+        "source_capture_path": { "type": "string", "minLength": 1 },
+        "source_capture_sha256": { "$ref": "#/$defs/sha256" },
+        "buffer_distance_m": { "type": "number", "exclusiveMinimum": 0 },
+        "buffer_crs": { "type": "string", "pattern": "^EPSG:[0-9]+$" },
+        "clip_mode": { "const": "exact" },
+        "rule": { "type": "string", "minLength": 1 },
+        "limitations": { "type": "string", "minLength": 1 }
+      }
+    }
   }
 }
