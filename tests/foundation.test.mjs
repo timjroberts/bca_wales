@@ -26,6 +26,8 @@ test("prototype evidence remains quarantined while production uses the validated
 test("site and evidence delivery remain separately scoped", async () => {
   const preview = await read(".github/workflows/preview.yml");
   const production = await read(".github/workflows/deploy-site.yml");
+  const staging = await read(".github/workflows/stage-evidence.yml");
+  const publication = await read(".github/workflows/publish-evidence.yml");
   assert.match(preview, /pages deploy apps\/web\/out/);
   assert.match(preview, /npm run stage:preview-evidence/);
   assert.match(preview, /NEXT_PUBLIC_ASSET_ORIGIN: ""/);
@@ -35,5 +37,11 @@ test("site and evidence delivery remain separately scoped", async () => {
   assert.match(production, /environment: production/);
   assert.match(production, /npm run stage:pages-worker/);
   assert.match(production, /npm run check:production/);
+  assert.match(production, /BCA_VERIFICATION_MODE: staged/);
+  assert.match(staging, /npm run geodata -- stage/);
+  assert.doesNotMatch(staging, /npm run geodata -- publish/);
+  assert.match(publication, /actions\/download-artifact@v4/);
+  assert.match(publication, /npm run geodata -- publish/);
+  assert.doesNotMatch(publication, /acquire --registry|build --release-root/);
   assert.doesNotMatch(`${preview}\n${production}`, /wrangler r2 object put/);
 });

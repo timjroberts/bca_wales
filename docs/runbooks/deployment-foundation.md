@@ -88,18 +88,26 @@ guard uses the existing project-scoped Pages deployment credential and cannot
 modify DNS, R2 or zone cache; it never purges hash-addressed `/_next` files or
 immutable evidence assets.
 
-For the first release, use this order:
+For a controlled release, use this order:
 
 1. Confirm both production hostnames, R2 CORS, Pages security headers and the
    restrictive Cloudflare credentials.
-2. Merge the reviewed application commit. Dispatch `Deploy production site`
-   with the exact evidence release identifier and immutable manifest SHA-256;
-   approve the protected environment only after its checks pass.
-3. Review the retained launch-acceptance candidate and the factual release's
+2. Stage the exact checksum-verified public bundle with `Stage evidence release`.
+   This uploads and reads back only immutable versioned objects, retains the
+   completed staged release as a private workflow artifact, and does not read or
+   write `releases/current.json`. Record its run and final manifest SHA-256.
+3. Merge the reviewed application commit. Dispatch `Deploy production site`
+   with the exact staged evidence release identifier and final immutable
+   manifest SHA-256; approve the protected environment only after its checks
+   pass. Its post-deployment check verifies the versioned release directly and
+   permits the current pointer to remain on the prior release.
+4. Review the retained launch-acceptance candidate and the factual release's
    manual QA warnings. Tim Roberts records the explicit release decision.
-4. Run the manual evidence `publish` command in the evidence runbook. This is
-   the single atomic change to `releases/current.json`.
-5. Retain the production workflow's `npm run check:production` JSON output in
+5. Dispatch `Publish evidence release` with the successful staging run, exact
+   release identifier and final manifest SHA-256. This is the single atomic
+   change to `releases/current.json`; it downloads the retained staged artifact
+   instead of rebuilding or reacquiring the approved candidate.
+6. Retain the publication workflow's `npm run check:production` JSON output in
    the final launch record. Confirm the map, source details and accessible CSV
    journeys manually, then finalise the schema-valid acceptance record.
 
