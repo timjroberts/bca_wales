@@ -7,12 +7,8 @@ on:
         description: Reviewed repository commit containing the publication toolchain
         required: true
         type: string
-      bundle_tag:
-        description: Draft GitHub release tag containing the verified public bundle
-        required: true
-        type: string
-      bundle_asset:
-        description: Bundle asset filename
+      bundle_asset_id:
+        description: Immutable asset ID from the draft GitHub release
         required: true
         type: string
       bundle_sha256:
@@ -43,8 +39,7 @@ jobs:
     env:
       CODE_COMMIT: ${{ inputs.code_commit }}
       GH_TOKEN: ${{ github.token }}
-      BUNDLE_TAG: ${{ inputs.bundle_tag }}
-      BUNDLE_ASSET: ${{ inputs.bundle_asset }}
+      BUNDLE_ASSET_ID: ${{ inputs.bundle_asset_id }}
       BUNDLE_SHA256: ${{ inputs.bundle_sha256 }}
       RELEASE_ID: ${{ inputs.release_id }}
       CANDIDATE_MANIFEST_SHA256: ${{ inputs.candidate_manifest_sha256 }}
@@ -57,7 +52,7 @@ jobs:
           ref: ${{ inputs.code_commit }}
           persist-credentials: false
       - name: Validate immutable inputs
-        run: node -e 'const assert=require("node:assert/strict"),{execFileSync}=require("node:child_process"); assert.match(process.env.CODE_COMMIT, /^[0-9a-f]{40}$/); assert.equal(execFileSync("git",["rev-parse","HEAD"],{encoding:"utf8"}).trim(), process.env.CODE_COMMIT); assert.match(process.env.RELEASE_ID, /^release-[a-z0-9][a-z0-9._-]+$/); assert.match(process.env.BUNDLE_ASSET, /^[a-zA-Z0-9][a-zA-Z0-9._-]+$/); assert.match(process.env.BUNDLE_SHA256, /^[0-9a-f]{64}$/); assert.match(process.env.CANDIDATE_MANIFEST_SHA256, /^[0-9a-f]{64}$/);'
+        run: node -e 'const assert=require("node:assert/strict"),{execFileSync}=require("node:child_process"); assert.match(process.env.CODE_COMMIT, /^[0-9a-f]{40}$/); assert.equal(execFileSync("git",["rev-parse","HEAD"],{encoding:"utf8"}).trim(), process.env.CODE_COMMIT); assert.match(process.env.RELEASE_ID, /^release-[a-z0-9][a-z0-9._-]+$/); assert.match(process.env.BUNDLE_ASSET_ID, /^[1-9][0-9]*$/); assert.match(process.env.BUNDLE_SHA256, /^[0-9a-f]{64}$/); assert.match(process.env.CANDIDATE_MANIFEST_SHA256, /^[0-9a-f]{64}$/);'
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
@@ -65,7 +60,8 @@ jobs:
       - run: npm ci
       - run: npm run check
       - name: Download the exact reviewed public bundle
-        run: gh release download "$BUNDLE_TAG" --pattern "$BUNDLE_ASSET" --output candidate-bundle.tgz
+        run: |
+          gh api -H "Accept: application/octet-stream" "repos/$GITHUB_REPOSITORY/releases/assets/$BUNDLE_ASSET_ID" > candidate-bundle.tgz
       - name: Verify and unpack the bundle
         run: |
           echo "$BUNDLE_SHA256  candidate-bundle.tgz" | sha256sum --check --strict
