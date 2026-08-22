@@ -33,6 +33,10 @@ The [evidence publication runbook](docs/runbooks/evidence-publication.md)
 documents immutable acquisition, offline transformation, QA, reproduction,
 promotion and withdrawal.
 
+The [Recent satellite thermal anomalies runbook](docs/runbooks/firms-operational-feed.md)
+documents the separately scheduled NASA FIRMS feed, freshness monitoring,
+retention, withdrawal and checksum-verified recovery.
+
 ## Reviewed prototype
 
 The interaction prototype remains in `prototypes/blorenge-explorer` as a
