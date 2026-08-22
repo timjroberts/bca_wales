@@ -5,6 +5,7 @@ dist/
 .wrangler/
 .geodata-work/
 .geodata-staging/
+.geodata-reproduction/
 .env
 .env.*
 !.env.example
