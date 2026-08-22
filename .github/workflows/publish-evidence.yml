@@ -3,8 +3,16 @@ name: Publish evidence release
 on:
   workflow_dispatch:
     inputs:
-      recipe:
-        description: Checked-in publication recipe path
+      staging_run_id:
+        description: Successful Stage evidence release workflow run
+        required: true
+        type: string
+      release_id:
+        description: Staged immutable release identifier
+        required: true
+        type: string
+      manifest_sha256:
+        description: SHA-256 of the staged final release manifest
         required: true
         type: string
       mode:
@@ -15,6 +23,7 @@ on:
         options: [manual, automatic]
 
 permissions:
+  actions: read
   contents: read
 
 concurrency:
@@ -24,10 +33,11 @@ concurrency:
 jobs:
   publish:
     runs-on: ubuntu-24.04
-    timeout-minutes: 120
+    timeout-minutes: 30
     environment: production
     env:
-      RECIPE_PATH: ${{ inputs.recipe }}
+      RELEASE_ID: ${{ inputs.release_id }}
+      MANIFEST_SHA256: ${{ inputs.manifest_sha256 }}
       PROMOTION_MODE: ${{ inputs.mode }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       CLOUDFLARE_R2_ACCESS_KEY_ID: ${{ secrets.CLOUDFLARE_R2_ACCESS_KEY_ID }}
@@ -42,28 +52,31 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run check
-      - name: Validate requested checked-in recipe
-        run: npm run geodata -- validate --registry data/launch/source-registry.json --recipe "$RECIPE_PATH"
-      - name: Resolve immutable release path
-        id: recipe
-        run: node -e 'const fs=require("node:fs"); const path=require("node:path"); const recipe=JSON.parse(fs.readFileSync(process.env.RECIPE_PATH)); if (!/^release-[a-z0-9][a-z0-9._-]+$/.test(recipe.release_id)) throw new Error("unsafe release id"); fs.appendFileSync(process.env.GITHUB_OUTPUT, `release_id=${recipe.release_id}\nrelease_root=.geodata-work/${recipe.release_id}\n`);'
-      - name: Build pinned geodata image
-        run: docker build --file tooling/geodata/Containerfile --tag bca/geodata-toolchain:1.0.0 .
-      - name: Acquire exact source snapshots
-        run: npm run geodata -- acquire --registry data/launch/source-registry.json --recipe "$RECIPE_PATH" --workspace .geodata-work --commit "$GITHUB_SHA" --allow-network
-      - name: Transform and gate candidate offline
-        run: npm run geodata -- build --release-root "${{ steps.recipe.outputs.release_root }}"
-      - name: Reproduce exact outputs before promotion
-        run: npm run geodata -- reproduce --archive "${{ steps.recipe.outputs.release_root }}" --workspace .geodata-reproduction
-      - name: Upload, verify and atomically promote
-        run: npm run geodata -- publish --release-root "${{ steps.recipe.outputs.release_root }}" --bucket bca-wales-public-releases --jurisdiction eu --identity timjroberts --mode "$PROMOTION_MODE"
+      - name: Validate immutable inputs
+        run: node -e 'const assert=require("node:assert/strict"); assert.match(process.env.RELEASE_ID, /^release-[a-z0-9][a-z0-9._-]+$/); assert.match(process.env.MANIFEST_SHA256, /^[0-9a-f]{64}$/); assert.match(process.env.STAGING_RUN_ID, /^[1-9][0-9]*$/);'
+        env:
+          STAGING_RUN_ID: ${{ inputs.staging_run_id }}
+      - name: Download the exact staged release
+        uses: actions/download-artifact@v4
+        with:
+          name: staged-evidence-${{ inputs.release_id }}
+          path: staged-release/${{ inputs.release_id }}
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: ${{ inputs.staging_run_id }}
+      - name: Verify the staged final manifest
+        run: echo "$MANIFEST_SHA256  staged-release/$RELEASE_ID/manifests/release.json" | sha256sum --check --strict
+      - name: Atomically promote the already staged release
+        run: npm run geodata -- publish --release-root "staged-release/$RELEASE_ID" --bucket bca-wales-public-releases --jurisdiction eu --identity timjroberts --mode "$PROMOTION_MODE"
+      - name: Verify production after promotion
+        run: npm run check:production
       - name: Retain release audit artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: evidence-${{ steps.recipe.outputs.release_id }}
+          name: evidence-${{ inputs.release_id }}
           path: |
-            ${{ steps.recipe.outputs.release_root }}/manifests/
-            ${{ steps.recipe.outputs.release_root }}/reports/
+            staged-release/${{ inputs.release_id }}/manifests/
+            staged-release/${{ inputs.release_id }}/reports/
           if-no-files-found: error
           retention-days: 90

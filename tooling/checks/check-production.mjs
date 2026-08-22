@@ -5,6 +5,8 @@ import { readFile } from "node:fs/promises";
 const explorer = JSON.parse(await readFile(new URL("../../data/launch/explorer-release-2026-08-13.json", import.meta.url), "utf8"));
 const siteOrigin = (process.env.BCA_SITE_ORIGIN ?? "https://explore.bca.wales").replace(/\/$/, "");
 const assetOrigin = (process.env.BCA_ASSET_ORIGIN ?? "https://assets.bca.wales").replace(/\/$/, "");
+const verificationMode = process.env.BCA_VERIFICATION_MODE ?? "current";
+assert.ok(["current", "staged"].includes(verificationMode), `unsupported verification mode: ${verificationMode}`);
 
 async function fetchOk(url, options) {
   const response = await fetch(url, options);
@@ -35,12 +37,20 @@ assert.equal(evidenceResponse.status, 404, "/evidence/ must use the normal not-f
 const pointerResponse = await fetchOk(`${assetOrigin}/releases/current.json`, { cache: "no-store" });
 const pointer = await pointerResponse.json();
 assert.equal(pointer.status, "current");
-assert.equal(pointer.release_id, explorer.release.id);
-assert.equal(pointer.manifest_sha256, explorer.release.manifestSha256);
+let manifestUrl;
+if (verificationMode === "current") {
+  assert.equal(pointer.release_id, explorer.release.id);
+  assert.equal(pointer.manifest_sha256, explorer.release.manifestSha256);
+  manifestUrl = pointer.manifest_url;
+} else {
+  assert.equal(process.env.BCA_EXPECTED_RELEASE_ID, explorer.release.id);
+  assert.equal(process.env.BCA_EXPECTED_MANIFEST_SHA256, explorer.release.manifestSha256);
+  manifestUrl = `${assetOrigin}${explorer.release.manifestPath}`;
+}
 
-const manifestResponse = await fetchOk(pointer.manifest_url, { cache: "no-store" });
+const manifestResponse = await fetchOk(manifestUrl, { cache: "no-store" });
 const manifestBytes = Buffer.from(await manifestResponse.arrayBuffer());
-assert.equal(createHash("sha256").update(manifestBytes).digest("hex"), pointer.manifest_sha256);
+assert.equal(createHash("sha256").update(manifestBytes).digest("hex"), explorer.release.manifestSha256);
 const manifest = JSON.parse(manifestBytes.toString("utf8"));
 assert.equal(manifest.release_id, explorer.release.id);
 assert.equal(manifest.gate.result, "pass");
@@ -57,7 +67,9 @@ process.stdout.write(`${JSON.stringify({
   checked_at: new Date().toISOString(),
   site_origin: siteOrigin,
   asset_origin: assetOrigin,
-  release_id: pointer.release_id,
+  verification_mode: verificationMode,
+  release_id: explorer.release.id,
+  current_release_id: pointer.release_id,
   routes: routeChecks.map(([path]) => path),
   representative_asset: representative.asset_id,
   result: "pass"
