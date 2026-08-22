@@ -36,6 +36,26 @@ function runWrangler(argv, env = process.env) {
   });
 }
 
+function runCurl(argv, credentials) {
+  return new Promise((resolve, reject) => {
+    const child = spawn("curl", ["--fail-with-body", "--silent", "--show-error", ...argv, "--config", "-"], {
+      stdio: ["pipe", "pipe", "pipe"]
+    });
+    let stdout = "";
+    let stderr = "";
+    child.stdout.setEncoding("utf8");
+    child.stderr.setEncoding("utf8");
+    child.stdout.on("data", (chunk) => { stdout += chunk; });
+    child.stderr.on("data", (chunk) => { stderr += chunk; });
+    child.on("error", reject);
+    child.on("close", (code) => {
+      if (code === 0) resolve({ stdout, stderr });
+      else reject(new Error(`R2 S3 request exited ${code}: ${stderr.trim()}`));
+    });
+    child.stdin.end(`user = "${credentials.accessKeyId}:${credentials.secretAccessKey}"\n`);
+  });
+}
+
 function assertKey(key) {
   if (!/^[a-zA-Z0-9][a-zA-Z0-9._/-]+$/.test(key) || key.includes("..")) {
     throw new Error(`Unsafe R2 object key: ${key}`);
@@ -76,6 +96,58 @@ export class WranglerR2Store {
       ...this.jurisdictionArgs(),
       "--remote"
     ], this.env);
+  }
+
+  async getOptional(key, destination) {
+    try {
+      await this.getFile(key, destination);
+      return true;
+    } catch (error) {
+      if (isMissingObjectError(error)) return false;
+      throw error;
+    }
+  }
+}
+
+export class S3R2Store {
+  constructor({ bucket, accountId, accessKeyId, secretAccessKey, jurisdiction = null }) {
+    if (!/^[a-z0-9][a-z0-9-]+$/.test(bucket)) throw new Error(`Unsafe R2 bucket name: ${bucket}`);
+    if (!/^[a-f0-9]{32}$/.test(accountId)) throw new Error("Invalid Cloudflare account ID");
+    if (!/^[A-Za-z0-9._-]+$/.test(accessKeyId) || !/^[A-Za-z0-9._-]+$/.test(secretAccessKey)) {
+      throw new Error("Invalid R2 S3 credentials");
+    }
+    if (jurisdiction !== null && !["eu", "fedramp"].includes(jurisdiction)) {
+      throw new Error(`Unsupported R2 jurisdiction: ${jurisdiction}`);
+    }
+    this.bucket = bucket;
+    this.credentials = { accessKeyId, secretAccessKey };
+    const jurisdictionLabel = jurisdiction ? `${jurisdiction}.` : "";
+    this.endpoint = `https://${accountId}.${jurisdictionLabel}r2.cloudflarestorage.com`;
+  }
+
+  objectUrl(key) {
+    assertKey(key);
+    const encodedKey = key.split("/").map(encodeURIComponent).join("/");
+    return `${this.endpoint}/${this.bucket}/${encodedKey}`;
+  }
+
+  async putFile(key, file, contentType) {
+    if (/\r|\n/.test(contentType)) throw new Error("Unsafe content type");
+    await runCurl([
+      "--aws-sigv4", "aws:amz:auto:s3",
+      "--request", "PUT",
+      "--upload-file", file,
+      "--header", `Content-Type: ${contentType}`,
+      this.objectUrl(key)
+    ], this.credentials);
+  }
+
+  async getFile(key, destination) {
+    await runCurl([
+      "--aws-sigv4", "aws:amz:auto:s3",
+      "--output", destination,
+      this.objectUrl(key)
+    ], this.credentials);
   }
 
   async getOptional(key, destination) {
@@ -155,6 +227,92 @@ async function writePointer(store, pointer) {
   } finally {
     await rm(directory, { recursive: true });
   }
+}
+
+function assertRestorableCurrent(current, releaseId) {
+  if (current !== null && (current.status !== "current" || current.release_id !== releaseId)) {
+    throw new Error(`Refusing pointer restoration: current release is ${current.release_id ?? current.status}`);
+  }
+}
+
+export async function restoreCurrentPointer({
+  store,
+  releaseId,
+  expectedManifestSha256,
+  identity,
+  publicAssetOrigin = "https://assets.bca.wales"
+}) {
+  if (!/^release-[a-z0-9][a-z0-9._-]+$/.test(releaseId)) {
+    throw new Error(`Unsafe release id: ${releaseId}`);
+  }
+  if (!/^[0-9a-f]{64}$/.test(expectedManifestSha256)) {
+    throw new Error("Expected manifest SHA-256 must be 64 lowercase hexadecimal characters");
+  }
+  if (typeof identity !== "string" || identity.length === 0) {
+    throw new Error("A release authority identity is required");
+  }
+  const assetOrigin = new URL(publicAssetOrigin);
+  if (assetOrigin.protocol !== "https:" || assetOrigin.pathname !== "/" || assetOrigin.search || assetOrigin.hash) {
+    throw new Error("Public asset origin must be an HTTPS origin without a path, query or fragment");
+  }
+
+  assertRestorableCurrent(await readCurrent(store), releaseId);
+  const manifestKey = `releases/${releaseId}/manifest.json`;
+  const remoteManifest = await remoteFile(store, manifestKey);
+  let release;
+  try {
+    if (!remoteManifest.exists) throw new Error(`Release manifest is absent: ${manifestKey}`);
+    if (await sha256File(remoteManifest.destination) !== expectedManifestSha256) {
+      throw new Error("Release manifest checksum does not match the expected immutable checksum");
+    }
+    release = await readJson(remoteManifest.destination);
+    await validateDocument("release", release, "restored release manifest");
+  } finally {
+    await remoteManifest.cleanup();
+  }
+  if (release.release_id !== releaseId) throw new Error("Release manifest identifies a different release");
+  if (release.gate.result !== "pass" || release.gate.hard_failures.length > 0) {
+    throw new Error("Only a passing release manifest can be restored");
+  }
+  if (release.promotion?.identity !== identity) {
+    throw new Error(`Only original release authority ${release.promotion?.identity ?? "unknown"} may restore this release`);
+  }
+  if (typeof release.published_at !== "string") throw new Error("Restored release has no publication timestamp");
+
+  const verifiedKeys = new Set();
+  for (const asset of release.assets) {
+    const assetUrl = new URL(asset.url);
+    const expectedPrefix = `/releases/${releaseId}/assets/`;
+    if (assetUrl.origin !== assetOrigin.origin || !assetUrl.pathname.startsWith(expectedPrefix) ||
+        assetUrl.pathname.slice(expectedPrefix.length).includes("/") || assetUrl.search || assetUrl.hash) {
+      throw new Error(`${asset.asset_id}: asset URL is outside the immutable release path`);
+    }
+    const key = assetUrl.pathname.slice(1);
+    if (verifiedKeys.has(key)) throw new Error(`${asset.asset_id}: duplicate immutable asset key`);
+    verifiedKeys.add(key);
+    const remoteAsset = await remoteFile(store, key);
+    try {
+      if (!remoteAsset.exists) throw new Error(`${asset.asset_id}: immutable asset is absent`);
+      const details = await stat(remoteAsset.destination);
+      if (details.size !== asset.bytes || await sha256File(remoteAsset.destination) !== asset.sha256) {
+        throw new Error(`${asset.asset_id}: immutable asset does not match the release manifest`);
+      }
+    } finally {
+      await remoteAsset.cleanup();
+    }
+  }
+
+  const pointer = {
+    schema_version: "1.0.0",
+    status: "current",
+    release_id: releaseId,
+    manifest_url: `${assetOrigin.origin}/${manifestKey}`,
+    manifest_sha256: expectedManifestSha256,
+    published_at: release.published_at
+  };
+  assertRestorableCurrent(await readCurrent(store), releaseId);
+  await writePointer(store, pointer);
+  return { release, pointer, verifiedAssets: verifiedKeys.size };
 }
 
 export async function stageRelease({

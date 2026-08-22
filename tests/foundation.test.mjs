@@ -31,7 +31,9 @@ test("site and evidence delivery remain separately scoped", async () => {
   assert.match(preview, /NEXT_PUBLIC_ASSET_ORIGIN: ""/);
   assert.match(preview, /npm run check:preview/);
   assert.doesNotMatch(preview, /assets-preview\.bca\.wales/);
-  assert.match(await read("config/cloudflare/preview-worker.mjs"), /status: 206/);
+  assert.match(await read("config/cloudflare/pages-worker.mjs"), /status: 206/);
   assert.match(production, /environment: production/);
+  assert.match(production, /npm run stage:pages-worker/);
+  assert.match(production, /npm run check:production/);
   assert.doesNotMatch(`${preview}\n${production}`, /wrangler r2 object put/);
 });

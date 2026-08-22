@@ -12,7 +12,14 @@ import {
   reuseAcquisition,
   verifyArchive
 } from "../src/pipeline.mjs";
-import { publishRelease, stageRelease, withdrawRelease, WranglerR2Store } from "../src/r2.mjs";
+import {
+  publishRelease,
+  restoreCurrentPointer,
+  S3R2Store,
+  stageRelease,
+  withdrawRelease,
+  WranglerR2Store
+} from "../src/r2.mjs";
 import { readJson } from "../src/runtime.mjs";
 
 const execFileAsync = promisify(execFile);
@@ -28,6 +35,7 @@ Usage:
   bca-geodata verify-archive --release-root DIR
   bca-geodata stage --release-root DIR --bucket NAME --identity LOGIN [--jurisdiction eu|fedramp]
   bca-geodata publish --release-root DIR --bucket NAME --identity LOGIN [--jurisdiction eu|fedramp] [--mode manual|automatic]
+  bca-geodata restore-pointer --bucket NAME --release-id ID --manifest-sha256 SHA --identity LOGIN [--jurisdiction eu|fedramp] [--asset-origin URL]
   bca-geodata withdraw --release-root DIR --bucket NAME --release-id ID --identity LOGIN --reason TEXT [--jurisdiction eu|fedramp] [--replacement FILE]
 
 Acquisition never uses the network unless --allow-network is present. Build
@@ -61,6 +69,29 @@ function required(options, name) {
 
 function absolute(value) {
   return path.resolve(process.cwd(), value);
+}
+
+function r2Store(options) {
+  const bucket = required(options, "bucket");
+  const jurisdiction = options.jurisdiction ?? null;
+  const s3Values = [
+    process.env.CLOUDFLARE_ACCOUNT_ID,
+    process.env.CLOUDFLARE_R2_ACCESS_KEY_ID,
+    process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY
+  ];
+  if (s3Values.some(Boolean)) {
+    if (!s3Values.every(Boolean)) {
+      throw new Error("CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_R2_ACCESS_KEY_ID and CLOUDFLARE_R2_SECRET_ACCESS_KEY must be set together");
+    }
+    return new S3R2Store({
+      bucket,
+      jurisdiction,
+      accountId: s3Values[0],
+      accessKeyId: s3Values[1],
+      secretAccessKey: s3Values[2]
+    });
+  }
+  return new WranglerR2Store({ bucket, jurisdiction });
 }
 
 async function gitCommit() {
@@ -123,10 +154,7 @@ async function main() {
   } else if (command === "verify-archive") {
     result = await verifyArchive(absolute(required(options, "release-root")));
   } else if (command === "stage") {
-    const store = new WranglerR2Store({
-      bucket: required(options, "bucket"),
-      jurisdiction: options.jurisdiction ?? null
-    });
+    const store = r2Store(options);
     const staged = await stageRelease({
       releaseRoot: absolute(required(options, "release-root")),
       store,
@@ -134,10 +162,7 @@ async function main() {
     });
     result = { release_id: staged.release.release_id, uploads: staged.uploads };
   } else if (command === "publish") {
-    const store = new WranglerR2Store({
-      bucket: required(options, "bucket"),
-      jurisdiction: options.jurisdiction ?? null
-    });
+    const store = r2Store(options);
     const published = await publishRelease({
       releaseRoot: absolute(required(options, "release-root")),
       store,
@@ -147,10 +172,7 @@ async function main() {
     result = { release_id: published.release.release_id, current: published.pointer, uploads: published.uploads };
   } else if (command === "withdraw") {
     const replacement = options.replacement ? await readJson(absolute(options.replacement)) : null;
-    const store = new WranglerR2Store({
-      bucket: required(options, "bucket"),
-      jurisdiction: options.jurisdiction ?? null
-    });
+    const store = r2Store(options);
     const withdrawn = await withdrawRelease({
       releaseRoot: absolute(required(options, "release-root")),
       store,
@@ -160,6 +182,20 @@ async function main() {
       replacement
     });
     result = { release_id: withdrawn.record.release_id, current: withdrawn.pointer };
+  } else if (command === "restore-pointer") {
+    const store = r2Store(options);
+    const restored = await restoreCurrentPointer({
+      store,
+      releaseId: required(options, "release-id"),
+      expectedManifestSha256: required(options, "manifest-sha256"),
+      identity: required(options, "identity"),
+      publicAssetOrigin: options["asset-origin"] ?? "https://assets.bca.wales"
+    });
+    result = {
+      release_id: restored.release.release_id,
+      current: restored.pointer,
+      verified_assets: restored.verifiedAssets
+    };
   } else {
     throw new Error(`Unknown command: ${command}\n\n${help}`);
   }

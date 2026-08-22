@@ -26,6 +26,7 @@
     "firms:publish": "node tooling/firms/publish-feed.mjs",
     "firms:monitor": "node tooling/firms/monitor-feed.mjs",
     "firms:manage": "node tooling/firms/manage-feed.mjs",
+    "stage:pages-worker": "node tooling/checks/stage-pages-worker.mjs",
     "geodata": "node tooling/geodata/bin/bca-geodata.mjs",
     "geodata:validate": "npm run geodata -- validate --registry data/launch/source-registry.json --recipe config/publication/recipe.example.json",
     "check": "npm run lint && npm run typecheck && npm test && npm run build",

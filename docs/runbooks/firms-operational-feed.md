@@ -35,9 +35,10 @@ pointer.
 
 ## Credentials and quota
 
-`FIRMS_MAP_KEY` is a repository secret. `CLOUDFLARE_R2_PUBLICATION_TOKEN` and
-`CLOUDFLARE_ACCOUNT_ID` are exposed only by the protected production
-environment; the token is restricted to the production publication bucket.
+`FIRMS_MAP_KEY` is a repository secret. `CLOUDFLARE_R2_ACCESS_KEY_ID`,
+`CLOUDFLARE_R2_SECRET_ACCESS_KEY` and `CLOUDFLARE_ACCOUNT_ID` are exposed only
+by the protected production environment; the S3-compatible credentials are
+restricted to the production publication bucket.
 Values must never enter source, logs, manifests, artifacts or issue comments.
 The publisher stops before acquisition when fewer than 20 FIRMS transactions
 remain in the provider's 5,000-per-10-minute allowance.

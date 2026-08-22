@@ -35,7 +35,8 @@ jobs:
     env:
       FIRMS_MAP_KEY: ${{ secrets.FIRMS_MAP_KEY }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_R2_PUBLICATION_TOKEN }}
+      CLOUDFLARE_R2_ACCESS_KEY_ID: ${{ secrets.CLOUDFLARE_R2_ACCESS_KEY_ID }}
+      CLOUDFLARE_R2_SECRET_ACCESS_KEY: ${{ secrets.CLOUDFLARE_R2_SECRET_ACCESS_KEY }}
       OPERATION: ${{ inputs.operation || 'publish' }}
       WITHDRAWAL_REASON: ${{ inputs.reason }}
       WITHDRAWAL_KEY: ${{ inputs.withdrawal_key }}
@@ -51,7 +52,7 @@ jobs:
       - name: Validate operational publisher
         run: node --test tests/firms-feed.test.mjs tests/firms-signal.test.mjs
       - name: Require protected credentials
-        run: test -n "$FIRMS_MAP_KEY" && test -n "$CLOUDFLARE_ACCOUNT_ID" && test -n "$CLOUDFLARE_API_TOKEN"
+        run: test -n "$FIRMS_MAP_KEY" && test -n "$CLOUDFLARE_ACCOUNT_ID" && test -n "$CLOUDFLARE_R2_ACCESS_KEY_ID" && test -n "$CLOUDFLARE_R2_SECRET_ACCESS_KEY"
       - name: Publish verified feed snapshot
         if: env.OPERATION == 'publish'
         run: npm run firms:publish

@@ -132,9 +132,13 @@ output checksum equals the archived lineage. No live upstream source is used.
 
 ## Stage, then promote
 
-Use a dedicated `CLOUDFLARE_API_TOKEN` restricted to object read/write on the
-target evidence bucket and `CLOUDFLARE_ACCOUNT_ID`. Site-deployment tokens must
-not have this permission. Production runs in the protected GitHub `production`
+Use dedicated `CLOUDFLARE_R2_ACCESS_KEY_ID` and
+`CLOUDFLARE_R2_SECRET_ACCESS_KEY` environment secrets from an R2 token
+restricted to object read/write on the target evidence bucket, together with
+`CLOUDFLARE_ACCOUNT_ID`. Site-deployment tokens must not have this permission.
+Wrangler's API-token authentication is not used for evidence objects because
+it attempts account enumeration that a bucket-scoped account token correctly
+cannot perform. Production runs in the protected GitHub `production`
 environment and the workflow concurrency group prevents two pointer changes at
 once.
 
@@ -179,3 +183,19 @@ After promotion, withdrawal or rollback, fetch `current.json`, its manifest and
 one representative asset through the public asset hostname and verify the
 recorded SHA-256. Confirm the homepage map, source details and accessible CSV
 show the same release state.
+
+### Recover a missing current pointer
+
+If `releases/current.json` is absent but a previously published immutable
+release is retained, run the protected **Restore evidence pointer** workflow
+with the reviewed release ID and manifest SHA-256. The workflow uses the
+existing token restricted to the evidence bucket. It downloads the immutable
+manifest and every referenced asset directly from R2, verifies their paths,
+sizes and SHA-256 values, confirms the passing gate and original release
+authority, and only then recreates `current.json`.
+
+The command refuses to replace a withdrawn pointer or a pointer selecting a
+different release. It never writes versioned assets, deletes objects, changes
+DNS, or purges a Cloudflare zone. Preserve the workflow run with the incident
+record and confirm the public pointer, manifest, representative asset and site
+with `npm run check:production`.

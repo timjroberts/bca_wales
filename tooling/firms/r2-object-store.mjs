@@ -1,11 +1,26 @@
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { WranglerR2Store } from "../geodata/src/r2.mjs";
+import { S3R2Store, WranglerR2Store } from "../geodata/src/r2.mjs";
 
 export class R2ObjectStore {
-  constructor(options) {
-    this.store = new WranglerR2Store(options);
+  constructor({ env = process.env, ...options }) {
+    const values = [
+      env.CLOUDFLARE_ACCOUNT_ID,
+      env.CLOUDFLARE_R2_ACCESS_KEY_ID,
+      env.CLOUDFLARE_R2_SECRET_ACCESS_KEY
+    ];
+    if (values.some(Boolean) && !values.every(Boolean)) {
+      throw new Error("CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_R2_ACCESS_KEY_ID and CLOUDFLARE_R2_SECRET_ACCESS_KEY must be set together");
+    }
+    this.store = values.every(Boolean)
+      ? new S3R2Store({
+        ...options,
+        accountId: values[0],
+        accessKeyId: values[1],
+        secretAccessKey: values[2]
+      })
+      : new WranglerR2Store({ ...options, env });
   }
 
   async get(key) {

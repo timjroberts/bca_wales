@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import previewWorker from "../config/cloudflare/preview-worker.mjs";
+import { createPagesWorker } from "../config/cloudflare/pages-worker.mjs";
+
+const previewWorker = createPagesWorker(["/evidence", "/evidence/"]);
 
 const bytes = new TextEncoder().encode(`PMTiles${"x".repeat(249)}`);
 const env = {
