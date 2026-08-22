@@ -23,7 +23,7 @@ const copy = {
   en: {
     skip: "Skip to the explorer",
     brand: "Blorenge Landscape Explorer",
-    fixture: "Verified release-two candidate · 22 August 2026",
+    fixture: "Published second release · 22 August 2026",
     title: "Explore the Blorenge landscape and see how it changes over time",
     intro: "After exploring this beautiful landscape on foot, why not explore its data and compare and observe how it changes over time.",
     caution: "Observed change is not proof of cause, severity or ecological recovery. EFFIS and recent thermal anomalies are separate sources, not verified incident perimeters.",
@@ -59,7 +59,7 @@ const copy = {
   cy: {
     skip: "Neidio i’r archwiliwr",
     brand: "Archwiliwr Tirwedd y Blorens",
-    fixture: "Ymgeisydd ail ryddhad wedi’i wirio · 22 Awst 2026",
+    fixture: "Ail ryddhad wedi’i gyhoeddi · 22 Awst 2026",
     title: "Archwiliwch dirwedd y Blorens a gweld sut mae’n newid dros amser",
     intro: "Ar ôl archwilio’r dirwedd hardd hon ar droed, beth am archwilio ei data a chymharu a gweld sut mae’n newid dros amser.",
     caution: "Nid yw newid a welwyd yn brawf o achos, difrifoldeb nac adferiad ecolegol. Mae EFFIS ac anomaleddau thermol diweddar yn ffynonellau ar wahân, nid terfynau digwyddiad wedi’u cadarnhau.",
