@@ -26,7 +26,7 @@ jobs:
       - run: npm run check
         env:
           NEXT_PUBLIC_SITE_ORIGIN: https://pr-${{ github.event.pull_request.number }}.bca-wales-explorer-preview.pages.dev
-          NEXT_PUBLIC_RELEASE_MANIFEST_URL: /releases/release-blorenge-2026-08-13.6/manifest.json
+          NEXT_PUBLIC_RELEASE_MANIFEST_URL: /releases/release-blorenge-2026-08-21.8/manifest.json
           NEXT_PUBLIC_ASSET_ORIGIN: ""
       - name: Stage checksum-verified evidence in the immutable preview artifact
         run: npm run stage:preview-evidence

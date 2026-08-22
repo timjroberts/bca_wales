@@ -79,6 +79,10 @@ h1 { max-width: 13ch; margin: 0; font: 500 clamp(2.9rem, 7vw, 6.8rem)/.92 Georgi
 .caution-card { padding: 20px; display: grid; grid-template-columns: 32px 1fr; gap: 12px; border-top: 4px solid var(--ember); background: var(--panel); box-shadow: 0 12px 30px #17342b17; }
 .caution-card > span { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; background: #f6d5c8; font-weight: 900; }
 .caution-card p { margin: 0; line-height: 1.5; }
+.release-state-card { max-width: 760px; margin: 0 auto 72px; padding: 28px; border: 1px solid var(--line); border-top: 4px solid var(--ember); background: var(--panel); box-shadow: 0 12px 30px #17342b17; }
+.release-state-card h2 { margin-top: 0; font-family: var(--font-serif); font-size: clamp(28px, 4vw, 42px); }
+.release-state-card p { line-height: 1.6; }
+.release-state-reason { padding: 12px 14px; border-left: 4px solid var(--ember); background: #f6ece6; }
 
 .explorer-shell { position: relative; margin: 0; border-block: 1px solid var(--line); background: var(--panel); }
 .fallback-badge { margin-left: 5px; padding: 2px 4px; border-radius: 3px; background: #e5e2d8; color: var(--ink); font-size: 8px; font-family: Inter, sans-serif; vertical-align: middle; }

@@ -15,6 +15,7 @@ import { INITIAL_ACTIVE_FIRE_STATE, loadActiveFireFeed, type ActiveFireFeatureCo
 import { MapApplicationMode } from "./MapApplicationMode";
 import { MapCanvas } from "./MapCanvas";
 import { MapTools } from "./MapTools";
+import { INITIAL_RELEASE_AVAILABILITY, loadReleaseAvailability } from "./releaseAvailability.mjs";
 
 const explorer = explorerDocument as unknown as ExplorerRelease;
 const LANGUAGE_COOKIE = "bca-language";
@@ -54,7 +55,12 @@ const copy = {
     fallback: "Some source names and map-control labels remain in English while verified Welsh wording is prepared.",
     download: "Download accessible evidence states (CSV)",
     noSources: "No layers are currently shown.",
-    area: "Release area: BCA-area of interest plus exactly 2 km"
+    area: "Release area: BCA-area of interest plus exactly 2 km",
+    checkingRelease: "Checking the current landscape evidence release…",
+    unavailableRelease: "Landscape evidence unavailable",
+    unavailableReleaseDetail: "The current landscape evidence release could not be verified, so its map and downloads are not being shown.",
+    withdrawnRelease: "Landscape evidence withdrawn",
+    withdrawnReleaseDetail: "The landscape evidence release has been withdrawn and is not being shown."
   },
   cy: {
     skip: "Neidio i’r archwiliwr",
@@ -90,7 +96,12 @@ const copy = {
     fallback: "Mae rhai enwau ffynonellau, metadata a’r crynodeb technegol yn aros yn Saesneg tra bod geiriad Cymraeg wedi’i wirio yn cael ei baratoi.",
     download: "Lawrlwytho cyflyrau tystiolaeth hygyrch (CSV)",
     noSources: "Nid oes haenau’n cael eu dangos ar hyn o bryd.",
-    area: "Ardal ryddhau: Ardal o ddiddordeb BCA ynghyd ag union 2 km"
+    area: "Ardal ryddhau: Ardal o ddiddordeb BCA ynghyd ag union 2 km",
+    checkingRelease: "Wrthi’n gwirio’r datganiad tystiolaeth tirwedd cyfredol…",
+    unavailableRelease: "Nid yw’r dystiolaeth tirwedd ar gael",
+    unavailableReleaseDetail: "Ni ellid gwirio’r datganiad tystiolaeth tirwedd cyfredol, felly nid yw ei fap na’i lawrlwythiadau’n cael eu dangos.",
+    withdrawnRelease: "Tystiolaeth tirwedd wedi’i thynnu’n ôl",
+    withdrawnReleaseDetail: "Mae’r datganiad tystiolaeth tirwedd wedi’i dynnu’n ôl ac nid yw’n cael ei ddangos."
   }
 } as const;
 
@@ -158,6 +169,7 @@ function LayerName({ layer, language }: { layer: ExplorerLayer; language: Langua
 
 export function Explorer() {
   const [state, setState] = useState<ExplorerState>(initialState);
+  const [releaseAvailability, setReleaseAvailability] = useState(INITIAL_RELEASE_AVAILABILITY);
   const [activeFire, setActiveFire] = useState(INITIAL_ACTIVE_FIRE_STATE);
   const [activeFireMapOverride, setActiveFireMapOverride] = useState<ActiveFireFeatureCollection | null>(null);
   const [ready, setReady] = useState(false);
@@ -178,6 +190,19 @@ export function Explorer() {
       setReady(true);
     });
     return () => window.cancelAnimationFrame(frame);
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    const configuredUrl = (process.env.NEXT_PUBLIC_RELEASE_MANIFEST_URL ?? "").trim() || explorer.release.manifestPath;
+    const manifestUrl = new URL(configuredUrl, window.location.origin).href;
+    void loadReleaseAvailability({
+      manifestUrl,
+      expectedReleaseId: explorer.release.id,
+      expectedManifestPath: explorer.release.manifestPath,
+      expectedManifestSha256: explorer.release.manifestSha256
+    }).then((availability) => { if (!cancelled) setReleaseAvailability(availability); });
+    return () => { cancelled = true; };
   }, []);
 
   useEffect(() => {
@@ -326,7 +351,7 @@ export function Explorer() {
           </aside>
         </section>
 
-        <MapApplicationMode language={state.language} area={c.area}>
+        {releaseAvailability.health === "current" ? <MapApplicationMode language={state.language} area={c.area}>
           <section className="explorer-shell" aria-label={state.language === "en" ? "Landscape explorer" : "Archwiliwr tirwedd"}>
             <div className="map-workspace">
               <div className="map-stage">
@@ -353,7 +378,13 @@ export function Explorer() {
               {sourcePanel}
             </div>
           </section>
-        </MapApplicationMode>
+        </MapApplicationMode> : <section className={`release-state-card release-state-${releaseAvailability.health}`} aria-live="polite">
+          {releaseAvailability.health === "loading" ? <p>{c.checkingRelease}</p> : <>
+            <h2>{releaseAvailability.health === "withdrawn" ? c.withdrawnRelease : c.unavailableRelease}</h2>
+            <p>{releaseAvailability.health === "withdrawn" ? c.withdrawnReleaseDetail : c.unavailableReleaseDetail}</p>
+            {releaseAvailability.health === "withdrawn" && releaseAvailability.reason ? <p className="release-state-reason">{releaseAvailability.reason}</p> : null}
+          </>}
+        </section>}
       </main>
       <footer id="service-footer" tabIndex={-1}><p>Evidence release {explorer.release.datasetVersion} · {explorer.release.publishedAt ? `published ${new Date(explorer.release.publishedAt).toLocaleDateString("en-GB")}` : "verified candidate awaiting promotion"} · owner {explorer.release.owner} · next review {explorer.release.nextReviewAt}</p><nav aria-label="Service information"><a href="/accessibility/">Accessibility</a> · <a href="/privacy/">Privacy</a> · <a href="/security/">Security</a></nav><a href="#explorer-main">{c.skip}</a></footer>
     </>
