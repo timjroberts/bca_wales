@@ -21,6 +21,8 @@ NODATA = -9999.0
 SCENE_MINIMUM = 95.0
 PRODUCT_MINIMUM = 90.0
 EFFIS_MINIMUM = 95.0
+EFFIS_HISTORIC_RESPONSE_SHA256 = "651b441769bd485c5f45e48fefb777084c08b059be4eee61c9ecf122e03c3e6a"
+EFFIS_CURRENT_RESPONSE_SHA256 = "ad5e648111a6e8803e9f159463d65ecda66976783868f1b798c45d3d0f854778"
 
 
 def first_geometry(path):
@@ -267,37 +269,68 @@ def write_component(summary, json_path, csv_path):
             writer.writerow([summary["product"], row["bin"], row["pixel_count"], row["area_ha"], summary["units"], summary["dates"][0], summary["dates"][1]])
 
 
-def load_effis(path):
+def sha256_file(path):
+    digest = hashlib.sha256()
+    with open(path, "rb") as handle:
+        for block in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def load_effis(path, feature_id):
     datasource = ogr.Open(path)
+    if datasource is None:
+        raise RuntimeError(f"Could not open EFFIS snapshot: {path}")
     layer = datasource.GetLayer(0)
     for feature in layer:
-        if str(feature.GetField("id")) == "592404":
-            return feature.GetGeometryRef().Clone(), layer.GetSpatialRef().Clone(), feature.items()
-    raise RuntimeError("EFFIS feature 592404 was not present in the controlled snapshot")
+        if str(feature.GetField("id")) == feature_id:
+            spatial_ref = layer.GetSpatialRef()
+            if spatial_ref is None:
+                spatial_ref = osr.SpatialReference()
+                spatial_ref.ImportFromEPSG(4326)
+            return feature.GetGeometryRef().Clone(), spatial_ref.Clone(), feature.items()
+    raise RuntimeError(f"EFFIS feature {feature_id} was not present in the controlled snapshot")
+
+
+def effis_feature_ids(path):
+    datasource = ogr.Open(path)
+    if datasource is None:
+        raise RuntimeError(f"Could not open EFFIS snapshot: {path}")
+    return {str(feature.GetField("id")) for feature in datasource.GetLayer(0)}
 
 
 def geometry_sha256(geometry):
     return hashlib.sha256(bytes(geometry.ExportToWkb())).hexdigest()
 
 
-def effis_comparison(previous_path, current_geometry, current_properties):
-    previous_geometry, _, previous_properties = load_effis(previous_path)
+def validate_effis_corroboration(current_path, historic_geometry, historic_properties):
+    if sha256_file(current_path) != EFFIS_CURRENT_RESPONSE_SHA256:
+        raise RuntimeError("Current EFFIS corroborating response does not match the reviewed checksum")
+    feature_ids = effis_feature_ids(current_path)
+    if "592404" in feature_ids or not {"627416", "627417"}.issubset(feature_ids):
+        raise RuntimeError("Current EFFIS response no longer has the reviewed disappearance, corroboration and exclusion identities")
+    current_geometry, _, current_properties = load_effis(current_path, "627416")
     changed = sorted(
-        key for key in set(previous_properties) | set(current_properties)
-        if previous_properties.get(key) != current_properties.get(key)
+        key for key in set(historic_properties) | set(current_properties)
+        if historic_properties.get(key) != current_properties.get(key)
     )
+    if changed != ["CLASS", "LASTUPDATE", "id"]:
+        raise RuntimeError(f"EFFIS 627416 differs from historic 592404 in unreviewed fields: {changed}")
+    historic_geometry_sha256 = geometry_sha256(historic_geometry)
+    current_geometry_sha256 = geometry_sha256(current_geometry)
+    if current_geometry_sha256 != historic_geometry_sha256:
+        raise RuntimeError("EFFIS 627416 geometry is not coordinate-identical to historic 592404")
     return {
-        "previous": {
-            "provider_area_ha": previous_properties.get("AREA_HA"),
-            "provider_lastupdate": previous_properties.get("LASTUPDATE"),
-            "geometry_sha256": geometry_sha256(previous_geometry),
-        },
-        "current": {
-            "provider_area_ha": current_properties.get("AREA_HA"),
-            "provider_lastupdate": current_properties.get("LASTUPDATE"),
-            "geometry_sha256": geometry_sha256(current_geometry),
-        },
+        "provider_feature_id": "627416",
+        "relationship": "BCA-inferred-rekey",
+        "provider_crosswalk_available": False,
+        "retrieved_at": "2026-08-21T21:32:07.885Z",
+        "response_sha256": EFFIS_CURRENT_RESPONSE_SHA256,
+        "provider_area_ha": current_properties.get("AREA_HA"),
+        "provider_lastupdate": current_properties.get("LASTUPDATE"),
+        "geometry_sha256": current_geometry_sha256,
         "changed_attributes": changed,
+        "excluded_feature_ids": ["627417"],
     }
 
 
@@ -308,7 +341,7 @@ def main():
     parser.add_argument("--prefire", nargs=6, required=True, metavar=("RED", "NIR10", "NIR20", "SWIR1", "SWIR2", "SCL"))
     parser.add_argument("--post", nargs=6, required=True, metavar=("RED", "NIR10", "NIR20", "SWIR1", "SWIR2", "SCL"))
     parser.add_argument("--effis", required=True)
-    parser.add_argument("--previous-effis", required=True)
+    parser.add_argument("--current-effis", required=True)
     parser.add_argument("--combined-cog", required=True)
     parser.add_argument("--ndvi-cog", required=True)
     parser.add_argument("--ndmi-cog", required=True)
@@ -385,7 +418,10 @@ def main():
     if min(coverage.values()) < PRODUCT_MINIMUM:
         raise RuntimeError(f"Product comparability gate failed; reselection decision required: {coverage}")
 
-    effis_geometry, effis_srs, effis_properties = load_effis(args.effis)
+    if sha256_file(args.effis) != EFFIS_HISTORIC_RESPONSE_SHA256:
+        raise RuntimeError("Historic EFFIS provider evidence does not match the reviewed release-one checksum")
+    effis_geometry, effis_srs, effis_properties = load_effis(args.effis, "592404")
+    effis_corroboration = validate_effis_corroboration(args.current_effis, effis_geometry, effis_properties)
     effis20 = rasterize(reference20, effis_geometry, effis_srs) & aoi20
     coverage["effis_combined_comparable_percent"] = percentage(comparable20 & effis20, effis20)
     if coverage["effis_combined_comparable_percent"] < EFFIS_MINIMUM:
@@ -418,10 +454,9 @@ def main():
     if clipped_effis.IsEmpty():
         raise RuntimeError("EFFIS feature 592404 does not intersect the release AOI")
     effis_wgs84 = transform_geometry(clipped_effis, effis_srs, wgs84)
-    effis_change = effis_comparison(args.previous_effis, effis_geometry, effis_properties)
     effis_feature = {
         "type": "Feature",
-        "properties": {**effis_properties, "layer_id": "effis-provisional-boundary", "provider_feature_id": "592404", "classification": "provisional_provider", "provider": "European Union, Copernicus EFFIS", "display_geometry": "Provider feature clipped only for display to the release AOI; the complete provider snapshot is retained in acquisition lineage.", "limitation": "Not an authority, legal or surveyed perimeter; provider dates are not authority incident times."},
+        "properties": {**effis_properties, "layer_id": "effis-provisional-boundary", "provider_feature_id": "592404", "classification": "historic_provisional_provider", "provider": "European Union, Copernicus EFFIS", "source_status": "Historic checksum-pinned provider evidence retained from release one; feature 592404 was not returned by EFFIS on 21 August 2026.", "current_corroboration": "Feature 627416 is geometry-identical but is only a BCA-inferred re-key, not an EFFIS-declared successor.", "display_geometry": "Provider feature clipped only for display to the release AOI; the complete historic provider snapshot is retained in acquisition lineage.", "limitation": "Not an authority, legal or surveyed perimeter; provider dates are not authority incident times."},
         "geometry": json.loads(effis_wgs84.ExportToJson()),
     }
     with open(args.effis_out, "x", encoding="utf-8") as handle:
@@ -433,13 +468,28 @@ def main():
                 "name_cy": "Ffin dros dro y darparwr EFFIS",
             },
             "provider_feature": effis_properties,
-            "comparison_with_release_one": effis_change,
+            "source_identity": {
+                "role": "canonical historic provider evidence retained from release one",
+                "provider_feature_id": "592404",
+                "retrieved_at": "2026-08-13T18:20:27.597Z",
+                "response_sha256": EFFIS_HISTORIC_RESPONSE_SHA256,
+                "feature_not_returned_on": "2026-08-21",
+                "fresh_reacquisition_claimed": False,
+            },
+            "current_corroboration": effis_corroboration,
             "display_geometry": effis_feature["properties"]["display_geometry"],
             "attribution": "European Union, Copernicus EFFIS; clipped and reformatted by Blorenge Commoners Association.",
             "limitations": [
                 "Not an authority, legal or surveyed perimeter.",
                 "Provider dates are not authority incident times.",
+                "EFFIS no longer returns historic feature 592404; 627416 is only a BCA-inferred re-key because no provider crosswalk is published.",
                 "Spatial overlap does not validate or establish the cause of raster change or thermal anomalies.",
+            ],
+            "limitations_cy": [
+                "Nid yw'n ffin awdurdod, gyfreithiol nac wedi'i harolygu.",
+                "Nid amseroedd digwyddiad awdurdod yw dyddiadau'r darparwr.",
+                "Nid yw EFFIS bellach yn dychwelyd nodwedd hanesyddol 592404; dim ond ailallweddiad a gasglwyd gan BCA yw 627416 gan nad oes croesgyfeiriad darparwr wedi'i gyhoeddi.",
+                "Nid yw gorgyffwrdd gofodol yn dilysu nac yn sefydlu achos newid raster nac anomaleddau thermol.",
             ],
         }, handle, separators=(",", ":"))
 
@@ -457,7 +507,9 @@ def main():
         ],
         "effis": {
             "provider_feature_id": "592404",
-            "comparison_with_release_one": effis_change,
+            "source_status": "historic_release_one_provider_evidence",
+            "historic_response_sha256": EFFIS_HISTORIC_RESPONSE_SHA256,
+            "current_corroboration": effis_corroboration,
             "limitation": "Independent provisional provider boundary; not an authority, legal or surveyed perimeter and not validation of any raster or thermal anomaly.",
         },
         "landsat_corroboration": "Retained as separate 30 m corroboration in lineage and not fused into the Sentinel-derived raster.",

@@ -314,7 +314,7 @@ test("the factual release-two recipe pins the expanded AOI and component contrac
     registryPath: path.join(repositoryRoot, "data/launch/source-registry.json"),
     recipePath: path.join(repositoryRoot, "data/launch/publication-recipe-2026-08-21.json")
   });
-  assert.equal(loaded.recipe.release_id, "release-blorenge-2026-08-21.5");
+  assert.equal(loaded.recipe.release_id, "release-blorenge-2026-08-21.6");
   assert.equal(loaded.recipe.supersedes, "release-blorenge-2026-08-13.6");
   assert.equal(loaded.recipe.spatial_contract.core_version, "2026-08-21.1");
   assert.equal(loaded.recipe.inputs.filter((item) => item.input_id.startsWith("lidar-") && item.input_id !== "lidar-catalogue").length, 163);
@@ -322,6 +322,13 @@ test("the factual release-two recipe pins the expanded AOI and component contrac
   assert.equal(loaded.recipe.outputs.find((item) => item.asset_id === "ndvi-cog").qa.maximum_bytes, 32 * 1024 * 1024);
   assert.equal(loaded.recipe.outputs.find((item) => item.asset_id === "ndmi-pmtiles").qa.maximum_bytes, 8 * 1024 * 1024);
   assert.equal(loaded.recipe.quality_gates[0].assertions.length, 7);
+  const changeStep = loaded.recipe.steps.find((step) => step.step_id === "build-change-evidence-v2");
+  assert.deepEqual(changeStep.argv.slice(changeStep.argv.indexOf("--effis"), changeStep.argv.indexOf("--effis") + 4), [
+    "--effis", "{artifact:effis-release-one}", "--current-effis", "{artifact:effis-bounded}"
+  ]);
+  const effisDataset = loaded.recipe.datasets.find((dataset) => dataset.dataset_id === "effis-event");
+  assert.equal(effisDataset.classification, "historical");
+  assert.match(effisDataset.method, /BCA-inferred re-key/);
 });
 
 test("acquisition, build, archive verification and reproduction preserve exact lineage", async (context) => {

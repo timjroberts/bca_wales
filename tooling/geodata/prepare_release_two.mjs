@@ -19,8 +19,8 @@ const selectedPath = process.argv[2];
 const cataloguePath = process.argv[3];
 const outputPath = process.argv[4];
 const cacheRoot = process.argv[5] ?? "/tmp/bca-release-two-prefetch";
-const releaseId = "release-blorenge-2026-08-21.5";
-const datasetVersion = "2026-08-21.5";
+const releaseId = "release-blorenge-2026-08-21.6";
+const datasetVersion = "2026-08-21.6";
 const stagingRoot = path.join(repositoryRoot, ".geodata-staging/release-two");
 
 if (!selectedPath || !cataloguePath || !outputPath) {
@@ -265,7 +265,7 @@ const steps = [
       "--baseline", ...sceneIds("baseline").map((id) => `{artifact:${id}}`),
       "--prefire", ...sceneIds("prefire").map((id) => `{artifact:${id}}`),
       "--post", ...sceneIds("post").map((id) => `{artifact:${id}}`),
-      "--effis", "{artifact:effis-bounded}", "--previous-effis", "{artifact:effis-release-one}",
+      "--effis", "{artifact:effis-release-one}", "--current-effis", "{artifact:effis-bounded}",
       "--combined-cog", "{artifact:change-cog}", "--ndvi-cog", "{artifact:ndvi-cog}", "--ndmi-cog", "{artifact:ndmi-cog}",
       "--effis-out", "{artifact:effis-geojson}", "--effis-summary", "{artifact:effis-summary-json}",
       "--combined-csv", "{artifact:evidence-csv}", "--ndvi-csv", "{artifact:ndvi-summary-csv}", "--ndvi-json", "{artifact:ndvi-summary-json}",
@@ -328,7 +328,7 @@ const outputs = [
   ["ndmi-summary-csv", "ndmi-change", "outputs/ndmi-change-summary.csv.txt", "accessible_csv", "text/csv", "public", "Accessible fixed-bin NDMI counts and areas.", { minimum_bytes: 100, maximum_bytes: 1048576, minimum_rows: 8, required_fields: ["product", "bin", "pixel_count", "area_ha", "units", "baseline_date", "comparison_date"] }],
   ["ndmi-summary-json", "ndmi-change", "outputs/ndmi-change-summary.json", "accessible_json", "application/json", "public", "Accessible bilingual NDMI method, dates, distribution, attribution and limitations.", { minimum_bytes: 500, maximum_bytes: 1048576, required_fields: ["product", "names", "formula", "bands", "dates", "units", "resolution_m", "bins", "limitations"] }],
   ["effis-geojson", "effis-event", "outputs/effis-592404.geojson", "geojson", "application/geo+json", "public", "Complete provider attributes with display geometry clipped to the expanded AOI.", { minimum_bytes: 500, maximum_bytes: 1048576, minimum_features: 1, required_fields: ["provider_feature_id", "provider", "classification", "display_geometry", "limitation"] }],
-  ["effis-summary-json", "effis-event", "outputs/effis-592404-summary.json", "accessible_json", "application/json", "public", "Accessible bilingual EFFIS provenance, release comparison and limitations.", { minimum_bytes: 300, maximum_bytes: 1048576, required_fields: ["layer", "provider_feature", "comparison_with_release_one", "attribution", "limitations"] }],
+  ["effis-summary-json", "effis-event", "outputs/effis-592404-summary.json", "accessible_json", "application/json", "public", "Accessible bilingual EFFIS provenance, current corroboration and limitations.", { minimum_bytes: 300, maximum_bytes: 1048576, required_fields: ["layer", "provider_feature", "source_identity", "current_corroboration", "attribution", "limitations", "limitations_cy"] }],
 ].map(([asset_id, dataset_id, outputPath, profile, media_type, visibility, accessible_description, qa]) => ({ asset_id, dataset_id, path: outputPath, profile, media_type, visibility, accessible_description, qa }));
 
 const datasets = [
@@ -354,14 +354,14 @@ const datasets = [
   },
   {
     dataset_id: "effis-event", source_dataset_ids: ["bca-area-of-interest", "effis-current-burnt-areas"], evidence_version: datasetVersion,
-    title: "EFFIS provisional provider boundary / Ffin dros dro y darparwr EFFIS", provider: "European Union, Copernicus EFFIS; BCA processing", licence: "CC BY 4.0 and BCA publication authority", attribution: "European Union, Copernicus EFFIS; clipped and reformatted by Blorenge Commoners Association.", classification: "provisional", observation_dates: ["2026-07-20", "2026-07-29"], method: "Reacquire complete provider feature 592404, preserve its fields and snapshot, compare it with release one, and clip only the display geometry to the expanded AOI.", uncertainty: "Provider dates and geometry are not incident-authority truth.", limitations: ["Not an authority, legal or surveyed perimeter.", "Does not validate raster change or thermal anomalies."],
+    title: "EFFIS provisional provider boundary / Ffin dros dro y darparwr EFFIS", provider: "European Union, Copernicus EFFIS; BCA processing", licence: "CC BY 4.0 and BCA publication authority", attribution: "European Union, Copernicus EFFIS; clipped and reformatted by Blorenge Commoners Association.", classification: "historical", observation_dates: ["2026-07-20", "2026-07-29"], method: "Retain checksum-pinned historic EFFIS feature 592404 from release one, preserve every provider field, clip only its display geometry, and record geometry-identical current feature 627416 solely as a BCA-inferred re-key.", uncertainty: "EFFIS no longer returns feature 592404 and publishes no authoritative crosswalk to 627416; provider dates and geometry are not incident-authority truth.", limitations: ["Not an authority, legal or surveyed perimeter.", "Does not claim fresh reacquisition or an EFFIS-declared successor identity.", "Does not validate raster change or thermal anomalies."],
   },
 ];
 
 const recipe = {
   schema_version: "1.0.0",
   recipe_id: "blorenge-second-release",
-  recipe_version: "2.0.4",
+  recipe_version: "2.0.5",
   release_id: releaseId,
   dataset_version: datasetVersion,
   registry_id: "blorenge-launch",

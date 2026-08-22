@@ -574,13 +574,13 @@
     {
       "dataset_id": "effis-current-burnt-areas",
       "title": "EFFIS Rapid Damage Assessment burnt areas",
-      "purpose": "Named provisional provider boundary and chronology lead, kept separate from any BCA-derived interpretation.",
+      "purpose": "Historic checksum-pinned provisional provider boundary retained from release one, with a current geometry-identical feature recorded only as BCA-inferred corroboration.",
       "classification": "provisional_provider",
       "provider": "European Commission Joint Research Centre, EFFIS",
       "provider_dataset_id": "ms:modis.ba.poly",
       "landing_url": "https://forest-fire.emergency.copernicus.eu/applications/data-and-services",
       "acquisition": {
-        "method": "Bounded WFS 1.1 GeoJSON snapshot using native axis order followed by stable id extraction",
+        "method": "Retain the complete checksum-pinned 13 August WFS 1.1 GeoJSON response as canonical historic evidence; retain the complete 21 August bounded response separately as current corroboration",
         "url": "https://maps.effis.emergency.copernicus.eu/effis?service=WFS&version=1.1.0&request=getfeature&typename=ms%3Amodis.ba.poly&outputformat=geojson&srsName=EPSG%3A4326&bbox=51.74,-3.06,51.77,-3.02,EPSG%3A4326",
         "media_type": "application/geo+json",
         "crs": "EPSG:4326",
@@ -593,8 +593,8 @@
         "candidate_finaldate": "2026-07-29T02:34:00Z",
         "candidate_lastupdate": "2026-08-03T09:11:56.420451Z",
         "candidate_class": "30DAYS",
-        "cadence": "current-season database updated in near real time",
-        "refresh_policy": "Snapshot weekly until stable, then before every evidence promotion; compare identifier, geometry, dates, area and class."
+        "cadence": "historic evidence is immutable; current-season corroboration was a one-time reviewed snapshot",
+        "refresh_policy": "Fail closed if either reviewed response checksum changes. Any later live WFS identity or geometry change requires a new manual source decision."
       },
       "licence": {
         "id": "CC-BY-4.0",
@@ -607,18 +607,18 @@
         "geometry": "Polygon",
         "required_fields": ["id", "FIREDATE", "FINALDATE", "LASTUPDATE", "COUNTRY", "PROVINCE", "COMMUNE", "AREA_HA", "CLASS"]
       },
-      "transformation": "Extract id 592404, preserve provider geometry and fields, clip only for display, and publish as a separate EFFIS provisional comparison. Never union it with a BCA-derived or authority boundary.",
-      "known_gaps": ["EFFIS dates are provider product dates, not verified ignition, control or extinction times.", "The feature is a high-confidence match to the documented July 2026 Blaenavon wildfire but remains a separate provisional provider interpretation.", "The current WFS reports 156 ha while the 9 August snapshot reported 155 ha; the release retains the exact current geometry and checksum and exposes the change.", "EFFIS does not distinguish wildfire from prescribed or environmental burning and may omit small islands or scars."],
+      "transformation": "Extract historic id 592404 from the complete release-one response, preserve every provider field, and clip only a display copy. Verify current id 627416 is coordinate-identical with only id, LASTUPDATE and rolling CLASS changed; label that relationship BCA-inferred-rekey, exclude unrelated id 627417, and never claim a provider crosswalk or fresh reacquisition of 592404.",
+      "known_gaps": ["EFFIS no longer returns historic feature 592404 and publishes no public archive, feature history or old-to-new id crosswalk.", "Geometry-identical current feature 627416 is compelling corroboration but its relationship to 592404 is a BCA inference, not an EFFIS-declared successor.", "Current feature 627417 describes a separate August event and is excluded.", "EFFIS dates are provider product dates, not verified ignition, control or extinction times.", "EFFIS does not distinguish wildfire from prescribed or environmental burning and may omit small islands or scars."],
       "safety": "public_safe",
       "publication": "approved_candidate",
       "contract": {
         "owner": "timjroberts",
         "temporal_role": "provisional provider comparison",
         "licence_terms": { "snapshot_path": "licences/effis-cc-by-4.0.md", "sha256": "ca690df1d44e30dffaf8ed1074c34fc7583d1b8b299ccf37bbe33fc9d6419c6b" },
-        "recipe": { "id": "effis-current-burnt-areas", "version": "1.0.0" },
+        "recipe": { "id": "effis-current-burnt-areas", "version": "1.1.0" },
         "output_profiles": ["geojson", "accessible_json"],
-        "refresh": { "mode": "manual", "maximum_age_days": 31, "approved_change_bounds": {} },
-        "retention": "Retain the exact provider snapshot used by each published provisional comparison.",
+        "refresh": { "mode": "manual", "maximum_age_days": null, "approved_change_bounds": {} },
+        "retention": "Retain the complete historic response and current corroborating response with their exact checksums and retrieval metadata.",
         "withdrawal": "Withdraw or supersede the provisional layer without relabelling another boundary as equivalent."
       }
     }
