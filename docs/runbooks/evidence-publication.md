@@ -143,8 +143,8 @@ restricted to object read/write on the target evidence bucket, together with
 Wrangler's API-token authentication is not used for evidence objects because
 it attempts account enumeration that a bucket-scoped account token correctly
 cannot perform. Production runs in the protected GitHub `production`
-environment and the workflow concurrency group prevents two pointer changes at
-once.
+environment and the workflow concurrency group prevents staging and pointer
+changes from racing.
 
 ```bash
 npm run geodata -- stage --release-root PRIVATE_ARCHIVE/RELEASE_ID --bucket bca-wales-public-releases --jurisdiction eu --identity timjroberts
@@ -158,6 +158,20 @@ checks the current release against `supersedes`, re-verifies the immutable
 objects, then replaces `releases/current.json`. A failed upload or verification
 leaves the current pointer untouched. R2's single-object replacement makes that
 small final pointer change atomic for readers.
+
+For protected production operation, package only the candidate's public
+outputs, candidate and lineage manifests, contract snapshots and QA reports as
+an exact checksummed bundle attached to a draft GitHub release. Dispatch
+`Stage evidence release` with the bundle checksum, gated candidate-manifest
+checksum, release identifier and reviewed code commit. Retain its successful
+run: the workflow adds the final timestamped release manifest after immutable
+upload and stores that exact completed release as a private 90-day artifact.
+
+After the matching application deployment passes its staged-release check,
+dispatch `Publish evidence release` with that staging run, release identifier
+and final manifest checksum. Publication downloads the exact staged artifact,
+verifies the final manifest and atomically moves only `releases/current.json`;
+it never reacquires, rebuilds or silently changes the approved release.
 
 Cloudflare applies special R2 Data Catalog handling to object keys ending in
 `.csv`. Accessible CSV assets therefore use a non-`.csv` terminal suffix while

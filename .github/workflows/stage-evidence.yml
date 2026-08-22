@@ -1,0 +1,86 @@
+name: Stage evidence release
+
+on:
+  workflow_dispatch:
+    inputs:
+      code_commit:
+        description: Reviewed repository commit containing the publication toolchain
+        required: true
+        type: string
+      bundle_asset_id:
+        description: Immutable asset ID from the draft GitHub release
+        required: true
+        type: string
+      bundle_sha256:
+        description: SHA-256 of the compressed bundle
+        required: true
+        type: string
+      release_id:
+        description: Immutable evidence release identifier
+        required: true
+        type: string
+      candidate_manifest_sha256:
+        description: SHA-256 of the gated candidate manifest
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-evidence-pointer
+  cancel-in-progress: false
+
+jobs:
+  stage:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    environment: production
+    env:
+      CODE_COMMIT: ${{ inputs.code_commit }}
+      GH_TOKEN: ${{ github.token }}
+      BUNDLE_ASSET_ID: ${{ inputs.bundle_asset_id }}
+      BUNDLE_SHA256: ${{ inputs.bundle_sha256 }}
+      RELEASE_ID: ${{ inputs.release_id }}
+      CANDIDATE_MANIFEST_SHA256: ${{ inputs.candidate_manifest_sha256 }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_R2_ACCESS_KEY_ID: ${{ secrets.CLOUDFLARE_R2_ACCESS_KEY_ID }}
+      CLOUDFLARE_R2_SECRET_ACCESS_KEY: ${{ secrets.CLOUDFLARE_R2_SECRET_ACCESS_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.code_commit }}
+          persist-credentials: false
+      - name: Validate immutable inputs
+        run: node -e 'const assert=require("node:assert/strict"),{execFileSync}=require("node:child_process"); assert.match(process.env.CODE_COMMIT, /^[0-9a-f]{40}$/); assert.equal(execFileSync("git",["rev-parse","HEAD"],{encoding:"utf8"}).trim(), process.env.CODE_COMMIT); assert.match(process.env.RELEASE_ID, /^release-[a-z0-9][a-z0-9._-]+$/); assert.match(process.env.BUNDLE_ASSET_ID, /^[1-9][0-9]*$/); assert.match(process.env.BUNDLE_SHA256, /^[0-9a-f]{64}$/); assert.match(process.env.CANDIDATE_MANIFEST_SHA256, /^[0-9a-f]{64}$/);'
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - name: Download the exact reviewed public bundle
+        run: |
+          gh api -H "Accept: application/octet-stream" "repos/$GITHUB_REPOSITORY/releases/assets/$BUNDLE_ASSET_ID" > candidate-bundle.tgz
+      - name: Verify and unpack the bundle
+        run: |
+          echo "$BUNDLE_SHA256  candidate-bundle.tgz" | sha256sum --check --strict
+          mkdir staged-release
+          tar -xzf candidate-bundle.tgz -C staged-release
+          test -f "staged-release/$RELEASE_ID/manifests/candidate-release.json"
+          echo "$CANDIDATE_MANIFEST_SHA256  staged-release/$RELEASE_ID/manifests/candidate-release.json" | sha256sum --check --strict
+      - name: Upload and verify immutable release objects without changing current.json
+        run: npm run geodata -- stage --release-root "staged-release/$RELEASE_ID" --bucket bca-wales-public-releases --jurisdiction eu --identity timjroberts
+      - name: Record the final immutable manifest
+        id: release
+        run: |
+          final_sha256=$(sha256sum "staged-release/$RELEASE_ID/manifests/release.json" | cut -d ' ' -f 1)
+          echo "manifest_sha256=$final_sha256" >> "$GITHUB_OUTPUT"
+          echo "Final release manifest SHA-256: $final_sha256" >> "$GITHUB_STEP_SUMMARY"
+      - name: Retain the exact staged release for later atomic promotion
+        uses: actions/upload-artifact@v4
+        with:
+          name: staged-evidence-${{ inputs.release_id }}
+          path: staged-release/${{ inputs.release_id }}
+          if-no-files-found: error
+          retention-days: 90
