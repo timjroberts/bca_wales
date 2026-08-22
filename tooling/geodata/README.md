@@ -75,4 +75,7 @@ the exact core-plus-2-km AOI, applies the common Sentinel-2 mask, fails before
 writing outputs when the 95% scene, 90% product or 95% EFFIS comparability gate
 fails, and writes separate lossless NDVI/NDMI COGs plus accessible CSV/JSON
 distribution summaries. It requires B04, B08, B8A, B11, B12 and SCL for each
-selected Sentinel-2 scene.
+selected Sentinel-2 observation. The post-report role independently masks the
+29 July and 11 August observations before choosing the earlier valid source per
+pixel; public 10 m and 20 m source-date provenance COGs preserve that choice
+without adding another selectable evidence layer.

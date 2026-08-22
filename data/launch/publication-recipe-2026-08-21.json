@@ -1,9 +1,9 @@
 {
   "schema_version": "1.0.0",
   "recipe_id": "blorenge-second-release",
-  "recipe_version": "2.0.5",
-  "release_id": "release-blorenge-2026-08-21.6",
-  "dataset_version": "2026-08-21.6",
+  "recipe_version": "2.1.0",
+  "release_id": "release-blorenge-2026-08-21.7",
+  "dataset_version": "2026-08-21.7",
   "registry_id": "blorenge-launch",
   "public_asset_origin": "https://assets.bca.wales",
   "supersedes": "release-blorenge-2026-08-13.6",
@@ -196,6 +196,12 @@
       "s2-prefire-swir1",
       "s2-prefire-swir2",
       "s2-prefire-scl",
+      "s2-post-primary-red",
+      "s2-post-primary-nir",
+      "s2-post-primary-nir20",
+      "s2-post-primary-swir1",
+      "s2-post-primary-swir2",
+      "s2-post-primary-scl",
       "s2-post-red",
       "s2-post-nir",
       "s2-post-nir20",
@@ -1968,6 +1974,60 @@
       "expected_sha256": "6b0e087dde7182d38cde38eef10da49a20223ee080b952a07a6e3d1be856b640"
     },
     {
+      "input_id": "s2-post-primary-red",
+      "dataset_id": "copernicus-sentinel-2-l2a",
+      "source": "https://e84-earth-search-sentinel-data.s3.us-west-2.amazonaws.com/sentinel-2-c1-l2a/30/U/VC/2026/7/S2A_T30UVC_20260729T112319_L2A/B04.tif",
+      "destination": "quarantine/sentinel/s2-post-primary/B04.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 268435456,
+      "expected_sha256": "105e0cf7af60e739fd63144453f61c8ba40258ce0ae69e9e197d648b69ee6e58"
+    },
+    {
+      "input_id": "s2-post-primary-nir",
+      "dataset_id": "copernicus-sentinel-2-l2a",
+      "source": "https://e84-earth-search-sentinel-data.s3.us-west-2.amazonaws.com/sentinel-2-c1-l2a/30/U/VC/2026/7/S2A_T30UVC_20260729T112319_L2A/B08.tif",
+      "destination": "quarantine/sentinel/s2-post-primary/B08.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 268435456,
+      "expected_sha256": "6ae8cf08d918973a65ee39bf296f0bbc6d41b67518d0576013a4983e427a54e4"
+    },
+    {
+      "input_id": "s2-post-primary-nir20",
+      "dataset_id": "copernicus-sentinel-2-l2a",
+      "source": "https://e84-earth-search-sentinel-data.s3.us-west-2.amazonaws.com/sentinel-2-c1-l2a/30/U/VC/2026/7/S2A_T30UVC_20260729T112319_L2A/B8A.tif",
+      "destination": "quarantine/sentinel/s2-post-primary/B8A.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 268435456,
+      "expected_sha256": "afad123898fa827341c482c5c29ef9a2df5ec2a1bd80a81177b297643454bb76"
+    },
+    {
+      "input_id": "s2-post-primary-swir1",
+      "dataset_id": "copernicus-sentinel-2-l2a",
+      "source": "https://e84-earth-search-sentinel-data.s3.us-west-2.amazonaws.com/sentinel-2-c1-l2a/30/U/VC/2026/7/S2A_T30UVC_20260729T112319_L2A/B11.tif",
+      "destination": "quarantine/sentinel/s2-post-primary/B11.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 268435456,
+      "expected_sha256": "b72178273f1d58b94ddedfc176163bb6024bebad3210f67f9b279dd245053ee4"
+    },
+    {
+      "input_id": "s2-post-primary-swir2",
+      "dataset_id": "copernicus-sentinel-2-l2a",
+      "source": "https://e84-earth-search-sentinel-data.s3.us-west-2.amazonaws.com/sentinel-2-c1-l2a/30/U/VC/2026/7/S2A_T30UVC_20260729T112319_L2A/B12.tif",
+      "destination": "quarantine/sentinel/s2-post-primary/B12.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 268435456,
+      "expected_sha256": "881ea6eeb8053aa99fe7d2f8288f2b8e7c430488d808d015ac3f3a59f918e034"
+    },
+    {
+      "input_id": "s2-post-primary-scl",
+      "dataset_id": "copernicus-sentinel-2-l2a",
+      "source": "https://e84-earth-search-sentinel-data.s3.us-west-2.amazonaws.com/sentinel-2-c1-l2a/30/U/VC/2026/7/S2A_T30UVC_20260729T112319_L2A/SCL.tif",
+      "destination": "quarantine/sentinel/s2-post-primary/SCL.tif",
+      "media_type": "image/tiff",
+      "maximum_bytes": 268435456,
+      "expected_sha256": "c43552a40dc3e89b10727b70ea305c4d1b7913174336de9c51e1a82e5eabddf5"
+    },
+    {
       "input_id": "landsat-baseline-red",
       "dataset_id": "usgs-landsat-c2-l2-sr",
       "source": "planetary:https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2025/203/024/LC09_L2SP_203024_20250708_20250710_02_T1/LC09_L2SP_203024_20250708_20250710_02_T1_SR_B4.TIF",
@@ -2603,7 +2663,14 @@
         "{artifact:s2-prefire-swir1}",
         "{artifact:s2-prefire-swir2}",
         "{artifact:s2-prefire-scl}",
-        "--post",
+        "--post-primary",
+        "{artifact:s2-post-primary-red}",
+        "{artifact:s2-post-primary-nir}",
+        "{artifact:s2-post-primary-nir20}",
+        "{artifact:s2-post-primary-swir1}",
+        "{artifact:s2-post-primary-swir2}",
+        "{artifact:s2-post-primary-scl}",
+        "--post-fill",
         "{artifact:s2-post-red}",
         "{artifact:s2-post-nir}",
         "{artifact:s2-post-nir20}",
@@ -2620,6 +2687,10 @@
         "{artifact:ndvi-cog}",
         "--ndmi-cog",
         "{artifact:ndmi-cog}",
+        "--post-provenance-10m",
+        "{artifact:post-provenance-10m-cog}",
+        "--post-provenance-20m",
+        "{artifact:post-provenance-20m-cog}",
         "--effis-out",
         "{artifact:effis-geojson}",
         "--effis-summary",
@@ -2651,6 +2722,12 @@
         "s2-prefire-swir1",
         "s2-prefire-swir2",
         "s2-prefire-scl",
+        "s2-post-primary-red",
+        "s2-post-primary-nir",
+        "s2-post-primary-nir20",
+        "s2-post-primary-swir1",
+        "s2-post-primary-swir2",
+        "s2-post-primary-scl",
         "s2-post-red",
         "s2-post-nir",
         "s2-post-nir20",
@@ -2674,6 +2751,8 @@
         "change-cog",
         "ndvi-cog",
         "ndmi-cog",
+        "post-provenance-10m-cog",
+        "post-provenance-20m-cog",
         "effis-geojson",
         "effis-summary-json",
         "evidence-csv",
@@ -2848,9 +2927,9 @@
         "--change",
         "{artifact:change-report}",
         "--release-id",
-        "release-blorenge-2026-08-21.6",
+        "release-blorenge-2026-08-21.7",
         "--dataset-version",
-        "2026-08-21.6",
+        "2026-08-21.7",
         "--output",
         "{artifact:release-summary}"
       ],
@@ -3106,6 +3185,7 @@
           "formula",
           "bands",
           "dates",
+          "comparison_observation",
           "units",
           "resolution_m",
           "bins",
@@ -3185,10 +3265,49 @@
           "formula",
           "bands",
           "dates",
+          "comparison_observation",
           "units",
           "resolution_m",
           "bins",
           "limitations"
+        ]
+      }
+    },
+    {
+      "asset_id": "post-provenance-10m-cog",
+      "dataset_id": "observed-change",
+      "path": "outputs/post-source-date-10m.tif",
+      "profile": "cog",
+      "media_type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "visibility": "public",
+      "accessible_description": "Per-pixel post-report source-date provenance for the 10 m NDVI grid; 20260729 is primary, 20260811 is fill and 0 is Not observed.",
+      "qa": {
+        "minimum_bytes": 1000,
+        "maximum_bytes": 8388608,
+        "expected_crs": "EPSG:32630",
+        "expected_resolution_m": 10,
+        "expected_band_count": 1,
+        "expected_band_descriptions": [
+          "post_source_date"
+        ]
+      }
+    },
+    {
+      "asset_id": "post-provenance-20m-cog",
+      "dataset_id": "observed-change",
+      "path": "outputs/post-source-date-20m.tif",
+      "profile": "cog",
+      "media_type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "visibility": "public",
+      "accessible_description": "Per-pixel post-report source-date provenance for the 20 m combined and NDMI grids; 20260729 is primary, 20260811 is fill and 0 is Not observed.",
+      "qa": {
+        "minimum_bytes": 1000,
+        "maximum_bytes": 8388608,
+        "expected_crs": "EPSG:32630",
+        "expected_resolution_m": 20,
+        "expected_band_count": 1,
+        "expected_band_descriptions": [
+          "post_source_date"
         ]
       }
     },
@@ -3247,7 +3366,7 @@
         "nrw-main-rivers",
         "nrw-phase1-vegetation-voronoi"
       ],
-      "evidence_version": "2026-08-21.6",
+      "evidence_version": "2026-08-21.7",
       "title": "Expanded Blorenge landscape context / Cyd-destun tirwedd ehangach Blorenge",
       "provider": "Blorenge Commoners Association, Natural Resources Wales, OpenStreetMap contributors and Geofabrik",
       "licence": "BCA publication authority, OGL 3.0 and ODbL 1.0 by source",
@@ -3273,7 +3392,7 @@
         "wg-lidar-tile-catalogue",
         "wg-lidar-dtm-2020-2023"
       ],
-      "evidence_version": "2026-08-21.6",
+      "evidence_version": "2026-08-21.7",
       "title": "Expanded Blorenge terrain context / Cyd-destun tir ehangach Blorenge",
       "provider": "Welsh Government; BCA processing",
       "licence": "Open Government Licence 3.0 and BCA publication authority",
@@ -3299,7 +3418,7 @@
         "copernicus-sentinel-2-l2a",
         "usgs-landsat-c2-l2-sr"
       ],
-      "evidence_version": "2026-08-21.6",
+      "evidence_version": "2026-08-21.7",
       "title": "Observed surface and vegetation change / Newid arwyneb a llystyfiant a arsylwyd",
       "provider": "European Union Copernicus programme, USGS and BCA processing",
       "licence": "Copernicus Sentinel data legal notice, USGS public domain and BCA publication authority",
@@ -3309,9 +3428,10 @@
         "2025-07-12",
         "2026-07-12",
         "2026-07-27",
+        "2026-07-29",
         "2026-08-11"
       ],
-      "method": "Apply the common Sentinel mask, require three-observation comparability, calculate continuous dNBR/NDVI/NDMI and publish the conservative uncalibrated combined states; Landsat corroboration remains separate and unfused.",
+      "method": "Independently apply the common Sentinel mask to both post-report observations, select every band from 29 July where valid and otherwise from 11 August where valid, require three-role comparability, and calculate continuous dNBR/NDVI/NDMI with per-pixel source-date provenance; Landsat corroboration remains separate and unfused.",
       "uncertainty": "Evidence states are not locally calibrated severity and do not establish pixel-level cause.",
       "limitations": [
         "Not proof of ecological condition or recovery.",
@@ -3325,7 +3445,7 @@
         "bca-area-of-interest",
         "copernicus-sentinel-2-l2a"
       ],
-      "evidence_version": "2026-08-21.6",
+      "evidence_version": "2026-08-21.7",
       "title": "Vegetation greenness index change (NDVI) / Newid mynegai gwyrddni llystyfiant (NDVI)",
       "provider": "European Union Copernicus programme; BCA processing",
       "licence": "Copernicus Sentinel data legal notice and BCA publication authority",
@@ -3333,13 +3453,14 @@
       "classification": "derived",
       "observation_dates": [
         "2025-07-12",
+        "2026-07-29",
         "2026-08-11"
       ],
-      "method": "Publish NDVI(2026-08-11) minus NDVI(2025-07-12) from native B8/B4 at 10 m after the common SCL mask.",
+      "method": "Publish NDVI(2026-07-29/2026-08-11 narrow same-season post-report composite) minus NDVI(2025-07-12) from native B8/B4 at 10 m after independent common SCL masks, with the earlier valid date selected per pixel and explicit source-date provenance.",
       "uncertainty": "Rainfall, phenology, grazing, management and residual observation effects may contribute.",
       "limitations": [
         "Does not establish cause, fire damage, severity, habitat condition or recovery.",
-        "Not observed pixels fail one or both date masks."
+        "Not observed pixels fail the baseline mask or both post-date masks."
       ]
     },
     {
@@ -3348,7 +3469,7 @@
         "bca-area-of-interest",
         "copernicus-sentinel-2-l2a"
       ],
-      "evidence_version": "2026-08-21.6",
+      "evidence_version": "2026-08-21.7",
       "title": "Moisture-sensitive index change (NDMI) / Newid mynegai sy’n sensitif i leithder (NDMI)",
       "provider": "European Union Copernicus programme; BCA processing",
       "licence": "Copernicus Sentinel data legal notice and BCA publication authority",
@@ -3356,13 +3477,14 @@
       "classification": "derived",
       "observation_dates": [
         "2025-07-12",
+        "2026-07-29",
         "2026-08-11"
       ],
-      "method": "Publish NDMI(2026-08-11) minus NDMI(2025-07-12) from native B8A/B11 at 20 m after the common SCL mask.",
+      "method": "Publish NDMI(2026-07-29/2026-08-11 narrow same-season post-report composite) minus NDMI(2025-07-12) from native B8A/B11 at 20 m after independent common SCL masks, with the earlier valid date selected per pixel and explicit source-date provenance.",
       "uncertainty": "Rainfall, phenology, grazing, management and residual observation effects may contribute.",
       "limitations": [
         "Does not establish cause, fire damage, severity, dryness or wetness.",
-        "Not observed pixels fail one or both date masks."
+        "Not observed pixels fail the baseline mask or both post-date masks."
       ]
     },
     {
@@ -3371,7 +3493,7 @@
         "bca-area-of-interest",
         "effis-current-burnt-areas"
       ],
-      "evidence_version": "2026-08-21.6",
+      "evidence_version": "2026-08-21.7",
       "title": "EFFIS provisional provider boundary / Ffin dros dro y darparwr EFFIS",
       "provider": "European Union, Copernicus EFFIS; BCA processing",
       "licence": "CC BY 4.0 and BCA publication authority",

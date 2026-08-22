@@ -157,6 +157,22 @@ def scene_values(paths, reference, aoi_mask):
     return values
 
 
+def composite_scene(primary_paths, fill_paths, reference, aoi_mask):
+    primary = scene_values(primary_paths, reference, aoi_mask)
+    fill = scene_values(fill_paths, reference, aoi_mask)
+    use_primary = ~primary["invalid"] & aoi_mask
+    use_fill = primary["invalid"] & ~fill["invalid"] & aoi_mask
+    values = {
+        band: np.where(use_primary, primary[band], fill[band])
+        for band in ["red", "nir10", "nir20", "swir1", "swir2"]
+    }
+    values["invalid"] = primary["invalid"] & fill["invalid"]
+    source_date = np.zeros(aoi_mask.shape, dtype=np.uint32)
+    source_date[use_primary] = 20260729
+    source_date[use_fill] = 20260811
+    return values, source_date
+
+
 def percentage(mask, denominator):
     return round(float(mask.sum()) * 100.0 / float(max(1, denominator.sum())), 3)
 
@@ -203,7 +219,71 @@ def write_cog(path, reference, bands, descriptions, domain):
     os.unlink(temporary)
 
 
-def component_summary(product, values, observed, domain, reference, dates, formula, bands):
+def write_source_date_cog(path, reference, source_date, domain):
+    rows, columns = np.where(domain)
+    if rows.size == 0 or columns.size == 0:
+        raise RuntimeError("Source-date provenance domain is empty")
+    row_start, row_stop = int(rows.min()), int(rows.max()) + 1
+    column_start, column_stop = int(columns.min()), int(columns.max()) + 1
+    transform = reference.GetGeoTransform()
+    cropped_transform = (
+        transform[0] + column_start * transform[1] + row_start * transform[2],
+        transform[1],
+        transform[2],
+        transform[3] + column_start * transform[4] + row_start * transform[5],
+        transform[4],
+        transform[5],
+    )
+    temporary = f"{path}.working.tif"
+    dataset = gdal.GetDriverByName("GTiff").Create(
+        temporary,
+        column_stop - column_start,
+        row_stop - row_start,
+        1,
+        gdal.GDT_UInt32,
+        options=["TILED=YES", "COMPRESS=ZSTD"],
+    )
+    dataset.SetProjection(reference.GetProjection())
+    dataset.SetGeoTransform(cropped_transform)
+    band = dataset.GetRasterBand(1)
+    band.WriteArray(source_date[row_start:row_stop, column_start:column_stop])
+    band.SetDescription("post_source_date")
+    band.SetNoDataValue(0)
+    dataset = None
+    gdal.Translate(path, temporary, format="COG", creationOptions=["COMPRESS=ZSTD", "OVERVIEWS=AUTO", "RESAMPLING=NEAREST"])
+    os.unlink(temporary)
+
+
+def source_date_summary(source_date, domain, reference):
+    transform = reference.GetGeoTransform()
+    pixel_area_ha = abs(transform[1] * transform[5]) / 10000.0
+    counts = Counter(source_date[domain].tolist())
+    total = int(domain.sum())
+    return {
+        "encoding": {
+            "0": "Not observed",
+            "20260729": "2026-07-29 earliest valid post-report source",
+            "20260811": "2026-08-11 invalid-pixel fill source",
+        },
+        "pixel_counts": {
+            "2026-07-29": counts[20260729],
+            "2026-08-11": counts[20260811],
+            "not_observed": counts[0],
+        },
+        "area_ha": {
+            "2026-07-29": round(counts[20260729] * pixel_area_ha, 3),
+            "2026-08-11": round(counts[20260811] * pixel_area_ha, 3),
+            "not_observed": round(counts[0] * pixel_area_ha, 3),
+        },
+        "coverage_percent": {
+            "2026-07-29": round(counts[20260729] * 100.0 / total, 3),
+            "2026-08-11": round(counts[20260811] * 100.0 / total, 3),
+            "not_observed": round(counts[0] * 100.0 / total, 3),
+        },
+    }
+
+
+def component_summary(product, values, observed, domain, reference, dates, formula, bands, provenance):
     transform = reference.GetGeoTransform()
     pixel_area_ha = abs(transform[1] * transform[5]) / 10000.0
     finite = values[observed]
@@ -234,6 +314,11 @@ def component_summary(product, values, observed, domain, reference, dates, formu
         "formula": formula,
         "bands": bands,
         "dates": dates,
+        "comparison_observation": {
+            "label": "2026-07-29/2026-08-11 narrow same-season post-report composite",
+            "selection": "Use 2026-07-29 where independently valid, otherwise 2026-08-11 where independently valid, otherwise Not observed.",
+            "source_date_provenance": provenance,
+        },
         "units": "index points",
         "resolution_m": abs(transform[1]),
         "render_scale": {
@@ -254,7 +339,7 @@ def component_summary(product, values, observed, domain, reference, dates, formu
         "limitations": [
             "The signed difference does not establish cause, fire damage, severity, habitat condition, recovery, dryness or wetness.",
             "Rainfall, phenology, grazing, management and residual observation effects may contribute.",
-            "Pixels failing either date's quality mask are Not observed, not zero change.",
+            "Pixels failing the baseline mask or both independently applied post-date masks are Not observed, not zero change.",
         ],
     }
 
@@ -266,7 +351,7 @@ def write_component(summary, json_path, csv_path):
         writer = csv.writer(handle)
         writer.writerow(["product", "bin", "pixel_count", "area_ha", "units", "baseline_date", "comparison_date"])
         for row in summary["bins"]:
-            writer.writerow([summary["product"], row["bin"], row["pixel_count"], row["area_ha"], summary["units"], summary["dates"][0], summary["dates"][1]])
+            writer.writerow([summary["product"], row["bin"], row["pixel_count"], row["area_ha"], summary["units"], summary["dates"][0], summary["comparison_observation"]["label"]])
 
 
 def sha256_file(path):
@@ -339,12 +424,15 @@ def main():
     parser.add_argument("--core", required=True)
     parser.add_argument("--baseline", nargs=6, required=True, metavar=("RED", "NIR10", "NIR20", "SWIR1", "SWIR2", "SCL"))
     parser.add_argument("--prefire", nargs=6, required=True, metavar=("RED", "NIR10", "NIR20", "SWIR1", "SWIR2", "SCL"))
-    parser.add_argument("--post", nargs=6, required=True, metavar=("RED", "NIR10", "NIR20", "SWIR1", "SWIR2", "SCL"))
+    parser.add_argument("--post-primary", nargs=6, required=True, metavar=("RED", "NIR10", "NIR20", "SWIR1", "SWIR2", "SCL"))
+    parser.add_argument("--post-fill", nargs=6, required=True, metavar=("RED", "NIR10", "NIR20", "SWIR1", "SWIR2", "SCL"))
     parser.add_argument("--effis", required=True)
     parser.add_argument("--current-effis", required=True)
     parser.add_argument("--combined-cog", required=True)
     parser.add_argument("--ndvi-cog", required=True)
     parser.add_argument("--ndmi-cog", required=True)
+    parser.add_argument("--post-provenance-10m", required=True)
+    parser.add_argument("--post-provenance-20m", required=True)
     parser.add_argument("--effis-out", required=True)
     parser.add_argument("--effis-summary", required=True)
     parser.add_argument("--combined-csv", required=True)
@@ -356,26 +444,43 @@ def main():
     args = parser.parse_args()
 
     aoi, aoi_srs, core_properties = release_aoi(args.core)
-    reference20 = gdal.Open(args.post[3])
-    reference10 = gdal.Open(args.post[0])
+    reference20 = gdal.Open(args.post_fill[3])
+    reference10 = gdal.Open(args.post_fill[0])
     aoi20 = rasterize(reference20, aoi, aoi_srs)
     aoi10 = rasterize(reference10, aoi, aoi_srs)
-    roles = [("seasonal_baseline", "2025-07-12", args.baseline), ("before_first_report", "2026-07-12", args.prefire), ("first_suitable_after_report", "2026-08-11", args.post)]
-    scenes20 = [(role, date, scene_values(paths, reference20, aoi20)) for role, date, paths in roles]
-    scenes10 = [(role, date, scene_values(paths, reference10, aoi10)) for role, date, paths in roles]
+    baseline20 = scene_values(args.baseline, reference20, aoi20)
+    prefire20 = scene_values(args.prefire, reference20, aoi20)
+    post20, post_source_date20 = composite_scene(args.post_primary, args.post_fill, reference20, aoi20)
+    baseline10 = scene_values(args.baseline, reference10, aoi10)
+    prefire10 = scene_values(args.prefire, reference10, aoi10)
+    post10, post_source_date10 = composite_scene(args.post_primary, args.post_fill, reference10, aoi10)
+    roles = [
+        ("seasonal_baseline", "2025-07-12", baseline20, baseline10),
+        ("before_first_report", "2026-07-12", prefire20, prefire10),
+        ("first_suitable_after_report", "2026-07-29/2026-08-11", post20, post10),
+    ]
 
     observations = []
-    for (role, date, values20), (_, _, values10) in zip(scenes20, scenes10):
+    for role, date, values20, values10 in roles:
         valid20 = ~values20["invalid"] & aoi20
         valid10 = ~values10["invalid"] & aoi10
         valid_percent = min(percentage(valid20, aoi20), percentage(valid10, aoi10))
-        observations.append({"role": role, "date": date, "valid_aoi_percent": valid_percent})
+        observation = {"role": role, "date": date, "valid_aoi_percent": valid_percent}
+        if role == "first_suitable_after_report":
+            observation.update({
+                "observation_type": "narrow_same_season_composite",
+                "label": "2026-07-29/2026-08-11 narrow same-season post-report composite",
+                "selection_order": ["2026-07-29", "2026-08-11"],
+                "source_date_provenance": {
+                    "10m": source_date_summary(post_source_date10, aoi10, reference10),
+                    "20m": source_date_summary(post_source_date20, aoi20, reference20),
+                },
+            })
+        observations.append(observation)
     failed_scenes = [item for item in observations if item["valid_aoi_percent"] < SCENE_MINIMUM]
     if failed_scenes:
         raise RuntimeError(f"Scene validity gate failed; reselection decision required: {failed_scenes}")
 
-    baseline20, prefire20, post20 = [item[2] for item in scenes20]
-    baseline10, _, post10 = [item[2] for item in scenes10]
     comparable20 = ~baseline20["invalid"] & ~prefire20["invalid"] & ~post20["invalid"] & aoi20
     comparable_ndmi = ~baseline20["invalid"] & ~post20["invalid"] & aoi20
     comparable_ndvi = ~baseline10["invalid"] & ~post10["invalid"] & aoi10
@@ -430,10 +535,14 @@ def main():
     write_cog(args.combined_cog, reference20, [combined_dnbr, combined_dndvi, combined_dndmi, evidence_state, observation_count], ["dNBR", "delta_NDVI", "delta_NDMI", "evidence_state", "observation_count"], aoi20)
     write_cog(args.ndvi_cog, reference10, [delta_ndvi], ["delta_NDVI"], aoi10)
     write_cog(args.ndmi_cog, reference20, [delta_ndmi], ["delta_NDMI"], aoi20)
+    write_source_date_cog(args.post_provenance_10m, reference10, post_source_date10, aoi10)
+    write_source_date_cog(args.post_provenance_20m, reference20, post_source_date20, aoi20)
 
-    dates = ["2025-07-12", "2026-08-11"]
-    ndvi_summary = component_summary("NDVI", delta_ndvi, comparable_ndvi, aoi10, reference10, dates, "(B8 - B4) / (B8 + B4)", ["B8", "B4"])
-    ndmi_summary = component_summary("NDMI", delta_ndmi, comparable_ndmi, aoi20, reference20, dates, "(B8A - B11) / (B8A + B11)", ["B8A", "B11"])
+    dates = ["2025-07-12", "2026-07-29", "2026-08-11"]
+    post_provenance10 = observations[2]["source_date_provenance"]["10m"]
+    post_provenance20 = observations[2]["source_date_provenance"]["20m"]
+    ndvi_summary = component_summary("NDVI", delta_ndvi, comparable_ndvi, aoi10, reference10, dates, "(B8 - B4) / (B8 + B4)", ["B8", "B4"], post_provenance10)
+    ndmi_summary = component_summary("NDMI", delta_ndmi, comparable_ndmi, aoi20, reference20, dates, "(B8A - B11) / (B8A + B11)", ["B8A", "B11"], post_provenance20)
     write_component(ndvi_summary, args.ndvi_json, args.ndvi_csv)
     write_component(ndmi_summary, args.ndmi_json, args.ndmi_csv)
 
@@ -498,7 +607,7 @@ def main():
         "observations": {item["role"]: item for item in observations},
         "coverage": coverage,
         "quality_thresholds": {"scene_valid_percent_min": SCENE_MINIMUM, "product_comparable_percent_min": PRODUCT_MINIMUM, "effis_comparable_percent_min": EFFIS_MINIMUM},
-        "mask": {"invalid_scl_classes": INVALID_SCL, "dilation_native_pixels": 1, "dilation_m": 20},
+        "mask": {"invalid_scl_classes": INVALID_SCL, "dilation_native_pixels": 1, "dilation_m": 20, "post_observations_masked_independently": True},
         "combined_thresholds": {"dNBR": "> 0.10", "delta_NDVI": "< -0.08", "delta_NDMI_higher_confidence": "< -0.05"},
         "components": {"ndvi": ndvi_summary, "ndmi": ndmi_summary},
         "evidence_state_summary": [

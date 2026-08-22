@@ -78,6 +78,10 @@ For the second Blorenge release, the copied recipe must additionally:
   reacquisition or rebuild;
 - acquire B8A as well as B04, B08, B11, B12 and SCL for every selected
   Sentinel-2 scene and invoke `build_change_evidence_v2.py`;
+- for the post-report role, independently mask the pinned 29 July and 11 August
+  observations, choose every band from 29 July where valid and otherwise from
+  11 August where valid, and publish the 10 m and 20 m source-date provenance
+  COGs together with accessible date/count/coverage summaries;
 - declare JSON quality assertions for every scene's 95% valid-AOI floor, each
   product's 90% comparable-AOI floor, and the combined product's 95% EFFIS
   comparability floor; and
