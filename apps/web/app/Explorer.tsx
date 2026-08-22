@@ -8,8 +8,10 @@ import {
   type Language
 } from "@bca/domain";
 import type { ExplorerLayer, ExplorerRelease } from "@bca/publication";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import explorerDocument from "../../../data/launch/explorer-release-2026-08-13.json";
+import { ActiveFirePanel } from "./ActiveFirePanel";
+import { INITIAL_ACTIVE_FIRE_STATE, loadActiveFireFeed, type ActiveFireFeatureCollection } from "./activeFire";
 import { MapApplicationMode } from "./MapApplicationMode";
 import { MapCanvas } from "./MapCanvas";
 import { MapTools } from "./MapTools";
@@ -21,10 +23,10 @@ const copy = {
   en: {
     skip: "Skip to the explorer",
     brand: "Blorenge Landscape Explorer",
-    fixture: "Published evidence · 13 August 2026",
+    fixture: "Verified release-two candidate · 22 August 2026",
     title: "Explore the Blorenge landscape and see how it changes over time",
     intro: "After exploring this beautiful landscape on foot, why not explore its data and compare and observe how it changes over time.",
-    caution: "Observed vegetation change is not proof of ecological recovery. The EFFIS boundary is provisional, not an authority or surveyed perimeter.",
+    caution: "Observed change is not proof of cause, severity or ecological recovery. EFFIS and recent thermal anomalies are separate sources, not verified incident perimeters.",
     map: "Explore map",
     mapTools: "Map Tools",
     toolCount: "2 tools",
@@ -52,15 +54,15 @@ const copy = {
     fallback: "Some source names and map-control labels remain in English while verified Welsh wording is prepared.",
     download: "Download accessible evidence states (CSV)",
     noSources: "No layers are currently shown.",
-    area: "Launch area: Blorenge SSSI plus exactly 2 km"
+    area: "Release area: BCA-area of interest plus exactly 2 km"
   },
   cy: {
     skip: "Neidio i’r archwiliwr",
     brand: "Archwiliwr Tirwedd y Blorens",
-    fixture: "Tystiolaeth gyhoeddedig · 13 Awst 2026",
+    fixture: "Ymgeisydd ail ryddhad wedi’i wirio · 22 Awst 2026",
     title: "Archwiliwch dirwedd y Blorens a gweld sut mae’n newid dros amser",
     intro: "Ar ôl archwilio’r dirwedd hardd hon ar droed, beth am archwilio ei data a chymharu a gweld sut mae’n newid dros amser.",
-    caution: "Nid yw newid llystyfiant a welwyd yn brawf o adferiad ecolegol. Mae ffin EFFIS yn dros dro, nid yn derfyn awdurdod nac arolwg.",
+    caution: "Nid yw newid a welwyd yn brawf o achos, difrifoldeb nac adferiad ecolegol. Mae EFFIS ac anomaleddau thermol diweddar yn ffynonellau ar wahân, nid terfynau digwyddiad wedi’u cadarnhau.",
     map: "Archwilio’r map",
     mapTools: "Offer map",
     toolCount: "2 offer",
@@ -88,7 +90,7 @@ const copy = {
     fallback: "Mae rhai enwau ffynonellau, metadata a’r crynodeb technegol yn aros yn Saesneg tra bod geiriad Cymraeg wedi’i wirio yn cael ei baratoi.",
     download: "Lawrlwytho cyflyrau tystiolaeth hygyrch (CSV)",
     noSources: "Nid oes haenau’n cael eu dangos ar hyn o bryd.",
-    area: "Ardal lansio: SoDdGA y Blorens ynghyd ag union 2 km"
+    area: "Ardal ryddhau: Ardal o ddiddordeb BCA ynghyd ag union 2 km"
   }
 } as const;
 
@@ -99,6 +101,17 @@ function initialState(): ExplorerState {
     primaryDate: explorer.dates.at(-1)?.id ?? null,
     comparisonDate: explorer.dates[0]?.id ?? null
   };
+}
+
+function normaliseVisibleLayers(layerIds: readonly string[]): string[] {
+  const seenSelectionGroups = new Set<string>();
+  return layerIds.filter((id) => {
+    const group = explorer.layers.find((layer) => layer.id === id)?.selectionGroup;
+    if (!group) return true;
+    if (seenSelectionGroups.has(group)) return false;
+    seenSelectionGroups.add(group);
+    return true;
+  });
 }
 
 function parseState(current: ExplorerState): ExplorerState {
@@ -116,7 +129,7 @@ function parseState(current: ExplorerState): ExplorerState {
 
   return {
     ...current,
-    visibleLayerIds: requestedLayers ?? current.visibleLayerIds,
+    visibleLayerIds: requestedLayers ? normaliseVisibleLayers(requestedLayers) : current.visibleLayerIds,
     primaryDate,
     comparisonDate,
     comparisonEnabled: Boolean(requestedComparisonDate && comparisonIndex >= 0 && comparisonIndex < primaryIndex),
@@ -145,6 +158,8 @@ function LayerName({ layer, language }: { layer: ExplorerLayer; language: Langua
 
 export function Explorer() {
   const [state, setState] = useState<ExplorerState>(initialState);
+  const [activeFire, setActiveFire] = useState(INITIAL_ACTIVE_FIRE_STATE);
+  const [activeFireMapOverride, setActiveFireMapOverride] = useState<ActiveFireFeatureCollection | null>(null);
   const [ready, setReady] = useState(false);
   const [detailLayerId, setDetailLayerId] = useState<string | null>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
@@ -163,6 +178,14 @@ export function Explorer() {
       setReady(true);
     });
     return () => window.cancelAnimationFrame(frame);
+  }, []);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const origin = ((process.env.NEXT_PUBLIC_ASSET_ORIGIN ?? "").trim() || window.location.origin).replace(/\/$/, "");
+    void loadActiveFireFeed({ origin, currentPath: explorer.activeFire.currentPath, statusPath: explorer.activeFire.statusPath })
+      .then((feed) => { if (!controller.signal.aborted) setActiveFire(feed); });
+    return () => controller.abort();
   }, []);
 
   useEffect(() => {
@@ -228,6 +251,21 @@ export function Explorer() {
     });
   }
 
+  function toggleLayer(layerId: string) {
+    const layer = explorer.layers.find((candidate) => candidate.id === layerId);
+    if (!layer?.selectionGroup) {
+      setState((current) => toggleVisibleLayer(current, layerId));
+      return;
+    }
+    const exclusiveIds = new Set(explorer.layers.filter((candidate) => candidate.selectionGroup === layer.selectionGroup).map((candidate) => candidate.id));
+    setState((current) => ({
+      ...current,
+      visibleLayerIds: [...current.visibleLayerIds.filter((id) => !exclusiveIds.has(id)), layerId]
+    }));
+  }
+
+  const setHistoryMap = useCallback((map: ActiveFireFeatureCollection | null) => setActiveFireMapOverride(map), []);
+
   const visibleLayers = useMemo(
     () => explorer.layers.filter((layer) => state.visibleLayerIds.includes(layer.id)),
     [state.visibleLayerIds]
@@ -254,6 +292,7 @@ export function Explorer() {
         <div><dt>{c.method}</dt><dd>{localise(detailLayer.method, state.language)}</dd></div>
       </dl>
       <div className="limitation-box"><strong>{c.limitations}</strong><ul>{detailLayer.limitations.map((limitation) => <li key={limitation.en}>{localise(limitation, state.language)}</li>)}</ul></div>
+      {detailLayer.accessibleDownload ? <p><a className="download-link" href={`${(process.env.NEXT_PUBLIC_ASSET_ORIGIN ?? "").trim()}${detailLayer.accessibleDownload}`}>{state.language === "en" ? "Download this layer’s accessible summary (CSV)" : "Lawrlwytho crynodeb hygyrch yr haen hon (CSV)"}</a></p> : null}
       {state.language === "cy" && (!detailLayer.name.cy || !detailLayer.description.cy || !detailLayer.method.cy) ? <p className="fallback-note"><span lang="en">EN</span>{c.fallback}</p> : null}
     </aside>
   ) : null;
@@ -291,7 +330,7 @@ export function Explorer() {
           <section className="explorer-shell" aria-label={state.language === "en" ? "Landscape explorer" : "Archwiliwr tirwedd"}>
             <div className="map-workspace">
               <div className="map-stage">
-                <MapCanvas explorer={explorer} language={state.language} state={state} />
+                <MapCanvas explorer={explorer} language={state.language} state={state} activeFire={activeFire} activeFireMapOverride={activeFireMapOverride} />
                 <noscript>
                   <p className="map-no-script">The interactive map requires JavaScript. Source information and the accessible evidence CSV remain available below the map.</p>
                 </noscript>
@@ -301,7 +340,7 @@ export function Explorer() {
                   language={state.language}
                   copy={c}
                   detailLayerId={detailLayerId}
-                  onLayerToggle={(layerId) => setState((current) => toggleVisibleLayer(current, layerId))}
+                  onLayerToggle={toggleLayer}
                   onLayerDetail={(layerId) => setDetailLayerId(detailLayerId === layerId ? null : layerId)}
                   onPrimaryDateChange={selectPrimaryDate}
                   onComparisonToggle={toggleComparison}
@@ -310,12 +349,13 @@ export function Explorer() {
                 />
               </div>
               {sourcesStrip}
+              <ActiveFirePanel feed={activeFire} language={state.language} visible={state.visibleLayerIds.includes("thermal")} onMapOverride={setHistoryMap} />
               {sourcePanel}
             </div>
           </section>
         </MapApplicationMode>
       </main>
-      <footer id="service-footer" tabIndex={-1}><p>Evidence release {explorer.release.datasetVersion} · published 13 August 2026 · owner {explorer.release.owner} · next review {explorer.release.nextReviewAt}</p><nav aria-label="Service information"><a href="/accessibility/">Accessibility</a> · <a href="/privacy/">Privacy</a> · <a href="/security/">Security</a></nav><a href="#explorer-main">{c.skip}</a></footer>
+      <footer id="service-footer" tabIndex={-1}><p>Evidence release {explorer.release.datasetVersion} · {explorer.release.publishedAt ? `published ${new Date(explorer.release.publishedAt).toLocaleDateString("en-GB")}` : "verified candidate awaiting promotion"} · owner {explorer.release.owner} · next review {explorer.release.nextReviewAt}</p><nav aria-label="Service information"><a href="/accessibility/">Accessibility</a> · <a href="/privacy/">Privacy</a> · <a href="/security/">Security</a></nav><a href="#explorer-main">{c.skip}</a></footer>
     </>
   );
 }

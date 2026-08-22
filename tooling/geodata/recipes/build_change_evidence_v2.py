@@ -21,6 +21,8 @@ NODATA = -9999.0
 SCENE_MINIMUM = 95.0
 PRODUCT_MINIMUM = 90.0
 EFFIS_MINIMUM = 95.0
+EFFIS_HISTORIC_RESPONSE_SHA256 = "651b441769bd485c5f45e48fefb777084c08b059be4eee61c9ecf122e03c3e6a"
+EFFIS_CURRENT_RESPONSE_SHA256 = "ad5e648111a6e8803e9f159463d65ecda66976783868f1b798c45d3d0f854778"
 
 
 def first_geometry(path):
@@ -155,6 +157,22 @@ def scene_values(paths, reference, aoi_mask):
     return values
 
 
+def composite_scene(primary_paths, fill_paths, reference, aoi_mask):
+    primary = scene_values(primary_paths, reference, aoi_mask)
+    fill = scene_values(fill_paths, reference, aoi_mask)
+    use_primary = ~primary["invalid"] & aoi_mask
+    use_fill = primary["invalid"] & ~fill["invalid"] & aoi_mask
+    values = {
+        band: np.where(use_primary, primary[band], fill[band])
+        for band in ["red", "nir10", "nir20", "swir1", "swir2"]
+    }
+    values["invalid"] = primary["invalid"] & fill["invalid"]
+    source_date = np.zeros(aoi_mask.shape, dtype=np.uint32)
+    source_date[use_primary] = 20260729
+    source_date[use_fill] = 20260811
+    return values, source_date
+
+
 def percentage(mask, denominator):
     return round(float(mask.sum()) * 100.0 / float(max(1, denominator.sum())), 3)
 
@@ -201,7 +219,71 @@ def write_cog(path, reference, bands, descriptions, domain):
     os.unlink(temporary)
 
 
-def component_summary(product, values, observed, domain, reference, dates, formula, bands):
+def write_source_date_cog(path, reference, source_date, domain):
+    rows, columns = np.where(domain)
+    if rows.size == 0 or columns.size == 0:
+        raise RuntimeError("Source-date provenance domain is empty")
+    row_start, row_stop = int(rows.min()), int(rows.max()) + 1
+    column_start, column_stop = int(columns.min()), int(columns.max()) + 1
+    transform = reference.GetGeoTransform()
+    cropped_transform = (
+        transform[0] + column_start * transform[1] + row_start * transform[2],
+        transform[1],
+        transform[2],
+        transform[3] + column_start * transform[4] + row_start * transform[5],
+        transform[4],
+        transform[5],
+    )
+    temporary = f"{path}.working.tif"
+    dataset = gdal.GetDriverByName("GTiff").Create(
+        temporary,
+        column_stop - column_start,
+        row_stop - row_start,
+        1,
+        gdal.GDT_UInt32,
+        options=["TILED=YES", "COMPRESS=ZSTD"],
+    )
+    dataset.SetProjection(reference.GetProjection())
+    dataset.SetGeoTransform(cropped_transform)
+    band = dataset.GetRasterBand(1)
+    band.WriteArray(source_date[row_start:row_stop, column_start:column_stop])
+    band.SetDescription("post_source_date")
+    band.SetNoDataValue(0)
+    dataset = None
+    gdal.Translate(path, temporary, format="COG", creationOptions=["COMPRESS=ZSTD", "OVERVIEWS=AUTO", "RESAMPLING=NEAREST"])
+    os.unlink(temporary)
+
+
+def source_date_summary(source_date, domain, reference):
+    transform = reference.GetGeoTransform()
+    pixel_area_ha = abs(transform[1] * transform[5]) / 10000.0
+    counts = Counter(source_date[domain].tolist())
+    total = int(domain.sum())
+    return {
+        "encoding": {
+            "0": "Not observed",
+            "20260729": "2026-07-29 earliest valid post-report source",
+            "20260811": "2026-08-11 invalid-pixel fill source",
+        },
+        "pixel_counts": {
+            "2026-07-29": counts[20260729],
+            "2026-08-11": counts[20260811],
+            "not_observed": counts[0],
+        },
+        "area_ha": {
+            "2026-07-29": round(counts[20260729] * pixel_area_ha, 3),
+            "2026-08-11": round(counts[20260811] * pixel_area_ha, 3),
+            "not_observed": round(counts[0] * pixel_area_ha, 3),
+        },
+        "coverage_percent": {
+            "2026-07-29": round(counts[20260729] * 100.0 / total, 3),
+            "2026-08-11": round(counts[20260811] * 100.0 / total, 3),
+            "not_observed": round(counts[0] * 100.0 / total, 3),
+        },
+    }
+
+
+def component_summary(product, values, observed, domain, reference, dates, formula, bands, provenance):
     transform = reference.GetGeoTransform()
     pixel_area_ha = abs(transform[1] * transform[5]) / 10000.0
     finite = values[observed]
@@ -232,6 +314,11 @@ def component_summary(product, values, observed, domain, reference, dates, formu
         "formula": formula,
         "bands": bands,
         "dates": dates,
+        "comparison_observation": {
+            "label": "2026-07-29/2026-08-11 narrow same-season post-report composite",
+            "selection": "Use 2026-07-29 where independently valid, otherwise 2026-08-11 where independently valid, otherwise Not observed.",
+            "source_date_provenance": provenance,
+        },
         "units": "index points",
         "resolution_m": abs(transform[1]),
         "render_scale": {
@@ -252,7 +339,7 @@ def component_summary(product, values, observed, domain, reference, dates, formu
         "limitations": [
             "The signed difference does not establish cause, fire damage, severity, habitat condition, recovery, dryness or wetness.",
             "Rainfall, phenology, grazing, management and residual observation effects may contribute.",
-            "Pixels failing either date's quality mask are Not observed, not zero change.",
+            "Pixels failing the baseline mask or both independently applied post-date masks are Not observed, not zero change.",
         ],
     }
 
@@ -264,40 +351,71 @@ def write_component(summary, json_path, csv_path):
         writer = csv.writer(handle)
         writer.writerow(["product", "bin", "pixel_count", "area_ha", "units", "baseline_date", "comparison_date"])
         for row in summary["bins"]:
-            writer.writerow([summary["product"], row["bin"], row["pixel_count"], row["area_ha"], summary["units"], summary["dates"][0], summary["dates"][1]])
+            writer.writerow([summary["product"], row["bin"], row["pixel_count"], row["area_ha"], summary["units"], summary["dates"][0], summary["comparison_observation"]["label"]])
 
 
-def load_effis(path):
+def sha256_file(path):
+    digest = hashlib.sha256()
+    with open(path, "rb") as handle:
+        for block in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def load_effis(path, feature_id):
     datasource = ogr.Open(path)
+    if datasource is None:
+        raise RuntimeError(f"Could not open EFFIS snapshot: {path}")
     layer = datasource.GetLayer(0)
     for feature in layer:
-        if str(feature.GetField("id")) == "592404":
-            return feature.GetGeometryRef().Clone(), layer.GetSpatialRef().Clone(), feature.items()
-    raise RuntimeError("EFFIS feature 592404 was not present in the controlled snapshot")
+        if str(feature.GetField("id")) == feature_id:
+            spatial_ref = layer.GetSpatialRef()
+            if spatial_ref is None:
+                spatial_ref = osr.SpatialReference()
+                spatial_ref.ImportFromEPSG(4326)
+            return feature.GetGeometryRef().Clone(), spatial_ref.Clone(), feature.items()
+    raise RuntimeError(f"EFFIS feature {feature_id} was not present in the controlled snapshot")
+
+
+def effis_feature_ids(path):
+    datasource = ogr.Open(path)
+    if datasource is None:
+        raise RuntimeError(f"Could not open EFFIS snapshot: {path}")
+    return {str(feature.GetField("id")) for feature in datasource.GetLayer(0)}
 
 
 def geometry_sha256(geometry):
     return hashlib.sha256(bytes(geometry.ExportToWkb())).hexdigest()
 
 
-def effis_comparison(previous_path, current_geometry, current_properties):
-    previous_geometry, _, previous_properties = load_effis(previous_path)
+def validate_effis_corroboration(current_path, historic_geometry, historic_properties):
+    if sha256_file(current_path) != EFFIS_CURRENT_RESPONSE_SHA256:
+        raise RuntimeError("Current EFFIS corroborating response does not match the reviewed checksum")
+    feature_ids = effis_feature_ids(current_path)
+    if "592404" in feature_ids or not {"627416", "627417"}.issubset(feature_ids):
+        raise RuntimeError("Current EFFIS response no longer has the reviewed disappearance, corroboration and exclusion identities")
+    current_geometry, _, current_properties = load_effis(current_path, "627416")
     changed = sorted(
-        key for key in set(previous_properties) | set(current_properties)
-        if previous_properties.get(key) != current_properties.get(key)
+        key for key in set(historic_properties) | set(current_properties)
+        if historic_properties.get(key) != current_properties.get(key)
     )
+    if changed != ["CLASS", "LASTUPDATE", "id"]:
+        raise RuntimeError(f"EFFIS 627416 differs from historic 592404 in unreviewed fields: {changed}")
+    historic_geometry_sha256 = geometry_sha256(historic_geometry)
+    current_geometry_sha256 = geometry_sha256(current_geometry)
+    if current_geometry_sha256 != historic_geometry_sha256:
+        raise RuntimeError("EFFIS 627416 geometry is not coordinate-identical to historic 592404")
     return {
-        "previous": {
-            "provider_area_ha": previous_properties.get("AREA_HA"),
-            "provider_lastupdate": previous_properties.get("LASTUPDATE"),
-            "geometry_sha256": geometry_sha256(previous_geometry),
-        },
-        "current": {
-            "provider_area_ha": current_properties.get("AREA_HA"),
-            "provider_lastupdate": current_properties.get("LASTUPDATE"),
-            "geometry_sha256": geometry_sha256(current_geometry),
-        },
+        "provider_feature_id": "627416",
+        "relationship": "BCA-inferred-rekey",
+        "provider_crosswalk_available": False,
+        "retrieved_at": "2026-08-21T21:32:07.885Z",
+        "response_sha256": EFFIS_CURRENT_RESPONSE_SHA256,
+        "provider_area_ha": current_properties.get("AREA_HA"),
+        "provider_lastupdate": current_properties.get("LASTUPDATE"),
+        "geometry_sha256": current_geometry_sha256,
         "changed_attributes": changed,
+        "excluded_feature_ids": ["627417"],
     }
 
 
@@ -306,12 +424,15 @@ def main():
     parser.add_argument("--core", required=True)
     parser.add_argument("--baseline", nargs=6, required=True, metavar=("RED", "NIR10", "NIR20", "SWIR1", "SWIR2", "SCL"))
     parser.add_argument("--prefire", nargs=6, required=True, metavar=("RED", "NIR10", "NIR20", "SWIR1", "SWIR2", "SCL"))
-    parser.add_argument("--post", nargs=6, required=True, metavar=("RED", "NIR10", "NIR20", "SWIR1", "SWIR2", "SCL"))
+    parser.add_argument("--post-primary", nargs=6, required=True, metavar=("RED", "NIR10", "NIR20", "SWIR1", "SWIR2", "SCL"))
+    parser.add_argument("--post-fill", nargs=6, required=True, metavar=("RED", "NIR10", "NIR20", "SWIR1", "SWIR2", "SCL"))
     parser.add_argument("--effis", required=True)
-    parser.add_argument("--previous-effis", required=True)
+    parser.add_argument("--current-effis", required=True)
     parser.add_argument("--combined-cog", required=True)
     parser.add_argument("--ndvi-cog", required=True)
     parser.add_argument("--ndmi-cog", required=True)
+    parser.add_argument("--post-provenance-10m", required=True)
+    parser.add_argument("--post-provenance-20m", required=True)
     parser.add_argument("--effis-out", required=True)
     parser.add_argument("--effis-summary", required=True)
     parser.add_argument("--combined-csv", required=True)
@@ -323,26 +444,43 @@ def main():
     args = parser.parse_args()
 
     aoi, aoi_srs, core_properties = release_aoi(args.core)
-    reference20 = gdal.Open(args.post[3])
-    reference10 = gdal.Open(args.post[0])
+    reference20 = gdal.Open(args.post_fill[3])
+    reference10 = gdal.Open(args.post_fill[0])
     aoi20 = rasterize(reference20, aoi, aoi_srs)
     aoi10 = rasterize(reference10, aoi, aoi_srs)
-    roles = [("seasonal_baseline", "2025-07-12", args.baseline), ("before_first_report", "2026-07-12", args.prefire), ("first_suitable_after_report", "2026-08-11", args.post)]
-    scenes20 = [(role, date, scene_values(paths, reference20, aoi20)) for role, date, paths in roles]
-    scenes10 = [(role, date, scene_values(paths, reference10, aoi10)) for role, date, paths in roles]
+    baseline20 = scene_values(args.baseline, reference20, aoi20)
+    prefire20 = scene_values(args.prefire, reference20, aoi20)
+    post20, post_source_date20 = composite_scene(args.post_primary, args.post_fill, reference20, aoi20)
+    baseline10 = scene_values(args.baseline, reference10, aoi10)
+    prefire10 = scene_values(args.prefire, reference10, aoi10)
+    post10, post_source_date10 = composite_scene(args.post_primary, args.post_fill, reference10, aoi10)
+    roles = [
+        ("seasonal_baseline", "2025-07-12", baseline20, baseline10),
+        ("before_first_report", "2026-07-12", prefire20, prefire10),
+        ("first_suitable_after_report", "2026-07-29/2026-08-11", post20, post10),
+    ]
 
     observations = []
-    for (role, date, values20), (_, _, values10) in zip(scenes20, scenes10):
+    for role, date, values20, values10 in roles:
         valid20 = ~values20["invalid"] & aoi20
         valid10 = ~values10["invalid"] & aoi10
         valid_percent = min(percentage(valid20, aoi20), percentage(valid10, aoi10))
-        observations.append({"role": role, "date": date, "valid_aoi_percent": valid_percent})
+        observation = {"role": role, "date": date, "valid_aoi_percent": valid_percent}
+        if role == "first_suitable_after_report":
+            observation.update({
+                "observation_type": "narrow_same_season_composite",
+                "label": "2026-07-29/2026-08-11 narrow same-season post-report composite",
+                "selection_order": ["2026-07-29", "2026-08-11"],
+                "source_date_provenance": {
+                    "10m": source_date_summary(post_source_date10, aoi10, reference10),
+                    "20m": source_date_summary(post_source_date20, aoi20, reference20),
+                },
+            })
+        observations.append(observation)
     failed_scenes = [item for item in observations if item["valid_aoi_percent"] < SCENE_MINIMUM]
     if failed_scenes:
         raise RuntimeError(f"Scene validity gate failed; reselection decision required: {failed_scenes}")
 
-    baseline20, prefire20, post20 = [item[2] for item in scenes20]
-    baseline10, _, post10 = [item[2] for item in scenes10]
     comparable20 = ~baseline20["invalid"] & ~prefire20["invalid"] & ~post20["invalid"] & aoi20
     comparable_ndmi = ~baseline20["invalid"] & ~post20["invalid"] & aoi20
     comparable_ndvi = ~baseline10["invalid"] & ~post10["invalid"] & aoi10
@@ -385,7 +523,10 @@ def main():
     if min(coverage.values()) < PRODUCT_MINIMUM:
         raise RuntimeError(f"Product comparability gate failed; reselection decision required: {coverage}")
 
-    effis_geometry, effis_srs, effis_properties = load_effis(args.effis)
+    if sha256_file(args.effis) != EFFIS_HISTORIC_RESPONSE_SHA256:
+        raise RuntimeError("Historic EFFIS provider evidence does not match the reviewed release-one checksum")
+    effis_geometry, effis_srs, effis_properties = load_effis(args.effis, "592404")
+    effis_corroboration = validate_effis_corroboration(args.current_effis, effis_geometry, effis_properties)
     effis20 = rasterize(reference20, effis_geometry, effis_srs) & aoi20
     coverage["effis_combined_comparable_percent"] = percentage(comparable20 & effis20, effis20)
     if coverage["effis_combined_comparable_percent"] < EFFIS_MINIMUM:
@@ -394,10 +535,14 @@ def main():
     write_cog(args.combined_cog, reference20, [combined_dnbr, combined_dndvi, combined_dndmi, evidence_state, observation_count], ["dNBR", "delta_NDVI", "delta_NDMI", "evidence_state", "observation_count"], aoi20)
     write_cog(args.ndvi_cog, reference10, [delta_ndvi], ["delta_NDVI"], aoi10)
     write_cog(args.ndmi_cog, reference20, [delta_ndmi], ["delta_NDMI"], aoi20)
+    write_source_date_cog(args.post_provenance_10m, reference10, post_source_date10, aoi10)
+    write_source_date_cog(args.post_provenance_20m, reference20, post_source_date20, aoi20)
 
-    dates = ["2025-07-12", "2026-08-11"]
-    ndvi_summary = component_summary("NDVI", delta_ndvi, comparable_ndvi, aoi10, reference10, dates, "(B8 - B4) / (B8 + B4)", ["B8", "B4"])
-    ndmi_summary = component_summary("NDMI", delta_ndmi, comparable_ndmi, aoi20, reference20, dates, "(B8A - B11) / (B8A + B11)", ["B8A", "B11"])
+    dates = ["2025-07-12", "2026-07-29", "2026-08-11"]
+    post_provenance10 = observations[2]["source_date_provenance"]["10m"]
+    post_provenance20 = observations[2]["source_date_provenance"]["20m"]
+    ndvi_summary = component_summary("NDVI", delta_ndvi, comparable_ndvi, aoi10, reference10, dates, "(B8 - B4) / (B8 + B4)", ["B8", "B4"], post_provenance10)
+    ndmi_summary = component_summary("NDMI", delta_ndmi, comparable_ndmi, aoi20, reference20, dates, "(B8A - B11) / (B8A + B11)", ["B8A", "B11"], post_provenance20)
     write_component(ndvi_summary, args.ndvi_json, args.ndvi_csv)
     write_component(ndmi_summary, args.ndmi_json, args.ndmi_csv)
 
@@ -418,10 +563,9 @@ def main():
     if clipped_effis.IsEmpty():
         raise RuntimeError("EFFIS feature 592404 does not intersect the release AOI")
     effis_wgs84 = transform_geometry(clipped_effis, effis_srs, wgs84)
-    effis_change = effis_comparison(args.previous_effis, effis_geometry, effis_properties)
     effis_feature = {
         "type": "Feature",
-        "properties": {**effis_properties, "layer_id": "effis-provisional-boundary", "provider_feature_id": "592404", "classification": "provisional_provider", "provider": "European Union, Copernicus EFFIS", "display_geometry": "Provider feature clipped only for display to the release AOI; the complete provider snapshot is retained in acquisition lineage.", "limitation": "Not an authority, legal or surveyed perimeter; provider dates are not authority incident times."},
+        "properties": {**effis_properties, "layer_id": "effis-provisional-boundary", "provider_feature_id": "592404", "classification": "historic_provisional_provider", "provider": "European Union, Copernicus EFFIS", "source_status": "Historic checksum-pinned provider evidence retained from release one; feature 592404 was not returned by EFFIS on 21 August 2026.", "current_corroboration": "Feature 627416 is geometry-identical but is only a BCA-inferred re-key, not an EFFIS-declared successor.", "display_geometry": "Provider feature clipped only for display to the release AOI; the complete historic provider snapshot is retained in acquisition lineage.", "limitation": "Not an authority, legal or surveyed perimeter; provider dates are not authority incident times."},
         "geometry": json.loads(effis_wgs84.ExportToJson()),
     }
     with open(args.effis_out, "x", encoding="utf-8") as handle:
@@ -433,13 +577,28 @@ def main():
                 "name_cy": "Ffin dros dro y darparwr EFFIS",
             },
             "provider_feature": effis_properties,
-            "comparison_with_release_one": effis_change,
+            "source_identity": {
+                "role": "canonical historic provider evidence retained from release one",
+                "provider_feature_id": "592404",
+                "retrieved_at": "2026-08-13T18:20:27.597Z",
+                "response_sha256": EFFIS_HISTORIC_RESPONSE_SHA256,
+                "feature_not_returned_on": "2026-08-21",
+                "fresh_reacquisition_claimed": False,
+            },
+            "current_corroboration": effis_corroboration,
             "display_geometry": effis_feature["properties"]["display_geometry"],
             "attribution": "European Union, Copernicus EFFIS; clipped and reformatted by Blorenge Commoners Association.",
             "limitations": [
                 "Not an authority, legal or surveyed perimeter.",
                 "Provider dates are not authority incident times.",
+                "EFFIS no longer returns historic feature 592404; 627416 is only a BCA-inferred re-key because no provider crosswalk is published.",
                 "Spatial overlap does not validate or establish the cause of raster change or thermal anomalies.",
+            ],
+            "limitations_cy": [
+                "Nid yw'n ffin awdurdod, gyfreithiol nac wedi'i harolygu.",
+                "Nid amseroedd digwyddiad awdurdod yw dyddiadau'r darparwr.",
+                "Nid yw EFFIS bellach yn dychwelyd nodwedd hanesyddol 592404; dim ond ailallweddiad a gasglwyd gan BCA yw 627416 gan nad oes croesgyfeiriad darparwr wedi'i gyhoeddi.",
+                "Nid yw gorgyffwrdd gofodol yn dilysu nac yn sefydlu achos newid raster nac anomaleddau thermol.",
             ],
         }, handle, separators=(",", ":"))
 
@@ -448,7 +607,7 @@ def main():
         "observations": {item["role"]: item for item in observations},
         "coverage": coverage,
         "quality_thresholds": {"scene_valid_percent_min": SCENE_MINIMUM, "product_comparable_percent_min": PRODUCT_MINIMUM, "effis_comparable_percent_min": EFFIS_MINIMUM},
-        "mask": {"invalid_scl_classes": INVALID_SCL, "dilation_native_pixels": 1, "dilation_m": 20},
+        "mask": {"invalid_scl_classes": INVALID_SCL, "dilation_native_pixels": 1, "dilation_m": 20, "post_observations_masked_independently": True},
         "combined_thresholds": {"dNBR": "> 0.10", "delta_NDVI": "< -0.08", "delta_NDMI_higher_confidence": "< -0.05"},
         "components": {"ndvi": ndvi_summary, "ndmi": ndmi_summary},
         "evidence_state_summary": [
@@ -457,7 +616,9 @@ def main():
         ],
         "effis": {
             "provider_feature_id": "592404",
-            "comparison_with_release_one": effis_change,
+            "source_status": "historic_release_one_provider_evidence",
+            "historic_response_sha256": EFFIS_HISTORIC_RESPONSE_SHA256,
+            "current_corroboration": effis_corroboration,
             "limitation": "Independent provisional provider boundary; not an authority, legal or surveyed perimeter and not validation of any raster or thermal anomaly.",
         },
         "landsat_corroboration": "Retained as separate 30 m corroboration in lineage and not fused into the Sentinel-derived raster.",

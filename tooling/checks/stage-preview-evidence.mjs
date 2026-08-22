@@ -65,6 +65,29 @@ for (const asset of assets) {
   await writeFile(path.join(assetRoot, asset.filename), asset.bytes, { flag: "wx" });
 }
 
+const activeFireRoot = path.join(outputRoot, "active-fire");
+const [currentBytes, statusBytes] = await Promise.all([
+  fetchBytes(`${sourceOrigin}/active-fire/current.json`),
+  fetchBytes(`${sourceOrigin}/active-fire/status.json`)
+]);
+const activeFirePointer = JSON.parse(currentBytes.toString("utf8"));
+await mkdir(activeFireRoot, { recursive: true });
+await writeFile(path.join(activeFireRoot, "current.json"), currentBytes, { flag: "wx" });
+await writeFile(path.join(activeFireRoot, "status.json"), statusBytes, { flag: "wx" });
+let activeFireAssets = 0;
+if (activeFirePointer.status !== "withdrawn") {
+  for (const reference of [activeFirePointer.map, activeFirePointer.history, activeFirePointer.accessible_table, activeFirePointer.contract]) {
+    assert.match(reference.key, /^active-fire\/runs\/[a-zA-Z0-9._/-]+$/);
+    assert.match(reference.sha256, /^[0-9a-f]{64}$/);
+    const bytes = await fetchBytes(reference.url);
+    assert.equal(sha256(bytes), reference.sha256, `${reference.key}: operational asset checksum changed`);
+    const target = path.join(outputRoot, reference.key);
+    await mkdir(path.dirname(target), { recursive: true });
+    await writeFile(target, bytes, { flag: "wx" });
+    activeFireAssets += 1;
+  }
+}
+
 process.stdout.write(`${JSON.stringify({
   release_id: releaseId,
   source_manifest: manifestUrl,
@@ -72,5 +95,6 @@ process.stdout.write(`${JSON.stringify({
   assets: assets.length,
   bytes: assets.reduce((total, asset) => total + asset.bytes.byteLength, 0),
   delivery: "same-origin-pages",
-  pmtiles_ranges: "preview-worker"
+  pmtiles_ranges: "preview-worker",
+  active_fire_assets: activeFireAssets
 })}\n`);

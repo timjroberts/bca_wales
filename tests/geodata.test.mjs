@@ -109,6 +109,49 @@ test("binary mirror media types are validated by their file contracts instead of
   assert.equal(acquired.manifest.qa_events.some((event) => event.code === "SOURCE_MEDIA_TYPE_CHANGED"), false);
 });
 
+test("remote acquisition retries transient stream failures without retaining partial bytes", async (context) => {
+  const root = await mkdtemp(path.join(tmpdir(), "bca-acquisition-retry-test-"));
+  context.after(() => rm(root, { recursive: true }));
+  const source = path.join(root, "source.tif");
+  const sourceBytes = Buffer.from([0x49, 0x49, 0x2a, 0x00, 0, 0, 0, 0]);
+  await writeFile(source, sourceBytes);
+  const contracts = await fixture(root);
+  const registry = await readJson(contracts.registryPath);
+  registry.sources[0].acquisition.media_type = "image/tiff";
+  registry.sources[0].schema = { geometry: "raster", nodata: "none" };
+  registry.sources[0].contract.output_profiles = ["cog", "accessible_csv"];
+  const recipe = await readJson(contracts.recipePath);
+  recipe.inputs[0].media_type = "image/tiff";
+  recipe.inputs[0].source = "https://example.invalid/source.tif";
+  recipe.inputs[0].destination = "quarantine/source.tif";
+  recipe.inputs[0].expected_sha256 = createHash("sha256").update(sourceBytes).digest("hex");
+  await Promise.all([
+    writeFile(contracts.registryPath, JSON.stringify(registry)),
+    writeFile(contracts.recipePath, JSON.stringify(recipe))
+  ]);
+  let attempts = 0;
+  const acquired = await acquireRelease({
+    ...contracts,
+    workspaceRoot: path.join(root, "work"),
+    codeCommit: commit,
+    clock,
+    allowNetwork: true,
+    fetchImpl: async () => {
+      attempts += 1;
+      if (attempts === 1) throw new TypeError("fetch failed");
+      const response = new Response(await readFile(source), {
+        status: 200,
+        headers: { "content-type": "application/octet-stream" }
+      });
+      Object.defineProperty(response, "url", { value: "https://example.invalid/source.tif" });
+      return response;
+    }
+  });
+  assert.equal(attempts, 2);
+  assert.equal(acquired.manifest.inputs[0].checksum_status, "matched");
+  assert.equal(acquired.manifest.inputs[0].sha256, recipe.inputs[0].expected_sha256);
+});
+
 class MemoryStore {
   objects = new Map();
 
@@ -289,7 +332,8 @@ function localRunner(releaseRoot) {
     else if (tool === "gdalinfo") return {
       stdout: JSON.stringify({
         metadata: { IMAGE_STRUCTURE: { LAYOUT: "COG" } },
-        coordinateSystem: { id: { authority: "EPSG", code: 32630 } },
+        coordinateSystem: { wkt: "PROJCRS[...]" },
+        stac: { "proj:epsg": 32630 },
         geoTransform: [0, 10, 0, 0, 0, -10],
         bands: [{ description: "delta_NDVI" }]
       }),
@@ -314,14 +358,48 @@ test("the factual release-two recipe pins the expanded AOI and component contrac
     registryPath: path.join(repositoryRoot, "data/launch/source-registry.json"),
     recipePath: path.join(repositoryRoot, "data/launch/publication-recipe-2026-08-21.json")
   });
-  assert.equal(loaded.recipe.release_id, "release-blorenge-2026-08-21.5");
+  assert.equal(loaded.recipe.release_id, "release-blorenge-2026-08-21.8");
+  assert.equal(loaded.recipe.recipe_version, "2.1.1");
   assert.equal(loaded.recipe.supersedes, "release-blorenge-2026-08-13.6");
   assert.equal(loaded.recipe.spatial_contract.core_version, "2026-08-21.1");
   assert.equal(loaded.recipe.inputs.filter((item) => item.input_id.startsWith("lidar-") && item.input_id !== "lidar-catalogue").length, 163);
-  assert.equal(loaded.recipe.inputs.filter((item) => item.input_id.endsWith("-nir20")).length, 3);
+  assert.equal(loaded.recipe.inputs.filter((item) => item.input_id.endsWith("-nir20")).length, 4);
+  assert.deepEqual(
+    loaded.recipe.inputs
+      .filter((item) => item.input_id.startsWith("s2-post-primary-"))
+      .map((item) => item.expected_sha256),
+    [
+      "105e0cf7af60e739fd63144453f61c8ba40258ce0ae69e9e197d648b69ee6e58",
+      "6ae8cf08d918973a65ee39bf296f0bbc6d41b67518d0576013a4983e427a54e4",
+      "afad123898fa827341c482c5c29ef9a2df5ec2a1bd80a81177b297643454bb76",
+      "b72178273f1d58b94ddedfc176163bb6024bebad3210f67f9b279dd245053ee4",
+      "881ea6eeb8053aa99fe7d2f8288f2b8e7c430488d808d015ac3f3a59f918e034",
+      "c43552a40dc3e89b10727b70ea305c4d1b7913174336de9c51e1a82e5eabddf5"
+    ]
+  );
   assert.equal(loaded.recipe.outputs.find((item) => item.asset_id === "ndvi-cog").qa.maximum_bytes, 32 * 1024 * 1024);
   assert.equal(loaded.recipe.outputs.find((item) => item.asset_id === "ndmi-pmtiles").qa.maximum_bytes, 8 * 1024 * 1024);
   assert.equal(loaded.recipe.quality_gates[0].assertions.length, 7);
+  const changeStep = loaded.recipe.steps.find((step) => step.step_id === "build-change-evidence-v2");
+  assert.deepEqual(changeStep.argv.slice(changeStep.argv.indexOf("--post-primary") + 1, changeStep.argv.indexOf("--post-fill")), [
+    "{artifact:s2-post-primary-red}",
+    "{artifact:s2-post-primary-nir}",
+    "{artifact:s2-post-primary-nir20}",
+    "{artifact:s2-post-primary-swir1}",
+    "{artifact:s2-post-primary-swir2}",
+    "{artifact:s2-post-primary-scl}"
+  ]);
+  assert.equal(changeStep.argv.includes("--post-provenance-10m"), true);
+  assert.equal(changeStep.argv.includes("--post-provenance-20m"), true);
+  assert.deepEqual(changeStep.argv.slice(changeStep.argv.indexOf("--effis"), changeStep.argv.indexOf("--effis") + 4), [
+    "--effis", "{artifact:effis-release-one}", "--current-effis", "{artifact:effis-bounded}"
+  ]);
+  const effisDataset = loaded.recipe.datasets.find((dataset) => dataset.dataset_id === "effis-event");
+  assert.equal(effisDataset.classification, "historical");
+  assert.match(effisDataset.method, /BCA-inferred re-key/);
+  const provenanceOutputs = loaded.recipe.outputs.filter((output) => output.asset_id.startsWith("post-provenance-"));
+  assert.deepEqual(provenanceOutputs.map((output) => output.qa.expected_resolution_m), [10, 20]);
+  assert.equal(provenanceOutputs.every((output) => output.visibility === "public"), true);
 });
 
 test("acquisition, build, archive verification and reproduction preserve exact lineage", async (context) => {

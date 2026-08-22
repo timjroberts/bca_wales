@@ -3,22 +3,29 @@
 import type { ContrastLevel, ExplorerState, Language } from "@bca/domain";
 import { localise } from "@bca/domain";
 import type { ExplorerRelease } from "@bca/publication";
-import maplibregl, { type LayerSpecification, type Map as MapLibreMap, type StyleSpecification } from "maplibre-gl";
+import maplibregl, { type GeoJSONSource, type LayerSpecification, type Map as MapLibreMap, type StyleSpecification } from "maplibre-gl";
 import { Protocol } from "pmtiles";
 import { useEffect, useRef } from "react";
+import type { ActiveFireFeatureCollection, ActiveFireState } from "./activeFire";
 
 const SOURCE = {
   context: "release-context",
   terrain: "release-terrain",
   contours: "release-contours",
   change: "release-change",
-  effis: "release-effis"
+  ndvi: "release-ndvi",
+  ndmi: "release-ndmi",
+  effis: "release-effis",
+  thermal: "operational-thermal"
 } as const;
 
 const STYLE_LAYER_IDS: Record<string, readonly string[]> = {
   change: ["change-raster"],
+  ndvi: ["ndvi-raster"],
+  ndmi: ["ndmi-raster"],
+  thermal: ["thermal-outline", "thermal-centre"],
   fire: ["effis-fill", "effis-outline"],
-  protected: ["national-park", "blorenge-sssi"],
+  protected: ["national-park", "blorenge-sssi", "bca-core"],
   access: ["basemap-land", "contextual-paths"],
   water: ["principal-watercourses"],
   terrain: ["terrain-hillshade", "terrain-contours"],
@@ -62,6 +69,14 @@ function makeStyle(explorer: ExplorerRelease, state: ExplorerState): StyleSpecif
       paint: { "raster-opacity": contrastOpacity[state.contrast], "raster-resampling": "nearest" }
     },
     {
+      id: "ndvi-raster", type: "raster", source: SOURCE.ndvi,
+      paint: { "raster-opacity": contrastOpacity[state.contrast], "raster-resampling": "nearest" }
+    },
+    {
+      id: "ndmi-raster", type: "raster", source: SOURCE.ndmi,
+      paint: { "raster-opacity": contrastOpacity[state.contrast], "raster-resampling": "nearest" }
+    },
+    {
       id: "historical-habitat", type: "fill", source: SOURCE.context, "source-layer": "context",
       filter: ["==", ["get", "layer_id"], "historical-phase1-habitat"],
       paint: { "fill-color": "#79a653", "fill-opacity": 0.28, "fill-outline-color": "#527538" }
@@ -75,6 +90,11 @@ function makeStyle(explorer: ExplorerRelease, state: ExplorerState): StyleSpecif
       id: "blorenge-sssi", type: "line", source: SOURCE.context, "source-layer": "context",
       filter: ["==", ["get", "layer_id"], "blorenge-sssi"],
       paint: { "line-color": "#6f3f91", "line-width": 4, "line-opacity": 0.95 }
+    },
+    {
+      id: "bca-core", type: "line", source: SOURCE.context, "source-layer": "context",
+      filter: ["==", ["get", "layer_id"], "bca-area-of-interest"],
+      paint: { "line-color": "#1f4d3b", "line-width": 2.5, "line-opacity": 0.95, "line-dasharray": [4, 2] }
     },
     {
       id: "contextual-paths", type: "line", source: SOURCE.context, "source-layer": "context",
@@ -97,6 +117,19 @@ function makeStyle(explorer: ExplorerRelease, state: ExplorerState): StyleSpecif
     {
       id: "effis-outline", type: "line", source: SOURCE.effis,
       paint: { "line-color": "#7b281a", "line-width": 3, "line-dasharray": [2, 1] }
+    },
+    {
+      id: "thermal-outline", type: "circle", source: SOURCE.thermal,
+      paint: {
+        "circle-radius": ["interpolate", ["exponential", 2], ["zoom"], 8, 0.7, 12, 7, 16, 108],
+        "circle-color": "rgba(109, 40, 217, 0.05)",
+        "circle-stroke-color": "#6D28D9",
+        "circle-stroke-width": 2
+      }
+    },
+    {
+      id: "thermal-centre", type: "symbol", source: SOURCE.thermal,
+      layout: { "icon-image": "thermal-diamond", "icon-allow-overlap": true }
     }
   ];
 
@@ -125,10 +158,27 @@ function makeStyle(explorer: ExplorerRelease, state: ExplorerState): StyleSpecif
         tileSize: 256,
         attribution: "Modified Copernicus Sentinel data 2025–2026 · USGS Landsat · BCA processing"
       },
+      [SOURCE.ndvi]: {
+        type: "raster",
+        url: `pmtiles://${origin}${explorer.map.assets.ndvi}`,
+        tileSize: 256,
+        attribution: "Modified Copernicus Sentinel data 2025–2026 · BCA processing"
+      },
+      [SOURCE.ndmi]: {
+        type: "raster",
+        url: `pmtiles://${origin}${explorer.map.assets.ndmi}`,
+        tileSize: 256,
+        attribution: "Modified Copernicus Sentinel data 2025–2026 · BCA processing"
+      },
       [SOURCE.effis]: {
         type: "geojson",
         data: `${origin}${explorer.map.assets.effis}`,
         attribution: "European Union, Copernicus EFFIS · BCA clipping"
+      },
+      [SOURCE.thermal]: {
+        type: "geojson",
+        data: { type: "FeatureCollection", features: [] },
+        attribution: "NASA FIRMS · VIIRS NOAA-21 and NOAA-20 · BCA clipping"
       }
     },
     layers
@@ -138,15 +188,24 @@ function makeStyle(explorer: ExplorerRelease, state: ExplorerState): StyleSpecif
 export function MapCanvas({
   explorer,
   language,
-  state
+  state,
+  activeFire,
+  activeFireMapOverride
 }: {
   explorer: ExplorerRelease;
   language: Language;
   state: ExplorerState;
+  activeFire: ActiveFireState;
+  activeFireMapOverride: ActiveFireFeatureCollection | null;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const initialStateRef = useRef(state);
+  const languageRef = useRef(language);
+
+  useEffect(() => {
+    languageRef.current = language;
+  }, [language]);
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
@@ -174,6 +233,44 @@ export function MapCanvas({
 
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
     map.addControl(new maplibregl.AttributionControl({ compact: true }), "bottom-right");
+    map.on("styleimagemissing", (event) => {
+      if (event.id !== "thermal-diamond" || map.hasImage(event.id)) return;
+      const size = 18;
+      const data = new Uint8Array(size * size * 4);
+      for (let y = 0; y < size; y += 1) {
+        for (let x = 0; x < size; x += 1) {
+          if (Math.abs(x - (size - 1) / 2) + Math.abs(y - (size - 1) / 2) > 7) continue;
+          const offset = (y * size + x) * 4;
+          data[offset] = 109;
+          data[offset + 1] = 40;
+          data[offset + 2] = 217;
+          data[offset + 3] = 255;
+        }
+      }
+      map.addImage(event.id, { width: size, height: size, data }, { pixelRatio: 2 });
+    });
+    map.on("click", "thermal-centre", (event) => {
+      const observations = map.queryRenderedFeatures(event.point, { layers: ["thermal-centre"] });
+      if (!observations.length) return;
+      const root = document.createElement("div");
+      root.className = "thermal-popup";
+      const title = document.createElement("strong");
+      title.textContent = languageRef.current === "en" ? "Satellite observations at this pixel" : "Arsylwadau lloeren yn y picsel hwn";
+      root.append(title);
+      for (const observation of observations) {
+        const row = document.createElement("p");
+        const observedAt = typeof observation.properties?.observed_at === "string" ? new Date(observation.properties.observed_at) : null;
+        const timestamp = observedAt && Number.isFinite(observedAt.getTime()) ? observedAt.toISOString().replace("T", " ").replace(".000Z", " UTC") : "unknown";
+        row.textContent = `${observation.properties?.sensor ?? "NOAA"} · ${timestamp} · ${observation.properties?.confidence ?? "unknown"} · FRP ${observation.properties?.frp_mw ?? "unknown"} MW`;
+        root.append(row);
+      }
+      const note = document.createElement("small");
+      note.textContent = languageRef.current === "en" ? "Nominal 375 m pixel centre — not an exact fire location or verified incident." : "Canol picsel enwol 375 m — nid union leoliad tân na digwyddiad wedi’i gadarnhau.";
+      root.append(note);
+      new maplibregl.Popup({ closeButton: true, maxWidth: "330px" }).setLngLat(event.lngLat).setDOMContent(root).addTo(map);
+    });
+    map.on("mouseenter", "thermal-centre", () => { map.getCanvas().style.cursor = "pointer"; });
+    map.on("mouseleave", "thermal-centre", () => { map.getCanvas().style.cursor = ""; });
     mapRef.current = map;
     const resizeObserver = new ResizeObserver(() => map.resize());
     resizeObserver.observe(containerRef.current);
@@ -188,6 +285,14 @@ export function MapCanvas({
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
+    const apply = () => (map.getSource(SOURCE.thermal) as GeoJSONSource | undefined)?.setData((activeFireMapOverride ?? activeFire.map) as never);
+    if (map.isStyleLoaded()) apply();
+    else map.once("load", apply);
+  }, [activeFire.map, activeFireMapOverride]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
 
     const apply = () => {
       for (const layer of explorer.layers) {
@@ -198,6 +303,9 @@ export function MapCanvas({
       }
       if (map.getLayer("change-raster")) {
         map.setPaintProperty("change-raster", "raster-opacity", contrastOpacity[state.contrast]);
+      }
+      for (const component of ["ndvi-raster", "ndmi-raster"]) {
+        if (map.getLayer(component)) map.setPaintProperty(component, "raster-opacity", contrastOpacity[state.contrast]);
       }
     };
 
@@ -221,7 +329,7 @@ export function MapCanvas({
         aria-describedby="map-description"
       />
       <figcaption id="map-description" className="map-caption">
-        <strong>{language === "en" ? "Selected observation state:" : "Cyflwr arsylwi dethol:"}</strong> {summary}. {language === "en" ? "The published change surface compares the 2025 seasonal baseline with the first suitable post-report observation on 11 August 2026; EFFIS remains a separate provisional boundary." : "Mae’r arwyneb newid cyhoeddedig yn cymharu llinell sylfaen dymhorol 2025 â’r arsylwad addas cyntaf ar ôl yr adroddiad ar 11 Awst 2026; mae EFFIS yn aros yn ffin dros dro ar wahân."}
+        <strong>{language === "en" ? "Selected observation state:" : "Cyflwr arsylwi dethol:"}</strong> {summary}. {language === "en" ? "The change layers compare the 2025 seasonal baseline with a 29 July / 11 August 2026 narrow same-season composite. EFFIS and the rolling thermal-anomaly points remain separate sources." : "Mae’r haenau newid yn cymharu llinell sylfaen dymhorol 2025 â chyfansawdd tymor cul 29 Gorffennaf / 11 Awst 2026. Mae EFFIS a’r pwyntiau anomaledd thermol treigl yn aros yn ffynonellau ar wahân."} {state.visibleLayerIds.includes("thermal") ? (language === "en" ? `Thermal feed: ${activeFire.health}; ${activeFire.counts.map24h} observations in the 24-hour view.` : `Ffrwd thermol: ${activeFire.health}; ${activeFire.counts.map24h} arsylwad yn yr olwg 24 awr.`) : null}
       </figcaption>
     </figure>
   );

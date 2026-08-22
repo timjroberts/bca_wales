@@ -22,7 +22,17 @@ export interface ReleaseManifest {
   readonly assets: readonly AssetReference[];
 }
 
-export type ExplorerMapStyle = "fire" | "change" | "protected" | "access" | "water" | "terrain" | "habitat";
+export type ExplorerMapStyle =
+  | "thermal"
+  | "fire"
+  | "change"
+  | "ndvi"
+  | "ndmi"
+  | "protected"
+  | "access"
+  | "water"
+  | "terrain"
+  | "habitat";
 
 export interface ExplorerDate {
   readonly id: string;
@@ -39,6 +49,7 @@ export interface ExplorerLayer {
   readonly classification: "authoritative" | "provisional" | "derived" | "contextual" | "historical";
   readonly defaultVisible: boolean;
   readonly mapStyle: ExplorerMapStyle;
+  readonly selectionGroup?: string;
   readonly temporal: boolean;
   readonly provider: string;
   readonly attribution: string;
@@ -49,6 +60,15 @@ export interface ExplorerLayer {
   readonly nextReviewAt: string;
   readonly method: { readonly en: string; readonly cy?: string };
   readonly limitations: readonly { readonly en: string; readonly cy?: string }[];
+  readonly accessibleDownload?: string;
+  readonly legend?: {
+    readonly unit: { readonly en: string; readonly cy: string };
+    readonly stops: readonly number[];
+    readonly colours: readonly string[];
+    readonly low: { readonly en: string; readonly cy: string };
+    readonly high: { readonly en: string; readonly cy: string };
+    readonly notObserved: { readonly en: string; readonly cy: string };
+  };
 }
 
 export interface ExplorerRelease {
@@ -57,7 +77,8 @@ export interface ExplorerRelease {
   readonly release: {
     readonly id: string;
     readonly datasetVersion: string;
-    readonly publishedAt: string;
+    readonly publishedAt: string | null;
+    readonly preparedAt: string;
     readonly retrievedAt: string;
     readonly nextReviewAt: string;
     readonly owner: string;
@@ -72,9 +93,15 @@ export interface ExplorerRelease {
       readonly terrain: string;
       readonly contours: string;
       readonly change: string;
+      readonly ndvi: string;
+      readonly ndmi: string;
       readonly effis: string;
       readonly download: string;
     };
+  };
+  readonly activeFire: {
+    readonly currentPath: string;
+    readonly statusPath: string;
   };
   readonly dates: readonly ExplorerDate[];
   readonly groups: readonly {

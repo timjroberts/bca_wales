@@ -91,25 +91,36 @@ export function MapTools({
                   </summary>
                   <div>
                     {layers.map((layer) => (
-                      <div className="map-tool-layer-row" key={layer.id}>
-                        <label>
-                          <input
-                            type="checkbox"
-                            checked={state.visibleLayerIds.includes(layer.id)}
-                            onChange={() => onLayerToggle(layer.id)}
-                          />
-                          <span className={`legend-swatch swatch-${layer.mapStyle}`} aria-hidden="true" />
-                          <span><MapToolLayerName layer={layer} language={language} /></span>
-                        </label>
-                        <button
-                          id={`details-${layer.id}`}
-                          type="button"
-                          className="map-tool-info-button"
-                          aria-label={`${copy.details}: ${localise(layer.name, language)}`}
-                          aria-expanded={detailLayerId === layer.id}
-                          aria-controls="source-details"
-                          onClick={() => onLayerDetail(layer.id)}
-                        >i</button>
+                      <div className="map-tool-layer-item" key={layer.id}>
+                        <div className="map-tool-layer-row">
+                          <label>
+                            <input
+                              type={layer.selectionGroup ? "radio" : "checkbox"}
+                              name={layer.selectionGroup ? `layer-${layer.selectionGroup}` : undefined}
+                              checked={state.visibleLayerIds.includes(layer.id)}
+                              onChange={() => onLayerToggle(layer.id)}
+                            />
+                            <span className={`legend-swatch swatch-${layer.mapStyle}`} aria-hidden="true" />
+                            <span><MapToolLayerName layer={layer} language={language} /></span>
+                          </label>
+                          <button
+                            id={`details-${layer.id}`}
+                            type="button"
+                            className="map-tool-info-button"
+                            aria-label={`${copy.details}: ${localise(layer.name, language)}`}
+                            aria-expanded={detailLayerId === layer.id}
+                            aria-controls="source-details"
+                            onClick={() => onLayerDetail(layer.id)}
+                          >i</button>
+                        </div>
+                        {layer.legend && state.visibleLayerIds.includes(layer.id) ? (
+                          <div className={`continuous-legend continuous-legend-${layer.mapStyle}`}>
+                            <span>{localise(layer.legend.low, language)}</span>
+                            <span className="continuous-legend-ramp" aria-hidden="true" />
+                            <span>{localise(layer.legend.high, language)}</span>
+                            <small>{layer.legend.stops.join(" · ")} {localise(layer.legend.unit, language)} · {localise(layer.legend.notObserved, language)}</small>
+                          </div>
+                        ) : null}
                       </div>
                     ))}
                   </div>

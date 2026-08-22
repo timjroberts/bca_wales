@@ -5,6 +5,8 @@ import {
   cp,
   mkdir,
   readFile,
+  rename,
+  rm,
   stat,
   writeFile
 } from "node:fs/promises";
@@ -226,6 +228,24 @@ async function copyLocal(url, destination, maximumBytes) {
   };
 }
 
+async function acquireRemoteInput(input, url, destination, fetchImpl) {
+  let lastError;
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    const temporary = `${destination}.partial-${attempt}`;
+    try {
+      const target = await resolveAcquisitionTarget(url, fetchImpl);
+      const acquired = await streamHttp(target.fetchUrl, temporary, input.maximum_bytes, fetchImpl);
+      await rename(temporary, destination);
+      acquired.resolvedUrl = target.recordUrl;
+      return acquired;
+    } catch (error) {
+      lastError = error;
+      await rm(temporary, { force: true });
+    }
+  }
+  throw new Error(`${input.input_id}: remote acquisition failed after 3 attempts: ${lastError.message}`);
+}
+
 function mediaTypeCompatible(expected, actual) {
   if (!actual) return true;
   const normalised = actual.split(";", 1)[0].trim().toLowerCase();
@@ -383,9 +403,7 @@ export async function acquireRelease({
     }
     let acquired;
     if (remote) {
-      const target = await resolveAcquisitionTarget(url, fetchImpl);
-      acquired = await streamHttp(target.fetchUrl, destination, input.maximum_bytes, fetchImpl);
-      acquired.resolvedUrl = target.recordUrl;
+      acquired = await acquireRemoteInput(input, url, destination, fetchImpl);
     } else {
       acquired = await copyLocal(url, destination, input.maximum_bytes);
     }
@@ -761,7 +779,9 @@ export async function inspectOutput(output, file, runner, releaseRoot) {
         if (output.qa.expected_crs) {
           const expectedCode = Number(output.qa.expected_crs.slice("EPSG:".length));
           const identifier = info.coordinateSystem?.id;
-          if (identifier?.authority !== "EPSG" || Number(identifier.code) !== expectedCode) {
+          const stacCode = Number(info.stac?.["proj:epsg"]);
+          const identifierMatches = identifier?.authority === "EPSG" && Number(identifier.code) === expectedCode;
+          if (!identifierMatches && stacCode !== expectedCode) {
             hardFailures.push(`${output.asset_id}: CRS does not match ${output.qa.expected_crs}`);
           }
         }

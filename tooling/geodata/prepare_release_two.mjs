@@ -19,8 +19,8 @@ const selectedPath = process.argv[2];
 const cataloguePath = process.argv[3];
 const outputPath = process.argv[4];
 const cacheRoot = process.argv[5] ?? "/tmp/bca-release-two-prefetch";
-const releaseId = "release-blorenge-2026-08-21.5";
-const datasetVersion = "2026-08-21.5";
+const releaseId = "release-blorenge-2026-08-21.8";
+const datasetVersion = "2026-08-21.8";
 const stagingRoot = path.join(repositoryRoot, ".geodata-staging/release-two");
 
 if (!selectedPath || !cataloguePath || !outputPath) {
@@ -94,6 +94,15 @@ const b8aUrls = Object.fromEntries(["baseline", "prefire", "post"].map((role) =>
   const source = oldInputs.get(`s2-${role}-swir1`).source;
   return [role, source.replace(/B11\.tif$/, "B8A.tif")];
 }));
+const postPrimaryBaseUrl = "https://e84-earth-search-sentinel-data.s3.us-west-2.amazonaws.com/sentinel-2-c1-l2a/30/U/VC/2026/7/S2A_T30UVC_20260729T112319_L2A";
+const postPrimaryAssets = {
+  red: ["B04.tif", 211311651, "105e0cf7af60e739fd63144453f61c8ba40258ce0ae69e9e197d648b69ee6e58"],
+  nir: ["B08.tif", 212023277, "6ae8cf08d918973a65ee39bf296f0bbc6d41b67518d0576013a4983e427a54e4"],
+  nir20: ["B8A.tif", 59744355, "afad123898fa827341c482c5c29ef9a2df5ec2a1bd80a81177b297643454bb76"],
+  swir1: ["B11.tif", 58129390, "b72178273f1d58b94ddedfc176163bb6024bebad3210f67f9b279dd245053ee4"],
+  swir2: ["B12.tif", 57861144, "881ea6eeb8053aa99fe7d2f8288f2b8e7c430488d808d015ac3f3a59f918e034"],
+  scl: ["SCL.tif", 2185691, "c43552a40dc3e89b10727b70ea305c4d1b7913174336de9c51e1a82e5eabddf5"],
+};
 
 const reviewDownloads = [
   ...Object.entries(contextUrls).map(([id, url]) => ({ id, url })),
@@ -178,6 +187,17 @@ for (const role of ["baseline", "prefire", "post"]) {
   inputs.push(oldInputs.get(`s2-${role}-swir1`));
   inputs.push(oldInputs.get(`s2-${role}-swir2`));
   inputs.push(oldInputs.get(`s2-${role}-scl`));
+}
+for (const [band, [fileName, byteLength, expectedSha256]] of Object.entries(postPrimaryAssets)) {
+  inputs.push(input({
+    input_id: `s2-post-primary-${band}`,
+    dataset_id: "copernicus-sentinel-2-l2a",
+    source: `${postPrimaryBaseUrl}/${fileName}`,
+    destination: `quarantine/sentinel/s2-post-primary/${fileName}`,
+    media_type: "image/tiff",
+    maximum_bytes: Math.max(268435456, byteLength),
+    expected_sha256: expectedSha256,
+  }));
 }
 inputs.push(...oldRecipe.inputs.filter((item) => item.input_id.startsWith("landsat-")));
 inputs.push(input({
@@ -264,15 +284,17 @@ const steps = [
       "/repo/tooling/geodata/recipes/build_change_evidence_v2.py", "--core", "{artifact:bca-area-core}",
       "--baseline", ...sceneIds("baseline").map((id) => `{artifact:${id}}`),
       "--prefire", ...sceneIds("prefire").map((id) => `{artifact:${id}}`),
-      "--post", ...sceneIds("post").map((id) => `{artifact:${id}}`),
-      "--effis", "{artifact:effis-bounded}", "--previous-effis", "{artifact:effis-release-one}",
+      "--post-primary", ...sceneIds("post-primary").map((id) => `{artifact:${id}}`),
+      "--post-fill", ...sceneIds("post").map((id) => `{artifact:${id}}`),
+      "--effis", "{artifact:effis-release-one}", "--current-effis", "{artifact:effis-bounded}",
       "--combined-cog", "{artifact:change-cog}", "--ndvi-cog", "{artifact:ndvi-cog}", "--ndmi-cog", "{artifact:ndmi-cog}",
+      "--post-provenance-10m", "{artifact:post-provenance-10m-cog}", "--post-provenance-20m", "{artifact:post-provenance-20m-cog}",
       "--effis-out", "{artifact:effis-geojson}", "--effis-summary", "{artifact:effis-summary-json}",
       "--combined-csv", "{artifact:evidence-csv}", "--ndvi-csv", "{artifact:ndvi-summary-csv}", "--ndvi-json", "{artifact:ndvi-summary-json}",
       "--ndmi-csv", "{artifact:ndmi-summary-csv}", "--ndmi-json", "{artifact:ndmi-summary-json}", "--summary", "{artifact:change-report}",
     ],
-    inputs: ["bca-area-core", ...sceneIds("baseline"), ...sceneIds("prefire"), ...sceneIds("post"), ...landsatIds, "effis-bounded", "effis-release-one"],
-    outputs: ["change-cog", "ndvi-cog", "ndmi-cog", "effis-geojson", "effis-summary-json", "evidence-csv", "ndvi-summary-csv", "ndvi-summary-json", "ndmi-summary-csv", "ndmi-summary-json", "change-report"],
+    inputs: ["bca-area-core", ...sceneIds("baseline"), ...sceneIds("prefire"), ...sceneIds("post-primary"), ...sceneIds("post"), ...landsatIds, "effis-bounded", "effis-release-one"],
+    outputs: ["change-cog", "ndvi-cog", "ndmi-cog", "post-provenance-10m-cog", "post-provenance-20m-cog", "effis-geojson", "effis-summary-json", "evidence-csv", "ndvi-summary-csv", "ndvi-summary-json", "ndmi-summary-csv", "ndmi-summary-json", "change-report"],
   },
   {
     step_id: "change-mbtiles-v2", tool: "gdal_translate",
@@ -322,13 +344,15 @@ const outputs = [
   ["ndvi-cog", "ndvi-change", "outputs/ndvi-change.tif", "cog", "image/tiff; application=geotiff; profile=cloud-optimized", "public", "Lossless native 10 m signed NDVI difference COG for bounded range reads.", { minimum_bytes: 1000, maximum_bytes: 33554432, expected_crs: "EPSG:32630", expected_resolution_m: 10, expected_band_count: 1, expected_band_descriptions: ["delta_NDVI"] }],
   ["ndvi-pmtiles", "ndvi-change", "outputs/ndvi-change.pmtiles", "raster_pmtiles", "application/vnd.pmtiles", "public", "Fixed-scale NDVI change display tiles with patterned Not observed pixels.", { minimum_bytes: 1000, maximum_bytes: 8388608 }],
   ["ndvi-summary-csv", "ndvi-change", "outputs/ndvi-change-summary.csv.txt", "accessible_csv", "text/csv", "public", "Accessible fixed-bin NDVI counts and areas.", { minimum_bytes: 100, maximum_bytes: 1048576, minimum_rows: 8, required_fields: ["product", "bin", "pixel_count", "area_ha", "units", "baseline_date", "comparison_date"] }],
-  ["ndvi-summary-json", "ndvi-change", "outputs/ndvi-change-summary.json", "accessible_json", "application/json", "public", "Accessible bilingual NDVI method, dates, distribution, attribution and limitations.", { minimum_bytes: 500, maximum_bytes: 1048576, required_fields: ["product", "names", "formula", "bands", "dates", "units", "resolution_m", "bins", "limitations"] }],
+  ["ndvi-summary-json", "ndvi-change", "outputs/ndvi-change-summary.json", "accessible_json", "application/json", "public", "Accessible bilingual NDVI method, dates, distribution, attribution and limitations.", { minimum_bytes: 500, maximum_bytes: 1048576, required_fields: ["product", "names", "formula", "bands", "dates", "comparison_observation", "units", "resolution_m", "bins", "limitations"] }],
   ["ndmi-cog", "ndmi-change", "outputs/ndmi-change.tif", "cog", "image/tiff; application=geotiff; profile=cloud-optimized", "public", "Lossless native 20 m signed NDMI difference COG for bounded range reads.", { minimum_bytes: 1000, maximum_bytes: 33554432, expected_crs: "EPSG:32630", expected_resolution_m: 20, expected_band_count: 1, expected_band_descriptions: ["delta_NDMI"] }],
   ["ndmi-pmtiles", "ndmi-change", "outputs/ndmi-change.pmtiles", "raster_pmtiles", "application/vnd.pmtiles", "public", "Fixed-scale NDMI change display tiles with patterned Not observed pixels.", { minimum_bytes: 1000, maximum_bytes: 8388608 }],
   ["ndmi-summary-csv", "ndmi-change", "outputs/ndmi-change-summary.csv.txt", "accessible_csv", "text/csv", "public", "Accessible fixed-bin NDMI counts and areas.", { minimum_bytes: 100, maximum_bytes: 1048576, minimum_rows: 8, required_fields: ["product", "bin", "pixel_count", "area_ha", "units", "baseline_date", "comparison_date"] }],
-  ["ndmi-summary-json", "ndmi-change", "outputs/ndmi-change-summary.json", "accessible_json", "application/json", "public", "Accessible bilingual NDMI method, dates, distribution, attribution and limitations.", { minimum_bytes: 500, maximum_bytes: 1048576, required_fields: ["product", "names", "formula", "bands", "dates", "units", "resolution_m", "bins", "limitations"] }],
+  ["ndmi-summary-json", "ndmi-change", "outputs/ndmi-change-summary.json", "accessible_json", "application/json", "public", "Accessible bilingual NDMI method, dates, distribution, attribution and limitations.", { minimum_bytes: 500, maximum_bytes: 1048576, required_fields: ["product", "names", "formula", "bands", "dates", "comparison_observation", "units", "resolution_m", "bins", "limitations"] }],
+  ["post-provenance-10m-cog", "observed-change", "outputs/post-source-date-10m.tif", "cog", "image/tiff; application=geotiff; profile=cloud-optimized", "public", "Per-pixel post-report source-date provenance for the 10 m NDVI grid; 20260729 is primary, 20260811 is fill and 0 is Not observed.", { minimum_bytes: 1000, maximum_bytes: 8388608, expected_crs: "EPSG:32630", expected_resolution_m: 10, expected_band_count: 1, expected_band_descriptions: ["post_source_date"] }],
+  ["post-provenance-20m-cog", "observed-change", "outputs/post-source-date-20m.tif", "cog", "image/tiff; application=geotiff; profile=cloud-optimized", "public", "Per-pixel post-report source-date provenance for the 20 m combined and NDMI grids; 20260729 is primary, 20260811 is fill and 0 is Not observed.", { minimum_bytes: 1000, maximum_bytes: 8388608, expected_crs: "EPSG:32630", expected_resolution_m: 20, expected_band_count: 1, expected_band_descriptions: ["post_source_date"] }],
   ["effis-geojson", "effis-event", "outputs/effis-592404.geojson", "geojson", "application/geo+json", "public", "Complete provider attributes with display geometry clipped to the expanded AOI.", { minimum_bytes: 500, maximum_bytes: 1048576, minimum_features: 1, required_fields: ["provider_feature_id", "provider", "classification", "display_geometry", "limitation"] }],
-  ["effis-summary-json", "effis-event", "outputs/effis-592404-summary.json", "accessible_json", "application/json", "public", "Accessible bilingual EFFIS provenance, release comparison and limitations.", { minimum_bytes: 300, maximum_bytes: 1048576, required_fields: ["layer", "provider_feature", "comparison_with_release_one", "attribution", "limitations"] }],
+  ["effis-summary-json", "effis-event", "outputs/effis-592404-summary.json", "accessible_json", "application/json", "public", "Accessible bilingual EFFIS provenance, current corroboration and limitations.", { minimum_bytes: 300, maximum_bytes: 1048576, required_fields: ["layer", "provider_feature", "source_identity", "current_corroboration", "attribution", "limitations", "limitations_cy"] }],
 ].map(([asset_id, dataset_id, outputPath, profile, media_type, visibility, accessible_description, qa]) => ({ asset_id, dataset_id, path: outputPath, profile, media_type, visibility, accessible_description, qa }));
 
 const datasets = [
@@ -342,26 +366,26 @@ const datasets = [
   },
   {
     dataset_id: "observed-change", source_dataset_ids: ["bca-area-of-interest", "copernicus-sentinel-2-l2a", "usgs-landsat-c2-l2-sr"], evidence_version: datasetVersion,
-    title: "Observed surface and vegetation change / Newid arwyneb a llystyfiant a arsylwyd", provider: "European Union Copernicus programme, USGS and BCA processing", licence: "Copernicus Sentinel data legal notice, USGS public domain and BCA publication authority", attribution: "Contains modified Copernicus Sentinel data 2025–2026; Landsat imagery courtesy of the U.S. Geological Survey; processing by Blorenge Commoners Association.", classification: "derived", observation_dates: ["2025-07-12", "2026-07-12", "2026-07-27", "2026-08-11"], method: "Apply the common Sentinel mask, require three-observation comparability, calculate continuous dNBR/NDVI/NDMI and publish the conservative uncalibrated combined states; Landsat corroboration remains separate and unfused.", uncertainty: "Evidence states are not locally calibrated severity and do not establish pixel-level cause.", limitations: ["Not proof of ecological condition or recovery.", "No exact incident-authority perimeter is available.", "Not observed is never no change."],
+    title: "Observed surface and vegetation change / Newid arwyneb a llystyfiant a arsylwyd", provider: "European Union Copernicus programme, USGS and BCA processing", licence: "Copernicus Sentinel data legal notice, USGS public domain and BCA publication authority", attribution: "Contains modified Copernicus Sentinel data 2025–2026; Landsat imagery courtesy of the U.S. Geological Survey; processing by Blorenge Commoners Association.", classification: "derived", observation_dates: ["2025-07-12", "2026-07-12", "2026-07-27", "2026-07-29", "2026-08-11"], method: "Independently apply the common Sentinel mask to both post-report observations, select every band from 29 July where valid and otherwise from 11 August where valid, require three-role comparability, and calculate continuous dNBR/NDVI/NDMI with per-pixel source-date provenance; Landsat corroboration remains separate and unfused.", uncertainty: "Evidence states are not locally calibrated severity and do not establish pixel-level cause.", limitations: ["Not proof of ecological condition or recovery.", "No exact incident-authority perimeter is available.", "Not observed is never no change."],
   },
   {
     dataset_id: "ndvi-change", source_dataset_ids: ["bca-area-of-interest", "copernicus-sentinel-2-l2a"], evidence_version: datasetVersion,
-    title: "Vegetation greenness index change (NDVI) / Newid mynegai gwyrddni llystyfiant (NDVI)", provider: "European Union Copernicus programme; BCA processing", licence: "Copernicus Sentinel data legal notice and BCA publication authority", attribution: "Contains modified Copernicus Sentinel data 2025–2026; processing by Blorenge Commoners Association.", classification: "derived", observation_dates: ["2025-07-12", "2026-08-11"], method: "Publish NDVI(2026-08-11) minus NDVI(2025-07-12) from native B8/B4 at 10 m after the common SCL mask.", uncertainty: "Rainfall, phenology, grazing, management and residual observation effects may contribute.", limitations: ["Does not establish cause, fire damage, severity, habitat condition or recovery.", "Not observed pixels fail one or both date masks."],
+    title: "Vegetation greenness index change (NDVI) / Newid mynegai gwyrddni llystyfiant (NDVI)", provider: "European Union Copernicus programme; BCA processing", licence: "Copernicus Sentinel data legal notice and BCA publication authority", attribution: "Contains modified Copernicus Sentinel data 2025–2026; processing by Blorenge Commoners Association.", classification: "derived", observation_dates: ["2025-07-12", "2026-07-29", "2026-08-11"], method: "Publish NDVI(2026-07-29/2026-08-11 narrow same-season post-report composite) minus NDVI(2025-07-12) from native B8/B4 at 10 m after independent common SCL masks, with the earlier valid date selected per pixel and explicit source-date provenance.", uncertainty: "Rainfall, phenology, grazing, management and residual observation effects may contribute.", limitations: ["Does not establish cause, fire damage, severity, habitat condition or recovery.", "Not observed pixels fail the baseline mask or both post-date masks."],
   },
   {
     dataset_id: "ndmi-change", source_dataset_ids: ["bca-area-of-interest", "copernicus-sentinel-2-l2a"], evidence_version: datasetVersion,
-    title: "Moisture-sensitive index change (NDMI) / Newid mynegai sy’n sensitif i leithder (NDMI)", provider: "European Union Copernicus programme; BCA processing", licence: "Copernicus Sentinel data legal notice and BCA publication authority", attribution: "Contains modified Copernicus Sentinel data 2025–2026; processing by Blorenge Commoners Association.", classification: "derived", observation_dates: ["2025-07-12", "2026-08-11"], method: "Publish NDMI(2026-08-11) minus NDMI(2025-07-12) from native B8A/B11 at 20 m after the common SCL mask.", uncertainty: "Rainfall, phenology, grazing, management and residual observation effects may contribute.", limitations: ["Does not establish cause, fire damage, severity, dryness or wetness.", "Not observed pixels fail one or both date masks."],
+    title: "Moisture-sensitive index change (NDMI) / Newid mynegai sy’n sensitif i leithder (NDMI)", provider: "European Union Copernicus programme; BCA processing", licence: "Copernicus Sentinel data legal notice and BCA publication authority", attribution: "Contains modified Copernicus Sentinel data 2025–2026; processing by Blorenge Commoners Association.", classification: "derived", observation_dates: ["2025-07-12", "2026-07-29", "2026-08-11"], method: "Publish NDMI(2026-07-29/2026-08-11 narrow same-season post-report composite) minus NDMI(2025-07-12) from native B8A/B11 at 20 m after independent common SCL masks, with the earlier valid date selected per pixel and explicit source-date provenance.", uncertainty: "Rainfall, phenology, grazing, management and residual observation effects may contribute.", limitations: ["Does not establish cause, fire damage, severity, dryness or wetness.", "Not observed pixels fail the baseline mask or both post-date masks."],
   },
   {
     dataset_id: "effis-event", source_dataset_ids: ["bca-area-of-interest", "effis-current-burnt-areas"], evidence_version: datasetVersion,
-    title: "EFFIS provisional provider boundary / Ffin dros dro y darparwr EFFIS", provider: "European Union, Copernicus EFFIS; BCA processing", licence: "CC BY 4.0 and BCA publication authority", attribution: "European Union, Copernicus EFFIS; clipped and reformatted by Blorenge Commoners Association.", classification: "provisional", observation_dates: ["2026-07-20", "2026-07-29"], method: "Reacquire complete provider feature 592404, preserve its fields and snapshot, compare it with release one, and clip only the display geometry to the expanded AOI.", uncertainty: "Provider dates and geometry are not incident-authority truth.", limitations: ["Not an authority, legal or surveyed perimeter.", "Does not validate raster change or thermal anomalies."],
+    title: "EFFIS provisional provider boundary / Ffin dros dro y darparwr EFFIS", provider: "European Union, Copernicus EFFIS; BCA processing", licence: "CC BY 4.0 and BCA publication authority", attribution: "European Union, Copernicus EFFIS; clipped and reformatted by Blorenge Commoners Association.", classification: "historical", observation_dates: ["2026-07-20", "2026-07-29"], method: "Retain checksum-pinned historic EFFIS feature 592404 from release one, preserve every provider field, clip only its display geometry, and record geometry-identical current feature 627416 solely as a BCA-inferred re-key.", uncertainty: "EFFIS no longer returns feature 592404 and publishes no authoritative crosswalk to 627416; provider dates and geometry are not incident-authority truth.", limitations: ["Not an authority, legal or surveyed perimeter.", "Does not claim fresh reacquisition or an EFFIS-declared successor identity.", "Does not validate raster change or thermal anomalies."],
   },
 ];
 
 const recipe = {
   schema_version: "1.0.0",
   recipe_id: "blorenge-second-release",
-  recipe_version: "2.0.4",
+  recipe_version: "2.1.1",
   release_id: releaseId,
   dataset_version: datasetVersion,
   registry_id: "blorenge-launch",
