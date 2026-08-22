@@ -85,7 +85,7 @@ test("the factual presentation contract is internally referential and exposes pu
   assert.ok(release.layers.every((layer) => groupIds.has(layer.groupId)));
   assert.ok(release.layers.every((layer) => layer.provider && layer.licence && layer.owner && layer.nextReviewAt));
   assert.equal(release.release.id, "release-blorenge-2026-08-21.8");
-  assert.equal(release.release.publishedAt, null);
+  assert.equal(release.release.publishedAt, "2026-08-22T09:40:24.559Z");
   assert.deepEqual(release.layers.filter((layer) => layer.selectionGroup === "change-evidence").map((layer) => layer.id), ["change", "ndvi", "ndmi"]);
   assert.equal(release.layers.find((layer) => layer.id === "thermal").defaultVisible, true);
   assert.deepEqual(Object.keys(release.map.assets).filter((key) => ["change", "ndvi", "ndmi"].includes(key)), ["change", "ndvi", "ndmi"]);

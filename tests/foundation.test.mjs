@@ -13,11 +13,11 @@ test("the production application uses static export and package seams", async ()
   assert.equal(webPackage.dependencies["@bca/publication"], "0.1.0");
 });
 
-test("prototype evidence remains quarantined while production uses the verified release-two candidate", async () => {
+test("prototype evidence remains quarantined while production uses the published second release", async () => {
   const page = await read("apps/web/app/page.tsx");
   const explorer = await read("apps/web/app/Explorer.tsx");
   assert.match(explorer, /data\/launch\/explorer-release-2026-08-13\.json/);
-  assert.match(explorer, /Verified release-two candidate/);
+  assert.match(explorer, /Published second release/);
   assert.doesNotMatch(explorer, /No factual evidence release is attached/);
   assert.doesNotMatch(`${page}\n${explorer}`, /prototypes\/blorenge-explorer|55%|burn scar|hectare/i);
   await assert.rejects(read("apps/web/app/evidence/page.tsx"), { code: "ENOENT" });
