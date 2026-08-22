@@ -4,17 +4,18 @@
   "title": "BCA explorer release presentation contract",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schemaVersion", "fixture", "release", "map", "dates", "groups", "layers", "claim", "incident", "evidenceStates", "contextCounts", "terrain", "limitations"],
+  "required": ["schemaVersion", "fixture", "release", "map", "activeFire", "dates", "groups", "layers", "claim", "incident", "evidenceStates", "contextCounts", "terrain", "limitations"],
   "properties": {
     "schemaVersion": { "const": "1.0.0" },
     "fixture": { "const": false },
     "release": {
       "type": "object", "additionalProperties": false,
-      "required": ["id", "datasetVersion", "publishedAt", "retrievedAt", "nextReviewAt", "owner", "manifestPath", "manifestSha256"],
+      "required": ["id", "datasetVersion", "publishedAt", "preparedAt", "retrievedAt", "nextReviewAt", "owner", "manifestPath", "manifestSha256"],
       "properties": {
         "id": { "type": "string", "pattern": "^release-[a-z0-9][a-z0-9._-]+$" },
         "datasetVersion": { "type": "string", "minLength": 1 },
-        "publishedAt": { "type": "string", "format": "date-time" },
+        "publishedAt": { "type": ["string", "null"], "format": "date-time" },
+        "preparedAt": { "type": "string", "format": "date-time" },
         "retrievedAt": { "type": "string", "format": "date-time" },
         "nextReviewAt": { "type": "string", "format": "date" },
         "owner": { "type": "string", "minLength": 1 },
@@ -29,13 +30,21 @@
         "zoom": { "type": "number", "minimum": 0, "maximum": 22 },
         "assets": {
           "type": "object", "additionalProperties": false,
-          "required": ["context", "terrain", "contours", "change", "effis", "download"],
+          "required": ["context", "terrain", "contours", "change", "ndvi", "ndmi", "effis", "download"],
           "properties": {
             "context": { "$ref": "#/$defs/assetPath" }, "terrain": { "$ref": "#/$defs/assetPath" },
             "contours": { "$ref": "#/$defs/assetPath" }, "change": { "$ref": "#/$defs/assetPath" },
+            "ndvi": { "$ref": "#/$defs/assetPath" }, "ndmi": { "$ref": "#/$defs/assetPath" },
             "effis": { "$ref": "#/$defs/assetPath" }, "download": { "$ref": "#/$defs/assetPath" }
           }
         }
+      }
+    },
+    "activeFire": {
+      "type": "object", "additionalProperties": false, "required": ["currentPath", "statusPath"],
+      "properties": {
+        "currentPath": { "const": "/active-fire/current.json" },
+        "statusPath": { "const": "/active-fire/status.json" }
       }
     },
     "dates": { "type": "array", "minItems": 2, "items": { "$ref": "#/$defs/date" } },
@@ -76,11 +85,22 @@
         "id": { "type": "string", "minLength": 1 }, "groupId": { "type": "string", "minLength": 1 },
         "name": { "$ref": "#/$defs/bilingual" }, "description": { "$ref": "#/$defs/bilingual" },
         "classification": { "enum": ["authoritative", "provisional", "derived", "contextual", "historical"] },
-        "defaultVisible": { "type": "boolean" }, "mapStyle": { "enum": ["fire", "change", "protected", "access", "water", "terrain", "habitat"] }, "temporal": { "type": "boolean" },
+        "defaultVisible": { "type": "boolean" }, "mapStyle": { "enum": ["thermal", "fire", "change", "ndvi", "ndmi", "protected", "access", "water", "terrain", "habitat"] }, "selectionGroup": { "type": "string", "minLength": 1 }, "temporal": { "type": "boolean" },
         "provider": { "type": "string", "minLength": 1 }, "attribution": { "type": "string", "minLength": 1 },
         "evidenceStatus": { "$ref": "#/$defs/bilingual" }, "sourceDate": { "$ref": "#/$defs/bilingual" },
         "licence": { "type": "string", "minLength": 1 }, "owner": { "type": "string", "minLength": 1 }, "nextReviewAt": { "type": "string", "minLength": 1 },
-        "method": { "$ref": "#/$defs/bilingual" }, "limitations": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/bilingual" } }
+        "method": { "$ref": "#/$defs/bilingual" }, "limitations": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/bilingual" } },
+        "accessibleDownload": { "$ref": "#/$defs/assetPath" },
+        "legend": {
+          "type": "object", "additionalProperties": false,
+          "required": ["unit", "stops", "colours", "low", "high", "notObserved"],
+          "properties": {
+            "unit": { "$ref": "#/$defs/bilingual" },
+            "stops": { "type": "array", "minItems": 2, "items": { "type": "number" } },
+            "colours": { "type": "array", "minItems": 2, "items": { "type": "string", "pattern": "^#[0-9A-Fa-f]{6}$" } },
+            "low": { "$ref": "#/$defs/bilingual" }, "high": { "$ref": "#/$defs/bilingual" }, "notObserved": { "$ref": "#/$defs/bilingual" }
+          }
+        }
       }
     },
     "evidenceState": {

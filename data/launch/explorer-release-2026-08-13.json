@@ -2,82 +2,137 @@
   "schemaVersion": "1.0.0",
   "fixture": false,
   "release": {
-    "id": "release-blorenge-2026-08-13.6",
-    "datasetVersion": "2026-08-13.6",
-    "publishedAt": "2026-08-13T20:08:46.245Z",
-    "retrievedAt": "2026-08-13T18:20:27.597Z",
-    "nextReviewAt": "2026-09-13",
+    "id": "release-blorenge-2026-08-21.8",
+    "datasetVersion": "2026-08-21.8",
+    "publishedAt": null,
+    "preparedAt": "2026-08-22T08:34:15.412Z",
+    "retrievedAt": "2026-08-22T08:27:59.685Z",
+    "nextReviewAt": "2026-09-21",
     "owner": "Tim Roberts",
-    "manifestPath": "/releases/release-blorenge-2026-08-13.6/manifest.json",
-    "manifestSha256": "65fa773b82e6995fe29867fca5a1c56404df53d0e399e0a4e1e0fa74426dbb2a"
+    "manifestPath": "/releases/release-blorenge-2026-08-21.8/manifest.json",
+    "manifestSha256": "3c7351c33934c4a04131523abb6aff12eac36e1c9d21c5444a5d30f4a4262695"
   },
   "map": {
-    "center": [-3.0593, 51.7862],
-    "zoom": 12,
+    "center": [-3.0359, 51.7587],
+    "zoom": 10.7,
     "assets": {
-      "context": "/releases/release-blorenge-2026-08-13.6/assets/context.pmtiles",
-      "terrain": "/releases/release-blorenge-2026-08-13.6/assets/terrain.pmtiles",
-      "contours": "/releases/release-blorenge-2026-08-13.6/assets/terrain-contours.pmtiles",
-      "change": "/releases/release-blorenge-2026-08-13.6/assets/observed-change.pmtiles",
-      "effis": "/releases/release-blorenge-2026-08-13.6/assets/effis-592404.geojson",
-      "download": "/releases/release-blorenge-2026-08-13.6/assets/evidence-states.csv.txt"
+      "context": "/releases/release-blorenge-2026-08-21.8/assets/context.pmtiles",
+      "terrain": "/releases/release-blorenge-2026-08-21.8/assets/terrain.pmtiles",
+      "contours": "/releases/release-blorenge-2026-08-21.8/assets/terrain-contours.pmtiles",
+      "change": "/releases/release-blorenge-2026-08-21.8/assets/observed-change.pmtiles",
+      "ndvi": "/releases/release-blorenge-2026-08-21.8/assets/ndvi-change.pmtiles",
+      "ndmi": "/releases/release-blorenge-2026-08-21.8/assets/ndmi-change.pmtiles",
+      "effis": "/releases/release-blorenge-2026-08-21.8/assets/effis-592404.geojson",
+      "download": "/releases/release-blorenge-2026-08-21.8/assets/evidence-states.csv.txt"
     }
   },
+  "activeFire": {
+    "currentPath": "/active-fire/current.json",
+    "statusPath": "/active-fire/status.json"
+  },
   "dates": [
-    { "id": "seasonal-baseline", "label": { "en": "Seasonal baseline", "cy": "Llinell sylfaen dymhorol" }, "displayDate": { "en": "12 July 2025", "cy": "12 Gorffennaf 2025" }, "validAoiPercent": 99.805 },
-    { "id": "before-report", "label": { "en": "Before first report", "cy": "Cyn yr adroddiad cyntaf" }, "displayDate": { "en": "12 July 2026", "cy": "12 Gorffennaf 2026" }, "validAoiPercent": 99.435 },
-    { "id": "after-report", "label": { "en": "First suitable after report", "cy": "Y cyntaf addas ar ôl yr adroddiad" }, "displayDate": { "en": "11 August 2026", "cy": "11 Awst 2026" }, "validAoiPercent": 98.51 }
+    { "id": "seasonal-baseline", "label": { "en": "Seasonal baseline", "cy": "Llinell sylfaen dymhorol" }, "displayDate": { "en": "12 July 2025", "cy": "12 Gorffennaf 2025" }, "validAoiPercent": 99.865 },
+    { "id": "before-report", "label": { "en": "Before first report", "cy": "Cyn yr adroddiad cyntaf" }, "displayDate": { "en": "12 July 2026", "cy": "12 Gorffennaf 2026" }, "validAoiPercent": 99.719 },
+    { "id": "after-report", "label": { "en": "First qualifying post-report composite", "cy": "Cyfansawdd cymwys cyntaf ar ôl yr adroddiad" }, "displayDate": { "en": "29 July / 11 August 2026", "cy": "29 Gorffennaf / 11 Awst 2026" }, "validAoiPercent": 99.479 }
   ],
   "groups": [
-    { "id": "evidence", "name": { "en": "Fire and change", "cy": "Tân a newid" }, "description": { "en": "Observed change and a separate provisional provider interpretation", "cy": "Newid a welwyd a dehongliad dros dro ar wahân gan ddarparwr" } },
+    { "id": "evidence", "name": { "en": "Thermal anomalies and change", "cy": "Anomaleddau thermol a newid" }, "description": { "en": "A rolling satellite feed, mutually exclusive change views and a separate historic EFFIS interpretation", "cy": "Ffrwd loeren dreigl, golygon newid sy’n eithrio ei gilydd a dehongliad EFFIS hanesyddol ar wahân" } },
     { "id": "landscape", "name": { "en": "Landscape context", "cy": "Cyd-destun y dirwedd" }, "description": { "en": "Protection, paths, terrain and water", "cy": "Gwarchodaeth, llwybrau, tirwedd a dŵr" } },
     { "id": "historical", "name": { "en": "Historical context", "cy": "Cyd-destun hanesyddol" }, "description": { "en": "Dated sources that are not current condition", "cy": "Ffynonellau â dyddiad nad ydynt yn gyflwr presennol" } }
   ],
   "layers": [
     {
-      "id": "change", "groupId": "evidence", "name": { "en": "Observed surface and vegetation change", "cy": "Newid arwyneb a llystyfiant a welwyd" },
-      "description": { "en": "A conservative, uncalibrated comparison of valid Sentinel-2 observations, independently checked where Landsat was observable.", "cy": "Cymhariaeth geidwadol heb ei graddnodi o arsylwadau Sentinel-2 dilys, wedi’i gwirio’n annibynnol lle roedd Landsat yn weladwy." },
-      "classification": "derived", "defaultVisible": true, "mapStyle": "change", "temporal": true,
-      "provider": "Copernicus Sentinel-2, USGS Landsat and BCA processing", "attribution": "Contains modified Copernicus Sentinel data 2025–2026; Landsat imagery courtesy of the U.S. Geological Survey",
-      "evidenceStatus": { "en": "Versioned derived observation — not ecological recovery or a severity class", "cy": "Arsylwad deilliedig â fersiwn — nid adferiad ecolegol na dosbarth difrifoldeb" },
-      "sourceDate": { "en": "12 July 2025, 12 July 2026 and 11 August 2026", "cy": "12 Gorffennaf 2025, 12 Gorffennaf 2026 ac 11 Awst 2026" },
-      "licence": "Copernicus Sentinel data legal notice; USGS public domain", "owner": "Tim Roberts", "nextReviewAt": "2026-09-13",
-      "method": { "en": "Quality-mask the observations, calculate continuous dNBR, NDVI and NDMI change, then display conservative evidence states. Landsat corroboration remains separate and is not fused.", "cy": "Masgio ansawdd yr arsylwadau, cyfrifo newid dNBR, NDVI ac NDMI parhaus, yna dangos cyflyrau tystiolaeth geidwadol. Mae cadarnhad Landsat yn aros ar wahân ac nid yw wedi’i uno." },
+      "id": "thermal", "groupId": "evidence", "name": { "en": "Recent satellite thermal anomalies", "cy": "Anomaleddau thermol lloeren diweddar" },
+      "description": { "en": "A separately operated 24-hour view of recent NOAA-21 and NOAA-20 VIIRS thermal-anomaly observations, with a filterable 30-day history.", "cy": "Golwg 24 awr a weithredir ar wahân o arsylwadau anomaledd thermol VIIRS NOAA-21 a NOAA-20 diweddar, gyda hanes 30 diwrnod y gellir ei hidlo." },
+      "classification": "provisional", "defaultVisible": true, "mapStyle": "thermal", "temporal": true,
+      "provider": "NASA FIRMS, VIIRS NOAA-21 and NOAA-20", "attribution": "Data: NASA FIRMS, VIIRS NOAA-21 and NOAA-20. Clipped and reformatted by Blorenge Commoners Association.",
+      "evidenceStatus": { "en": "Operational satellite observations — freshness is shown live and detections are not verified incidents", "cy": "Arsylwadau lloeren gweithredol — dangosir ffresni’n fyw ac nid digwyddiadau wedi’u cadarnhau yw canfyddiadau" },
+      "sourceDate": { "en": "Rolling 24-hour map and 30-day history; observation and publication times are shown with feed health", "cy": "Map 24 awr treigl a hanes 30 diwrnod; dangosir amseroedd arsylwi a chyhoeddi gyda iechyd y ffrwd" },
+      "licence": "NASA FIRMS terms and BCA publication authority", "owner": "Tim Roberts", "nextReviewAt": "Continuous monitoring; contract review on source change",
+      "method": { "en": "Query only VIIRS_NOAA21_NRT and VIIRS_NOAA20_NRT every six hours, validate and exact-clip observation centroids to the release AOI, then atomically publish checksum-addressed snapshots.", "cy": "Ymholi dim ond VIIRS_NOAA21_NRT a VIIRS_NOAA20_NRT bob chwe awr, dilysu a chlipio canolbwyntiau arsylwi’n union i AOI y rhyddhad, yna cyhoeddi cipluniau â chyfeiriad checksum yn atomig." },
       "limitations": [
-        { "en": "Observed change is not proof of ecological recovery, habitat condition, cause or local severity.", "cy": "Nid yw newid a welwyd yn brawf o adferiad ecolegol, cyflwr cynefin, achos na difrifoldeb lleol." },
-        { "en": "The first suitable post-report Sentinel-2 observation is 11 August; cloud-obscured areas remain not observed.", "cy": "Yr arsylwad Sentinel-2 addas cyntaf ar ôl yr adroddiad yw 11 Awst; mae ardaloedd dan gymylau yn aros heb eu harsylwi." }
+        { "en": "A point is the centre of a nominal approximately 375 m observation pixel, not an exact heat or fire location or extent.", "cy": "Canol picsel arsylwi enwol tua 375 m yw pwynt, nid union leoliad nac arwynebedd gwres neu dân." },
+        { "en": "A detection is not a verified incident, perimeter, warning, severity measure or forecast; absence of detections is not evidence that no fire exists.", "cy": "Nid digwyddiad wedi’i gadarnhau, terfyn, rhybudd, mesur difrifoldeb na rhagolwg yw canfyddiad; nid yw diffyg canfyddiadau’n dystiolaeth nad oes tân." },
+        { "en": "Do not travel to investigate. Report immediate danger through 999 or 112.", "cy": "Peidiwch â theithio i ymchwilio. Rhowch wybod am berygl uniongyrchol drwy 999 neu 112." }
       ]
     },
     {
+      "id": "change", "groupId": "evidence", "name": { "en": "Observed surface and vegetation change", "cy": "Newid arwyneb a llystyfiant a welwyd" },
+      "description": { "en": "A conservative, uncalibrated comparison of valid Sentinel-2 observations, independently checked where Landsat was observable.", "cy": "Cymhariaeth geidwadol heb ei graddnodi o arsylwadau Sentinel-2 dilys, wedi’i gwirio’n annibynnol lle roedd Landsat yn weladwy." },
+      "classification": "derived", "defaultVisible": true, "mapStyle": "change", "selectionGroup": "change-evidence", "temporal": true,
+      "provider": "Copernicus Sentinel-2, USGS Landsat and BCA processing", "attribution": "Contains modified Copernicus Sentinel data 2025–2026; Landsat imagery courtesy of the U.S. Geological Survey",
+      "evidenceStatus": { "en": "Versioned derived observation — not ecological recovery or a severity class", "cy": "Arsylwad deilliedig â fersiwn — nid adferiad ecolegol na dosbarth difrifoldeb" },
+      "sourceDate": { "en": "12 July 2025, 12 July 2026 and 29 July / 11 August 2026 composite", "cy": "12 Gorffennaf 2025, 12 Gorffennaf 2026 a chyfansawdd 29 Gorffennaf / 11 Awst 2026" },
+      "licence": "Copernicus Sentinel data legal notice; USGS public domain", "owner": "Tim Roberts", "nextReviewAt": "2026-09-13",
+      "method": { "en": "Mask the two post observations independently, use valid 29 July pixels before 11 August fill, require three-role comparability and calculate continuous dNBR, NDVI and NDMI before displaying conservative evidence states. Landsat corroboration remains separate and is not fused.", "cy": "Masgio’r ddau arsylwad ôl-adroddiad yn annibynnol, defnyddio picseli dilys 29 Gorffennaf cyn llenwad 11 Awst, mynnu cymaroldeb tair rôl a chyfrifo dNBR, NDVI ac NDMI parhaus cyn dangos cyflyrau tystiolaeth geidwadol. Mae cadarnhad Landsat yn aros ar wahân ac nid yw wedi’i uno." },
+      "limitations": [
+        { "en": "Observed change is not proof of ecological recovery, habitat condition, cause or local severity.", "cy": "Nid yw newid a welwyd yn brawf o adferiad ecolegol, cyflwr cynefin, achos na difrifoldeb lleol." },
+        { "en": "Pixels invalid on both 29 July and 11 August remain Not observed, never no change.", "cy": "Mae picseli annilys ar 29 Gorffennaf ac 11 Awst yn aros Heb eu harsylwi, byth yn ddim newid." }
+      ],
+      "accessibleDownload": "/releases/release-blorenge-2026-08-21.8/assets/evidence-states.csv.txt"
+    },
+    {
+      "id": "ndvi", "groupId": "evidence", "name": { "en": "Vegetation greenness index change (NDVI)", "cy": "Newid mynegai gwyrddni llystyfiant (NDVI)" },
+      "description": { "en": "A neutral signed difference in the vegetation greenness index across the release AOI; negative is lower and positive is higher.", "cy": "Gwahaniaeth niwtral ag arwydd ym mynegai gwyrddni llystyfiant ar draws AOI y rhyddhad; mae negyddol yn is a phositif yn uwch." },
+      "classification": "derived", "defaultVisible": false, "mapStyle": "ndvi", "selectionGroup": "change-evidence", "temporal": true,
+      "provider": "European Union Copernicus programme and BCA processing", "attribution": "Contains modified Copernicus Sentinel data 2025–2026; processing by Blorenge Commoners Association",
+      "evidenceStatus": { "en": "Versioned 10 m signed index difference — not a fire, recovery or severity measure", "cy": "Gwahaniaeth mynegai 10 m ag arwydd ac â fersiwn — nid mesur tân, adferiad na difrifoldeb" },
+      "sourceDate": { "en": "NDVI(29 July / 11 August 2026 composite) minus NDVI(12 July 2025)", "cy": "NDVI(cyfansawdd 29 Gorffennaf / 11 Awst 2026) llai NDVI(12 Gorffennaf 2025)" },
+      "licence": "Copernicus Sentinel data legal notice and BCA publication authority", "owner": "Tim Roberts", "nextReviewAt": "2026-09-21",
+      "method": { "en": "Calculate (B8 - B4) / (B8 + B4) at native 10 m after the common mask; use 29 July where independently valid, otherwise 11 August, otherwise Not observed.", "cy": "Cyfrifo (B8 - B4) / (B8 + B4) ar 10 m brodorol ar ôl y masg cyffredin; defnyddio 29 Gorffennaf lle mae’n ddilys yn annibynnol, neu 11 Awst fel arall, neu Heb ei arsylwi." },
+      "limitations": [
+        { "en": "The difference does not establish cause, fire damage, severity, habitat condition or recovery.", "cy": "Nid yw’r gwahaniaeth yn sefydlu achos, difrod tân, difrifoldeb, cyflwr cynefin nac adferiad." },
+        { "en": "Rainfall, phenology, grazing, management and residual observation effects may contribute; Not observed is not zero change.", "cy": "Gall glawiad, ffenoleg, pori, rheolaeth ac effeithiau arsylwi gweddilliol gyfrannu; nid yw Heb ei arsylwi yn ddim newid." }
+      ],
+      "accessibleDownload": "/releases/release-blorenge-2026-08-21.8/assets/ndvi-change-summary.csv.txt",
+      "legend": { "unit": { "en": "index points", "cy": "pwyntiau mynegai" }, "stops": [-0.5, -0.25, -0.1, 0, 0.1, 0.25, 0.5], "colours": ["#762A83", "#AF8DC3", "#E7D4E8", "#F7F7F7", "#D9F0D3", "#7FBF7B", "#1B7837"], "low": { "en": "Lower", "cy": "Is" }, "high": { "en": "Higher", "cy": "Uwch" }, "notObserved": { "en": "Grey hatch = Not observed", "cy": "Llinellau llwyd = Heb ei arsylwi" } }
+    },
+    {
+      "id": "ndmi", "groupId": "evidence", "name": { "en": "Moisture-sensitive index change (NDMI)", "cy": "Newid mynegai sy’n sensitif i leithder (NDMI)" },
+      "description": { "en": "A neutral signed difference in a moisture-sensitive vegetation index across the release AOI; negative is lower and positive is higher.", "cy": "Gwahaniaeth niwtral ag arwydd mewn mynegai llystyfiant sy’n sensitif i leithder ar draws AOI y rhyddhad; mae negyddol yn is a phositif yn uwch." },
+      "classification": "derived", "defaultVisible": false, "mapStyle": "ndmi", "selectionGroup": "change-evidence", "temporal": true,
+      "provider": "European Union Copernicus programme and BCA processing", "attribution": "Contains modified Copernicus Sentinel data 2025–2026; processing by Blorenge Commoners Association",
+      "evidenceStatus": { "en": "Versioned 20 m signed index difference — not dryness, fire, recovery or severity", "cy": "Gwahaniaeth mynegai 20 m ag arwydd ac â fersiwn — nid sychder, tân, adferiad na difrifoldeb" },
+      "sourceDate": { "en": "NDMI(29 July / 11 August 2026 composite) minus NDMI(12 July 2025)", "cy": "NDMI(cyfansawdd 29 Gorffennaf / 11 Awst 2026) llai NDMI(12 Gorffennaf 2025)" },
+      "licence": "Copernicus Sentinel data legal notice and BCA publication authority", "owner": "Tim Roberts", "nextReviewAt": "2026-09-21",
+      "method": { "en": "Calculate (B8A - B11) / (B8A + B11) at native 20 m after the common mask; use 29 July where independently valid, otherwise 11 August, otherwise Not observed.", "cy": "Cyfrifo (B8A - B11) / (B8A + B11) ar 20 m brodorol ar ôl y masg cyffredin; defnyddio 29 Gorffennaf lle mae’n ddilys yn annibynnol, neu 11 Awst fel arall, neu Heb ei arsylwi." },
+      "limitations": [
+        { "en": "The difference does not establish cause, fire damage, severity, dryness, wetness, habitat condition or recovery.", "cy": "Nid yw’r gwahaniaeth yn sefydlu achos, difrod tân, difrifoldeb, sychder, gwlybaniaeth, cyflwr cynefin nac adferiad." },
+        { "en": "Rainfall, phenology, grazing, management and residual observation effects may contribute; Not observed is not zero change.", "cy": "Gall glawiad, ffenoleg, pori, rheolaeth ac effeithiau arsylwi gweddilliol gyfrannu; nid yw Heb ei arsylwi yn ddim newid." }
+      ],
+      "accessibleDownload": "/releases/release-blorenge-2026-08-21.8/assets/ndmi-change-summary.csv.txt",
+      "legend": { "unit": { "en": "index points", "cy": "pwyntiau mynegai" }, "stops": [-0.5, -0.25, -0.1, 0, 0.1, 0.25, 0.5], "colours": ["#8C510A", "#D8B365", "#F6E8C3", "#F5F5F5", "#C7EAE5", "#5AB4AC", "#01665E"], "low": { "en": "Lower", "cy": "Is" }, "high": { "en": "Higher", "cy": "Uwch" }, "notObserved": { "en": "Grey hatch = Not observed", "cy": "Llinellau llwyd = Heb ei arsylwi" } }
+    },
+    {
       "id": "fire", "groupId": "evidence", "name": { "en": "EFFIS provisional provider boundary", "cy": "Ffin dros dro darparwr EFFIS" },
-      "description": { "en": "EFFIS feature 592404 is a high-confidence event match shown separately from the observed-change evidence.", "cy": "Mae nodwedd EFFIS 592404 yn gyfatebiaeth digwyddiad hyder uchel a ddangosir ar wahân i’r dystiolaeth newid a welwyd." },
-      "classification": "provisional", "defaultVisible": true, "mapStyle": "fire", "temporal": false,
+      "description": { "en": "Checksum-pinned historic EFFIS feature 592404 is shown separately from change evidence and rolling thermal-anomaly points.", "cy": "Dangosir nodwedd EFFIS hanesyddol 592404 â checksum wedi’i binio ar wahân i dystiolaeth newid a phwyntiau anomaledd thermol treigl." },
+      "classification": "historical", "defaultVisible": true, "mapStyle": "fire", "temporal": false,
       "provider": "European Union, Copernicus EFFIS", "attribution": "European Union, Copernicus EFFIS; clipping by Blorenge Commoners Association",
       "evidenceStatus": { "en": "Provisional provider interpretation — not an authority or surveyed perimeter", "cy": "Dehongliad dros dro gan ddarparwr — nid terfyn awdurdod nac arolwg" },
-      "sourceDate": { "en": "Provider feature last updated 30 July 2026", "cy": "Diweddarwyd nodwedd y darparwr ddiwethaf 30 Gorffennaf 2026" },
+      "sourceDate": { "en": "Historic feature 592404 retained from 13 August 2026 acquisition; provider no longer returns that identifier", "cy": "Nodwedd hanesyddol 592404 a gedwir o gaffaeliad 13 Awst 2026; nid yw’r darparwr bellach yn dychwelyd y dynodwr hwnnw" },
       "licence": "Creative Commons Attribution 4.0", "owner": "Tim Roberts", "nextReviewAt": "2026-09-13",
-      "method": { "en": "Publish the exact bounded provider feature as a separate named comparison.", "cy": "Cyhoeddi union nodwedd derfynedig y darparwr fel cymhariaeth ar wahân ag enw." },
+      "method": { "en": "Retain the checksum-pinned historic provider feature and clip only its display geometry; record geometry-identical 627416 only as a BCA-inferred re-key, not a provider crosswalk.", "cy": "Cadw’r nodwedd darparwr hanesyddol â checksum wedi’i binio a chlipio ei geometreg arddangos yn unig; cofnodi 627416 â geometreg union yr un fath dim ond fel ailallweddiad a gasglwyd gan BCA, nid croesgyfeiriad darparwr." },
       "limitations": [
         { "en": "No incident-authority, legal or surveyed fire perimeter is available.", "cy": "Nid oes terfyn tân gan awdurdod y digwyddiad, terfyn cyfreithiol na therfyn wedi’i arolygu ar gael." },
-        { "en": "Provider dates are not authority ignition, containment or stop times; no cause or exact incident-area claim is made.", "cy": "Nid amseroedd cynnau, cyfyngu na stopio’r awdurdod yw dyddiadau’r darparwr; ni wneir honiad am achos nac arwynebedd union y digwyddiad." }
+        { "en": "Provider dates are not authority incident times; EFFIS no longer returns feature 592404 and publishes no authoritative crosswalk to 627416.", "cy": "Nid amseroedd digwyddiad awdurdod yw dyddiadau’r darparwr; nid yw EFFIS bellach yn dychwelyd nodwedd 592404 ac nid yw’n cyhoeddi croesgyfeiriad awdurdodol i 627416." }
       ]
     },
     {
       "id": "protected", "groupId": "landscape", "name": { "en": "Blorenge SSSI and National Park", "cy": "SoDdGA y Blorens a’r Parc Cenedlaethol" },
-      "description": { "en": "The authoritative protected-site and National Park context used to define the launch area.", "cy": "Cyd-destun awdurdodol y safle gwarchodedig a’r Parc Cenedlaethol a ddefnyddiwyd i ddiffinio ardal y lansiad." },
+      "description": { "en": "The independent authoritative protected-site and National Park context, shown with the approximate BCA-area of interest core outline.", "cy": "Cyd-destun awdurdodol annibynnol y safle gwarchodedig a’r Parc Cenedlaethol, wedi’i ddangos gydag amlinell graidd fras Ardal o ddiddordeb BCA." },
       "classification": "authoritative", "defaultVisible": true, "mapStyle": "protected", "temporal": false,
       "provider": "Natural Resources Wales", "attribution": "Contains Natural Resources Wales information and Ordnance Survey data under OGL 3.0",
-      "evidenceStatus": { "en": "Authoritative designation context", "cy": "Cyd-destun dynodi awdurdodol" }, "sourceDate": { "en": "Retrieved 13 August 2026", "cy": "Adalwyd 13 Awst 2026" },
+      "evidenceStatus": { "en": "Authoritative designation context; the BCA core is approximate and non-legal", "cy": "Cyd-destun dynodi awdurdodol; mae craidd BCA yn fras ac nid yw’n ffin gyfreithiol" }, "sourceDate": { "en": "BCA core version 2026-08-21.1; NRW sources retrieved 21 August 2026", "cy": "Fersiwn craidd BCA 2026-08-21.1; ffynonellau CNC a adalwyd 21 Awst 2026" },
       "licence": "Open Government Licence 3.0", "owner": "Tim Roberts", "nextReviewAt": "2026-09-13",
-      "method": { "en": "Clip allowlisted source fields to the Blorenge SSSI plus 2 km launch area.", "cy": "Clipio meysydd ffynhonnell a ganiateir i ardal lansio SoDdGA y Blorens ynghyd â 2 km." },
-      "limitations": [{ "en": "The SSSI boundary is not the legal Blorenge Common CL18 boundary.", "cy": "Nid ffin gyfreithiol Comin y Blorens CL18 yw ffin y SoDdGA." }]
+      "method": { "en": "Preserve canonical BCA-area version 2026-08-21.1, derive its exact 2 km AOI in EPSG:27700 and independently clip allowlisted NRW fields.", "cy": "Cadw fersiwn ganonaidd Ardal BCA 2026-08-21.1, deillio ei AOI union 2 km yn EPSG:27700 a chlipio meysydd CNC a ganiateir yn annibynnol." },
+      "limitations": [{ "en": "The BCA-area is approximate and is not the legal, official, surveyed or current CL18 boundary; the SSSI remains independent authoritative context.", "cy": "Mae Ardal BCA yn fras ac nid dyma ffin gyfreithiol, swyddogol, wedi’i harolygu na chyfredol CL18; mae’r SoDdGA yn aros yn gyd-destun awdurdodol annibynnol." }]
     },
     {
       "id": "access", "groupId": "landscape", "name": { "en": "Contextual paths and places", "cy": "Llwybrau a lleoedd cyd-destunol" },
       "description": { "en": "A dated OpenStreetMap snapshot for orientation.", "cy": "Ciplun OpenStreetMap â dyddiad ar gyfer cyfeiriadedd." },
       "classification": "contextual", "defaultVisible": true, "mapStyle": "access", "temporal": false,
       "provider": "OpenStreetMap contributors via Geofabrik", "attribution": "© OpenStreetMap contributors; processed by Geofabrik",
-      "evidenceStatus": { "en": "Dated community context", "cy": "Cyd-destun cymunedol â dyddiad" }, "sourceDate": { "en": "Wales snapshot 12 August 2026", "cy": "Ciplun Cymru 12 Awst 2026" },
+      "evidenceStatus": { "en": "Dated community context", "cy": "Cyd-destun cymunedol â dyddiad" }, "sourceDate": { "en": "Wales snapshot 12 August 2026; retrieved 21 August 2026", "cy": "Ciplun Cymru 12 Awst 2026; adalwyd 21 Awst 2026" },
       "licence": "Open Database Licence 1.0", "owner": "Tim Roberts", "nextReviewAt": "2026-11-14",
       "method": { "en": "Clip selected place and path fields to the launch area.", "cy": "Clipio meysydd lleoedd a llwybrau dethol i ardal y lansiad." },
       "limitations": [{ "en": "Paths are contextual and do not establish legal public-rights-of-way status.", "cy": "Mae llwybrau yn gyd-destunol ac nid ydynt yn sefydlu statws hawl tramwy cyhoeddus cyfreithiol." }]
@@ -87,7 +142,7 @@
       "description": { "en": "Named NRW main-river context within the launch area.", "cy": "Cyd-destun prif afonydd CNC ag enwau o fewn ardal y lansiad." },
       "classification": "authoritative", "defaultVisible": true, "mapStyle": "water", "temporal": false,
       "provider": "Natural Resources Wales", "attribution": "Contains Natural Resources Wales information and Ordnance Survey data under OGL 3.0",
-      "evidenceStatus": { "en": "Authoritative contextual source", "cy": "Ffynhonnell gyd-destunol awdurdodol" }, "sourceDate": { "en": "Retrieved 13 August 2026", "cy": "Adalwyd 13 Awst 2026" },
+      "evidenceStatus": { "en": "Authoritative contextual source", "cy": "Ffynhonnell gyd-destunol awdurdodol" }, "sourceDate": { "en": "Retrieved 21 August 2026", "cy": "Adalwyd 21 Awst 2026" },
       "licence": "Open Government Licence 3.0", "owner": "Tim Roberts", "nextReviewAt": "2026-11-14",
       "method": { "en": "Clip allowlisted main-river features to the launch area.", "cy": "Clipio nodweddion prif afonydd a ganiateir i ardal y lansiad." },
       "limitations": [{ "en": "This is landscape context, not live flood or water-quality information.", "cy": "Cyd-destun tirwedd yw hwn, nid gwybodaeth fyw am lifogydd nac ansawdd dŵr." }]
@@ -107,35 +162,38 @@
       "description": { "en": "A dated survey layer that must not be read as current habitat condition.", "cy": "Haen arolwg â dyddiad na ddylid ei darllen fel cyflwr cynefin presennol." },
       "classification": "historical", "defaultVisible": false, "mapStyle": "habitat", "temporal": false,
       "provider": "Natural Resources Wales", "attribution": "Contains Natural Resources Wales information and Ordnance Survey data under OGL 3.0",
-      "evidenceStatus": { "en": "Historical survey context", "cy": "Cyd-destun arolwg hanesyddol" }, "sourceDate": { "en": "Historical source; retrieved 13 August 2026", "cy": "Ffynhonnell hanesyddol; adalwyd 13 Awst 2026" },
+      "evidenceStatus": { "en": "Historical survey context", "cy": "Cyd-destun arolwg hanesyddol" }, "sourceDate": { "en": "Historical source; retrieved 21 August 2026", "cy": "Ffynhonnell hanesyddol; adalwyd 21 Awst 2026" },
       "licence": "Open Government Licence 3.0", "owner": "Tim Roberts", "nextReviewAt": "Review on source or contract change",
       "method": { "en": "Clip the recorded Phase 1 habitat polygons to the launch area.", "cy": "Clipio’r polygonau cynefinoedd Cam 1 a gofnodwyd i ardal y lansiad." },
       "limitations": [{ "en": "The survey does not describe current habitat condition or ecological recovery.", "cy": "Nid yw’r arolwg yn disgrifio cyflwr cynefin presennol nac adferiad ecolegol." }]
     }
   ],
-  "claim": "Satellite observations show surface and vegetation change consistent with the documented July 2026 Blaenavon wildfire.",
+  "claim": "Satellite observations show surface and vegetation change consistent with the documented July 2026 Blaenavon wildfire; component index changes do not establish cause.",
   "incident": {
     "firstReport": "19 July 2026 at 19:42 UTC",
     "chronology": "Active and under containment operations on 23 July; work and a holding perimeter line were reported on 27 July.",
     "unknowns": "No authority stop time, surveyed perimeter or cause is available."
   },
   "evidenceStates": [
-    { "id": "not_observed", "meaning": "A quality mask prevents comparison.", "pixels": 1990, "areaHaRounded": 80 },
-    { "id": "observed_no_thresholded_change", "meaning": "A valid comparison exists but the conservative change rule is not met.", "pixels": 89807, "areaHaRounded": 3592 },
-    { "id": "lower_confidence_observed_change", "meaning": "dNBR and NDVI indicate change; the moisture-sensitive indicator does not agree.", "pixels": 1505, "areaHaRounded": 60 },
-    { "id": "higher_confidence_observed_change", "meaning": "dNBR, NDVI and NDMI agree on observed surface and vegetation change.", "pixels": 38301, "areaHaRounded": 1532 }
+    { "id": "not_observed", "meaning": "A quality mask prevents comparison; this is never no change.", "pixels": 2422, "areaHaRounded": 97 },
+    { "id": "observed_no_thresholded_change", "meaning": "A valid comparison exists but the conservative change rule is not met.", "pixels": 259768, "areaHaRounded": 10391 },
+    { "id": "lower_confidence_observed_change", "meaning": "dNBR and NDVI indicate change; the moisture-sensitive indicator does not agree.", "pixels": 10385, "areaHaRounded": 415 },
+    { "id": "higher_confidence_observed_change", "meaning": "dNBR, NDVI and NDMI agree on observed surface and vegetation change.", "pixels": 62595, "areaHaRounded": 2504 }
   ],
   "contextCounts": [
     { "label": "Blorenge SSSI", "count": 1 }, { "label": "Bannau Brycheiniog National Park", "count": 1 },
-    { "label": "Principal watercourses", "count": 12 }, { "label": "Place names", "count": 13 },
-    { "label": "Contextual paths", "count": 1945 }, { "label": "Historical habitat features", "count": 2530 }
+    { "label": "BCA-area of interest", "count": 1 }, { "label": "Principal watercourses", "count": 21 },
+    { "label": "Place names", "count": 50 }, { "label": "Contextual paths", "count": 6099 },
+    { "label": "Historical habitat features", "count": 6021 }
   ],
-  "terrain": { "minimumM": 38.8, "maximumM": 558.8, "meanM": 300.5, "contourIntervalM": 10 },
+  "terrain": { "minimumM": 35.2, "maximumM": 558.9, "meanM": 215.9, "contourIntervalM": 10 },
   "limitations": [
     "Observed change is not proof of ecological recovery or habitat condition.",
+    "Component NDVI and NDMI differences do not establish cause, fire damage, severity, dryness or wetness.",
     "No exact, legal, surveyed or incident-authority fire perimeter is available.",
     "The evidence-state thresholds are conservative and are not locally calibrated severity classes.",
-    "The SSSI boundary is not the legal Blorenge Common CL18 boundary.",
+    "The BCA-area of interest is approximate and is not the legal, official, surveyed or current CL18 boundary.",
+    "Recent thermal anomalies are satellite pixel-centre observations, not verified incidents, exact locations, perimeters or warnings; absence is not evidence that no fire exists.",
     "Paths are contextual and do not establish legal public-rights-of-way status.",
     "Historical habitat does not describe current condition or recovery."
   ]

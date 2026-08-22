@@ -53,6 +53,31 @@ const assetBytes = Buffer.from(await assetResponse.arrayBuffer());
 assert.equal(assetBytes.length, representative.bytes);
 assert.equal(createHash("sha256").update(assetBytes).digest("hex"), representative.sha256);
 
+const [activeFireCurrentResponse, activeFireStatusResponse] = await Promise.all([
+  fetchOk(`${assetOrigin}${explorer.activeFire.currentPath}`, { cache: "no-store" }),
+  fetchOk(`${assetOrigin}${explorer.activeFire.statusPath}`, { cache: "no-store" })
+]);
+const activeFirePointer = await activeFireCurrentResponse.json();
+const activeFireStatus = await activeFireStatusResponse.json();
+assert.ok(["current", "degraded", "stale", "outage", "withdrawn"].includes(activeFireStatus.status));
+assert.equal(JSON.stringify(activeFirePointer).includes("VIIRS_SNPP_NRT"), false);
+if (activeFirePointer.status !== "withdrawn") {
+  assert.ok(["current", "degraded", "stale"].includes(activeFirePointer.status));
+  for (const reference of [activeFirePointer.map, activeFirePointer.history, activeFirePointer.accessible_table, activeFirePointer.contract]) {
+    const url = new URL(reference.url);
+    assert.equal(url.origin, assetOrigin);
+    assert.equal(url.pathname, `/${reference.key}`);
+    const response = await fetchOk(url, { cache: "no-store" });
+    const bytes = Buffer.from(await response.arrayBuffer());
+    assert.equal(createHash("sha256").update(bytes).digest("hex"), reference.sha256);
+  }
+  const map = await (await fetchOk(activeFirePointer.map.url, { cache: "no-store" })).json();
+  assert.equal(map.type, "FeatureCollection");
+  assert.ok(map.features.every((feature) => ["NOAA-20", "NOAA-21"].includes(feature.properties.sensor)));
+  const contract = await (await fetchOk(activeFirePointer.contract.url, { cache: "no-store" })).json();
+  assert.match(contract.limitations.en.join(" "), /Absence of detections is not evidence that no fire exists/);
+}
+
 process.stdout.write(`${JSON.stringify({
   checked_at: new Date().toISOString(),
   site_origin: siteOrigin,
@@ -60,5 +85,6 @@ process.stdout.write(`${JSON.stringify({
   release_id: pointer.release_id,
   routes: routeChecks.map(([path]) => path),
   representative_asset: representative.asset_id,
+  active_fire_status: activeFireStatus.status,
   result: "pass"
 })}\n`);

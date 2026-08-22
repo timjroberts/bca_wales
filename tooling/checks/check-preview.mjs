@@ -65,6 +65,23 @@ const download = await downloadResponse.text();
 assert.match(download, /evidence_state/i);
 assert.match(download, /higher_confidence_observed_change/);
 
+const [activeFirePointer, activeFireStatus] = await Promise.all([
+  fetchPreview(explorer.activeFire.currentPath).then((response) => response.json()),
+  fetchPreview(explorer.activeFire.statusPath).then((response) => response.json())
+]);
+assert.ok(["current", "degraded", "stale", "outage", "withdrawn"].includes(activeFireStatus.status));
+assert.equal(JSON.stringify(activeFirePointer).includes("VIIRS_SNPP_NRT"), false);
+if (activeFirePointer.status !== "withdrawn") {
+  const [map, history, contract] = await Promise.all([
+    fetchPreview(`/${activeFirePointer.map.key}`).then((response) => response.json()),
+    fetchPreview(`/${activeFirePointer.history.key}`).then((response) => response.json()),
+    fetchPreview(`/${activeFirePointer.contract.key}`).then((response) => response.json())
+  ]);
+  assert.equal(map.type, "FeatureCollection");
+  assert.ok(Array.isArray(history.observations));
+  assert.match(contract.limitations.en.join(" "), /Absence of detections is not evidence that no fire exists/);
+}
+
 process.stdout.write(`${JSON.stringify({
   origin,
   release_id: explorer.release.id,
@@ -72,5 +89,6 @@ process.stdout.write(`${JSON.stringify({
   pmtiles_range: rangeResponse.headers.get("content-range"),
   geojson_features: geoJson.features.length,
   download_bytes: Buffer.byteLength(download),
-  isolation: "all exercised routes remained on the preview origin"
+  isolation: "all exercised routes remained on the preview origin",
+  active_fire_status: activeFireStatus.status
 })}\n`);
