@@ -19,8 +19,8 @@ const selectedPath = process.argv[2];
 const cataloguePath = process.argv[3];
 const outputPath = process.argv[4];
 const cacheRoot = process.argv[5] ?? "/tmp/bca-release-two-prefetch";
-const releaseId = "release-blorenge-2026-08-21.7";
-const datasetVersion = "2026-08-21.7";
+const releaseId = "release-blorenge-2026-08-21.8";
+const datasetVersion = "2026-08-21.8";
 const stagingRoot = path.join(repositoryRoot, ".geodata-staging/release-two");
 
 if (!selectedPath || !cataloguePath || !outputPath) {
@@ -385,7 +385,7 @@ const datasets = [
 const recipe = {
   schema_version: "1.0.0",
   recipe_id: "blorenge-second-release",
-  recipe_version: "2.1.0",
+  recipe_version: "2.1.1",
   release_id: releaseId,
   dataset_version: datasetVersion,
   registry_id: "blorenge-launch",

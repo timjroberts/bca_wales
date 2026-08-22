@@ -779,7 +779,9 @@ export async function inspectOutput(output, file, runner, releaseRoot) {
         if (output.qa.expected_crs) {
           const expectedCode = Number(output.qa.expected_crs.slice("EPSG:".length));
           const identifier = info.coordinateSystem?.id;
-          if (identifier?.authority !== "EPSG" || Number(identifier.code) !== expectedCode) {
+          const stacCode = Number(info.stac?.["proj:epsg"]);
+          const identifierMatches = identifier?.authority === "EPSG" && Number(identifier.code) === expectedCode;
+          if (!identifierMatches && stacCode !== expectedCode) {
             hardFailures.push(`${output.asset_id}: CRS does not match ${output.qa.expected_crs}`);
           }
         }
