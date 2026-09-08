@@ -35,7 +35,7 @@ export function validateDocument(source) {
     requireThat(allowed.includes(type), 422, 'Unsupported node or nesting; preserve your original');
     const attrs = node.attrs || {};
     if (type === 'heading') { exact(attrs, ['level']); requireThat([2, 3].includes(attrs.level), 422, 'Only H2 and H3 are supported'); }
-    else if (type === 'orderedList') { exact(attrs, ['start']); requireThat(attrs.start === undefined || Number.isInteger(attrs.start) && attrs.start >= 1 && attrs.start <= 9999, 422); }
+    else if (type === 'orderedList') { exact(attrs, ['start','type']); requireThat(attrs.type === undefined || attrs.type === null || attrs.type === '1', 422); requireThat(attrs.start === undefined || Number.isInteger(attrs.start) && attrs.start >= 1 && attrs.start <= 9999, 422); }
     else if (type === 'callout') { exact(attrs, ['version', 'tone']); requireThat(attrs.version === 1 && ['note', 'warning'].includes(attrs.tone), 422, 'Unsupported callout'); }
     else if (type === 'image') {
       exact(attrs, ['version', 'assetId', 'policyVersion', 'sensitive', 'warning', 'alt', 'decorative', 'caption', 'credit']);
@@ -97,7 +97,7 @@ export function renderDocument(source, resolveImage) {
         const media = resolveImage(a);
         requireThat(media && typeof media.sensitive === 'boolean', 422, 'Image unavailable');
         const sensitive = a.sensitive || media.sensitive;
-        if (sensitive) return el('figure', { className: ['sensitive'], dataAsset: a.assetId, dataPolicy: a.policyVersion, dataSensitive: 'true' }, [
+        if (sensitive) return el('figure', { className: ['sensitive'], dataAsset: a.assetId, dataPolicy: JSON.stringify([a.policyVersion,a.sensitive,a.warning]), dataSensitive: 'true' }, [
           el('img', { src: safeUrl(media.pixel), alt: '', loading: 'lazy', className: ['pixelated'] }),
           el('p', {}, [txt(a.warning || 'Sensitive image. Reveal only if you choose.')]),
           el('button', { type: 'button', dataReveal: a.assetId, ariaExpanded: 'false' }, [txt('Show image')]),

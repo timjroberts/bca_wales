@@ -77,8 +77,9 @@ export async function mediaForSource(env, postId, source, revision, preview = fa
     const row = await first(env, 'SELECT * FROM media WHERE id=? AND post_id=?', id, postId); requireThat(row, 422, 'Upload incomplete or belongs to another post');
     const manifest = JSON.parse(row.manifest);
     requireThat(manifest.display && manifest.pixel, 422, 'Image processing incomplete');
-    for (const variant of Object.values(manifest)) {
-      const object = await env.CONTENT.head(variant.key); requireThat(object && object.size === variant.size && object.customMetadata?.sha256 === variant.hash, 503, 'Image unavailable');
+    for (const variant of new Map(Object.values(manifest).map(v=>[v.key,v])).values()) {
+      const object = await env.CONTENT.get(variant.key); requireThat(object && object.size === variant.size, 503, 'Image unavailable');
+      requireThat(await digest(await object.arrayBuffer()) === variant.hash, 503, 'Image unavailable');
     }
     media[id] = { ...row, manifest };
   }

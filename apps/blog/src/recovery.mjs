@@ -42,7 +42,7 @@ async function removePrefix(bucket, prefix) {
 }
 export async function cleanupPost(env, post) {
   requireThat(post.deleted_at !== null, 409, 'Post must be fenced before cleanup');
-  if (await first(env, 'SELECT id FROM staging WHERE post_id=? AND expires_at>? LIMIT 1', post.id, now())) return false;
+  if (await first(env, 'SELECT id FROM staging WHERE post_id=? LIMIT 1', post.id)) return false;
   const media = await rows(env, 'SELECT id FROM media WHERE post_id=?', post.id);
   let done = await removePrefix(env.CONTENT, `posts/${post.id}/`);
   for (const item of media) done = await removePrefix(env.CONTENT, `media/${item.id}/`) && done;
@@ -59,7 +59,7 @@ export async function cleanupPost(env, post) {
 }
 export async function runErasure(env, job) {
   const subject = job.subject; if (!subject) return;
-  if (await first(env, 'SELECT id FROM staging WHERE expires_at>? AND (actor=? OR post_id IN (SELECT id FROM posts WHERE creator=?) OR post_id IN (SELECT post_id FROM media WHERE owner=?)) LIMIT 1', now(), subject, subject, subject)) return;
+  if (await first(env, 'SELECT id FROM staging WHERE actor=? OR post_id IN (SELECT id FROM posts WHERE creator=?) OR post_id IN (SELECT post_id FROM media WHERE owner=?) LIMIT 1', subject, subject, subject)) return;
   let done = true;
   for (const post of await rows(env, 'SELECT * FROM posts WHERE creator=?', subject)) done = await cleanupPost(env, post) && done;
   for (const asset of await rows(env, 'SELECT * FROM media WHERE owner=?', subject)) {
@@ -83,7 +83,6 @@ export async function maintenance(env) {
   for (const post of await rows(env, 'SELECT * FROM posts WHERE deleted_at IS NOT NULL AND draft_revision IS NOT NULL LIMIT 20')) await cleanupPost(env, post);
   const time = now();
   await env.DB.batch([
-    stmt(env, 'DELETE FROM staging WHERE expires_at<=?', time),
     stmt(env, 'DELETE FROM oauth_transactions WHERE expires_at<=?', time),
     stmt(env, 'DELETE FROM revocations WHERE expires_at<=?', time),
     stmt(env, 'DELETE FROM operations WHERE expires_at<=?', time),
@@ -107,9 +106,9 @@ export async function maintenance(env) {
 
 export async function cleanupOrphans(env) {
   const time = now();
-  const unused = await rows(env, `SELECT m.* FROM media m WHERE m.created_at<? AND NOT EXISTS (SELECT 1 FROM revisions r,json_each(r.assets) a WHERE a.value=m.id) AND NOT EXISTS (SELECT 1 FROM staging s WHERE s.post_id=m.post_id AND s.expires_at>?) LIMIT 30`, time - 86400, time);
+  const unused = await rows(env, `SELECT m.* FROM media m WHERE m.created_at<? AND NOT EXISTS (SELECT 1 FROM revisions r,json_each(r.assets) a WHERE a.value=m.id) AND NOT EXISTS (SELECT 1 FROM staging s WHERE s.post_id=m.post_id) LIMIT 30`, time - 86400);
   for (const media of unused) {
-    const deleted = await stmt(env, `DELETE FROM media WHERE id=? AND NOT EXISTS (SELECT 1 FROM revisions r,json_each(r.assets) a WHERE a.value=media.id) AND NOT EXISTS (SELECT 1 FROM staging s WHERE s.post_id=media.post_id AND s.expires_at>?) RETURNING id`, media.id, time).first();
+    const deleted = await stmt(env, `DELETE FROM media WHERE id=? AND NOT EXISTS (SELECT 1 FROM revisions r,json_each(r.assets) a WHERE a.value=media.id) AND NOT EXISTS (SELECT 1 FROM staging s WHERE s.post_id=media.post_id) RETURNING id`, media.id).first();
     if (deleted) await removePrefix(env.CONTENT, `media/${media.id}/`);
   }
   const cursor = (await first(env, "SELECT value FROM settings WHERE key='cleanup_cursor'"))?.value;
@@ -118,7 +117,7 @@ export async function cleanupOrphans(env) {
     if (object.uploaded.getTime() > (time - 86400) * 1000) continue;
     const parts = object.key.split('/');
     if (parts[0] === 'posts') {
-      if (await first(env, 'SELECT 1 FROM staging WHERE post_id=? AND expires_at>?', parts[1], time)) continue;
+      if (await first(env, 'SELECT 1 FROM staging WHERE post_id=?', parts[1])) continue;
       if (await first(env, 'SELECT 1 FROM revisions WHERE source_key=? OR manifest_key=?', object.key, object.key)) continue;
     } else if (parts[0] === 'media') {
       if (await first(env, 'SELECT 1 FROM media WHERE id=?', parts[1])) continue;

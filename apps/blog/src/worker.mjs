@@ -4,6 +4,7 @@ import { pageHtml, articleHtml, indexHtml } from './html.mjs';
 import { escapeHtml } from './document.mjs';
 import { authEnabled, beginLogin, completeLogin, session, csrfToken, mutation, logout, verifySignedRequest } from './auth.mjs';
 import { listComments, commentCapabilities, submitComment, moderateComment, inspectComment, deleteComment } from './comments.mjs';
+import { uploadImage, imageDetails } from './media.mjs';
 import { flushOutbox, requestErasure, maintenance } from './recovery.mjs';
 
 export const json = (value, status = 200) => Response.json(value, { status });
@@ -48,6 +49,8 @@ async function route(request, env) {
     const body = await readJson(request, 1000); requireThat(body.confirm === 'DELETE MY CONTRIBUTIONS', 422, 'Confirm permanent deletion');
     const result = await requestErasure(env, actor.subject); return json({ statusUrl: `/deletion-status/${result.id}` }, 202);
   }
+  const image = path.match(/^\/api\/blog\/posts\/([a-f0-9-]{36})\/images\/([a-f0-9-]{36})\/([a-f0-9-]{36})$/);
+  if (image && reading) return json(await imageDetails(env,image[1],image[2],image[3]));
   const comments = path.match(/^\/api\/blog\/posts\/([a-f0-9-]{36})\/comments(?:\/(capabilities))?$/);
   if (comments) {
     if (reading && !comments[2]) return json(await listComments(env, comments[1], url.searchParams.get('after')));
@@ -67,6 +70,11 @@ async function route(request, env) {
     if (path === '/api/admin/posts') {
       if (reading) return json(await rows(env, 'SELECT id,slug,version,state,draft_revision AS draftRevision,public_revision AS publicRevision FROM posts WHERE deleted_at IS NULL ORDER BY created_at DESC LIMIT 200'));
       requireThat(request.method === 'POST', 405); return json(await createPost(env, actor, await readJson(request, 1000), request.headers.get('idempotency-key')), 201);
+    }
+    const upload = path.match(/^\/api\/admin\/posts\/([a-f0-9-]{36})\/images$/);
+    if (upload && request.method === 'POST') {
+      requireThat(['true','false'].includes(request.headers.get('x-image-sensitive')), 422, 'Review sensitivity');
+      return json(await uploadImage(env, actor, upload[1], await readBytes(request, 10*1024*1024), { type:request.headers.get('content-type'),sensitive:request.headers.get('x-image-sensitive') === 'true',placeholder:request.headers.get('x-image-placeholder') || 'pixel' }, request.headers.get('idempotency-key')),201);
     }
     const post = path.match(/^\/api\/admin\/posts\/([a-f0-9-]{36})(?:\/(save|publish|unpublish|delete|slug|preview))?$/);
     if (post) {
@@ -89,11 +97,15 @@ async function route(request, env) {
   }
   if (path.startsWith('/preview/media/') && reading) return deliverMedia(env, request, path.slice(15).split('/'), await session(request, env));
   requireThat(reading, 405, 'Method not allowed');
-  if (path.startsWith('/static/') && env.ASSETS) return env.ASSETS.fetch(request);
+  if (path.startsWith('/static/') && env.ASSETS) { const assetUrl = new URL(request.url); assetUrl.pathname = path.slice(7); return env.ASSETS.fetch(new Request(assetUrl, request)); }
   if (path === '/') return html(pageHtml(env, { html: '<h1>BCA Wales</h1><p>Landscape, community and recovery.</p><p><a data-nav href="/blog/">Read the blog</a> · <a href="https://explore.bca.wales">Explore the landscape</a></p>' }));
   if (path === '/api/blog/posts') return json(await publicIndex(env));
   if (path.startsWith('/media/')) return deliverMedia(env, request, path.slice(7).split('/'));
+  if (path === '/account/') return html(pageHtml(env, { title:'Your account', private:true, html:'<h1>Your account</h1><p>Loading account controls…</p><noscript>Enable JavaScript to sign in with Facebook.</noscript>' }));
+  if (path === '/admin/') { const actor = await session(request,env); await checkAuthority(env,actor); return html(pageHtml(env,{ title:'Manage posts',private:true,html:'<h1>Manage posts</h1><p>Loading editor…</p>' })); }
   if (path.startsWith('/admin') || path.startsWith('/preview') || path.startsWith('/api/admin')) throw new HttpError(401, 'Sign in required');
+  if (path === '/blog/privacy/') return html(pageHtml(env,{ title:'Privacy and deletion',html:'<h1>Privacy and deletion</h1><p>You can read without signing in. Facebook login enables comments and administrator access. We use your app-scoped identifier for ownership and security, and show your Facebook name with contributions. Email is not requested. Optional Facebook profile links may be restricted by Facebook.</p><p>Drafts and hidden comment originals are private. Hidden comments remain stored so administrators can restore them. You can permanently delete your own comments or request erasure of your contributions from your account. Deauthorization starts the same process. Contact the BCA Wales operator through the existing BCA Wales contact channel if you cannot sign in; identity must be verified before erasure.</p><p>Live erasure targets 24 hours. Protected backups expire within 30 days; minimal recovery receipts last at most 37 days. Restores reconcile deletion and moderation before returning to service. Short-lived security counters expire within 24 hours. Moderation audit records expire within 90 days, or earlier upon erasure.</p><p>The encrypted sign-in cookie lasts at most eight hours. Exact image reveal choices use this tab’s session storage; restored or duplicated tabs may retain them. Reset image reveals clears them. No analytics or cross-tab tracking is added.</p>' }));
+  if (path === '/blog/guidelines/') return html(pageHtml(env,{ title:'Community guidelines',html:'<h1>Community guidelines</h1><p>Comments appear immediately. Keep discussion relevant and respectful. Do not post abuse, harassment, identifying personal information, discriminatory language or spam. Administrators may hide nonconforming comments with a private reason and may restore them. Only you can permanently delete your own comments; administrators cannot restore deleted text.</p><p>Hiding changes the next authoritative read. Already displayed screens, external copies and social-network caches cannot be recalled.</p>' }));
   if (path === '/blog') return new Response(null, { status: 308, headers: { Location: '/blog/' } });
   if (path === '/blog/') return html(pageHtml(env, { html: indexHtml(await publicIndex(env)) }));
   const match = path.match(/^\/(api\/blog\/posts|blog)\/([a-z0-9-]+)\/?$/);
