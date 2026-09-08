@@ -1,0 +1,49 @@
+{
+  "review_date": "2026-09-08",
+  "recorded_at": "2026-09-08T12:34:19.409685+00:00",
+  "requested_scope": "Use the latest suitable observations with the existing baseline.",
+  "current_release_id": "release-blorenge-2026-08-21.8",
+  "current_manifest_sha256": "2b5baf34235903dd948cca59d9b51f41215ccbf46e611b2d641545b36db6049e",
+  "current_published_at": "2026-08-22T09:40:24.559Z",
+  "search_bbox": [
+    -3.1141917079035677,
+    51.680022769546724,
+    -2.9576185245017776,
+    51.83740107116975
+  ],
+  "search_datetime": "2026-08-12T00:00:00Z/2026-09-08T23:59:59Z",
+  "earth_search_url": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items?bbox=-3.1141917079035677,51.680022769546724,-2.9576185245017776,51.83740107116975&datetime=2026-08-12T00:00:00Z/2026-09-08T23:59:59Z&limit=100",
+  "official_catalogue_url": "https://stac.dataspace.copernicus.eu/v1/collections/sentinel-2-l2a/items?bbox=-3.1141917079035677,51.680022769546724,-2.9576185245017776,51.83740107116975&datetime=2026-08-12T00:00:00Z/2026-09-08T23:59:59Z&limit=100",
+  "catalogue_records": [
+    {
+      "file": ".geodata-staging/release-three/earth-search.json",
+      "sha256": "d3e9dedf9de988c87c0e9736e2ca2b9e5060b8e6aedc085f5ce53bc9513dbdd8",
+      "bytes": 601806,
+      "feature_count": 34,
+      "next_links": [
+        "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items?datetime=2026-08-12T00%3A00%3A00Z%2F2026-09-08T23%3A59%3A59Z&collections=sentinel-2-c1-l2a&bbox=-3.1141917079035677%2C51.680022769546724%2C-2.9576185245017776%2C51.83740107116975&limit=100&next=2026-08-13T11%3A16%3A51.206000Z%2CS2C_T30UWC_20260813T111612_L2A%2Csentinel-2-c1-l2a"
+      ]
+    },
+    {
+      "file": ".geodata-staging/release-three/earth-search-page2.json",
+      "sha256": "3bac6671c14705cd450c8c5d369fb102f24a0eb30cc11d5ae3b5975f10e4dd33",
+      "bytes": 536,
+      "feature_count": 0,
+      "next_links": []
+    },
+    {
+      "file": ".geodata-staging/release-three/cdse.json",
+      "sha256": "0f582615ab060437646cdd754baa7534b4e072d164e962475b1245da423c477b",
+      "bytes": 1783194,
+      "feature_count": 25,
+      "next_links": []
+    }
+  ],
+  "toolchain_image": "bca/geodata-toolchain:1.0.0",
+  "toolchain_image_id": "sha256:6569e77896e3d296c70dcb67f1086789464909982a1a5ba33294cbe5999a6cca",
+  "network_during_screening": "none",
+  "result": "No newer observation set qualifies for a replacement vegetation release.",
+  "publication_performed": false,
+  "scope_limit": "Context-only publication was not substituted for the requested newer vegetation comparison. Full reflectance acquisition and a candidate build were not performed because quality-mask coverage already fails.",
+  "reproduce_command": "python3 /repo/tooling/geodata/screen_observation_refresh.py --archive /repo/.geodata-work/release-blorenge-2026-08-21.8 --catalogue /repo/.geodata-staging/release-three/earth-search.json --scl-directory /repo/.geodata-staging/release-three/scl --output /repo/.geodata-staging/release-three/reproduced-screening.json"
+}
