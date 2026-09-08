@@ -60,7 +60,7 @@ const scenarios=[
 ];
 const el=(tag,text)=>{let n=document.createElement(tag);if(text!==undefined)n.textContent=text;return n;};
 function documentView(d){let box=el('article');if(!d){box.textContent='No post to show.';return box;}box.append(el('h3',d.title),el('p',d.body));for(const n of d.nodes){let p=el('p',n.kind==='image'?(n.sensitive?'Sensitive image — pixelated placeholder':'Ordinary image')+' · '+n.text+' · version '+n.asset:n.kind+': '+n.text);if(n.kind==='image'&&n.sensitive)p.className='placeholder';box.append(p);}return box;}
-function dispatch(action,payload){current=change(current,action,payload);render();}
+function dispatch(action,payload){if(action==='reset'){step=0;selected=0;}current=change(current,action,payload);render();}
 function render(){
  document.querySelector('#notice').textContent=current.note;
  const panel=document.querySelector('#state');panel.replaceChildren();
