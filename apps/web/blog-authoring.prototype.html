@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BCA Wales — authoring decision prototype</title>
+<style>
+body{font:16px/1.5 system-ui,sans-serif;background:#f4f5f1;color:#22342c;max-width:1100px;margin:auto;padding:28px}h1,h2{line-height:1.2}small{color:#52635a}section{background:white;border:1px solid #ced7cf;padding:22px;border-radius:10px;margin:18px 0}.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}button,input,select,textarea{font:inherit;padding:9px;border:1px solid #91a697;border-radius:5px}button{background:#eef4ed;color:#163b27;cursor:pointer;margin:4px}button:focus-visible{outline:3px solid #326743}label{display:block;margin:12px 0}input:not([type=checkbox]),textarea,select{box-sizing:border-box;width:100%}textarea{height:100px}dt{font-weight:700}dd{margin:0 0 10px;white-space:pre-wrap}#notice{padding:14px;background:#e4eddf}#walk button[aria-selected=true]{background:#244b32;color:white}.placeholder{background:repeating-conic-gradient(#c6cab9 0% 25%,#8b9a82 0% 50%) 0/22px 22px;padding:28px;color:#142519}#steps button:disabled{opacity:.5}article{white-space:pre-wrap}@media(max-width:700px){.grid{grid-template-columns:1fr}body{padding:14px}}
+</style>
+<h1>Write privately. Publish deliberately.</h1>
+<p><strong>Throwaway design prototype.</strong> Does a saved draft plus a separate public revision make authoring clear, including component forms and conflicting edits? This models behavior in memory; it is not a working CMS or a Tiptap compatibility test.</p>
+<p>Reloading resets everything. Image uploads are simulated. No information leaves this file.</p>
+<p id="notice" role="status" aria-live="polite"></p>
+<section><h2>Current state</h2><div id="state" class="grid"></div></section>
+<div class="grid"><section><h2>Editor</h2>
+<label>Title<input id="title"></label><label>Post text<textarea id="body"></textarea></label>
+<p><small>Production toolbar: paragraph, H2/H3, bold, italic, lists, quote and link. This demo uses plain text to isolate saving and publishing.</small></p>
+<label>Component<select id="component"><option value="image">Image</option><option value="callout">Callout</option></select></label>
+<label>Image description or callout text<input id="description" value="A landscape photograph"></label>
+<label><input id="sensitive" type="checkbox" checked> Sensitive image</label>
+<button data-action="component">Insert component</button><button data-action="replace">Replace image</button><button data-action="remove">Remove component</button>
+<p><small>The production form also collects caption, credit and warning. Unsupported components block saving without deleting their content.</small></p>
+<div id="actions"></div></section>
+<section><h2>What readers see</h2><div id="public"></div><h2>Private preview</h2><div id="preview"></div></section></div>
+<section id="walk"><h2>Guided walkthroughs</h2><div id="tabs" role="tablist" aria-label="Walkthroughs"></div><p id="scenario"></p><div id="steps"></div></section>
+<script>
+const initial=()=>({local:{title:'A day on the hills',body:'Notes from our latest visit.',nodes:[]},saved:null,live:null,version:0,base:0,preview:null,note:'New post: only you can see these unsaved words.'});
+function change(old,action,payload={}){
+ const s=structuredClone(old), copy=x=>structuredClone(x), valid=d=>d.title.trim()&&d.nodes.every(n=>n.version===1&&['image','callout'].includes(n.kind));
+ if(action==='reset')return initial();
+ if(action==='edit'){s.local.title=payload.title;s.local.body=payload.body;s.note='Unsaved changes. Readers still see the last published revision.';}
+ if(action==='component'){s.local.nodes.push({kind:payload.kind,version:1,text:payload.text,sensitive:payload.sensitive,asset:payload.asset});s.note='Component added privately. Its properties are entered through a form.';}
+ if(action==='remove'){s.local.nodes.pop();s.note='Last component removed from the unsaved draft.';}
+ if(action==='replace'){let n=s.local.nodes.find(n=>n.kind==='image');if(n){n.asset=(n.asset||1)+1;n.text='Replacement photograph';n.sensitive=true;}s.note='Replacement stays private and starts sensitive; publication requires an explicit action.';}
+ if(action==='save'){
+  if(s.base!==s.version)s.note='Conflict: another administrator saved. Your text is preserved. Reload their saved draft and reapply your changes.';
+  else if(!valid(s.local))s.note='Cannot save: title or component version is unsupported. Your unsaved content is preserved.';
+  else{s.saved=copy(s.local);s.version++;s.base=s.version;s.note='Draft saved. Public content has not changed.';}
+ }
+ if(action==='publish'){
+  if(s.base!==s.version)s.note='Publication blocked by a newer saved draft. Reload first.';
+  else if(!s.saved||JSON.stringify(s.local)!==JSON.stringify(s.saved))s.note='Save your current changes before publishing.';
+  else if(!valid(s.saved))s.note='Publication blocked by unsupported content.';
+  else{s.live=copy(s.saved);s.note='Saved revision is now public.';}
+ }
+ if(action==='preview'){if(valid(s.local)){s.preview=copy(s.local);s.note='Private preview of the current editor buffer; never a public URL.';}else s.note='Preview blocked: unsupported component. Nothing was discarded.';}
+ if(action==='unpublish'){s.live=null;s.note='Post withdrawn. Saved draft is retained privately.';}
+ if(action==='delete'){if(s.live)s.note='Unpublish before permanently deleting a post.';else{s.saved=null;s.local={title:'',body:'',nodes:[]};s.preview=null;s.version++;s.base=s.version;s.note='Post deleted in this in-memory demonstration. Production requires explicit confirmation.';}}
+ if(action==='other'){s.saved=copy(s.saved||s.local);s.saved.body='A change saved by another administrator.';s.version++;s.note='Another administrator saved. Your local edits remain intact.';}
+ if(action==='reload'){if(s.saved){s.local=copy(s.saved);s.base=s.version;s.note='Loaded the latest saved draft. Production offers a copy of local work before discarding it.';}}
+ if(action==='invalid'){s.local.nodes.push({kind:'future-component',version:99,text:'Preserve this unsupported content'});s.note='An unsupported future component was loaded; saving must stop.';}
+ return s;
+}
+let current=initial(),selected=0,step=0;
+const actions={save:'Save draft',preview:'Private preview',publish:'Publish saved revision',unpublish:'Unpublish',delete:'Delete post',other:'Simulate another editor saving',reload:'Reload saved draft',invalid:'Simulate outdated component',reset:'Reset demo'};
+const scenarios=[
+ {name:'First publication',text:'Saving keeps the post private. Preview it, then explicitly publish.',steps:[['save'],['preview'],['publish']]},
+ {name:'Edit a live post',text:'A saved replacement must not change what readers see until you publish again.',steps:[['save'],['publish'],['edit',{title:'Updated hill visit',body:'A private correction.'}],['save'],['publish']]},
+ {name:'Conflicting edits',text:'A stale save must preserve local work and refuse to overwrite the other administrator.',steps:[['save'],['other'],['edit',{title:'My title',body:'My unsaved work'}],['save'],['reload']]},
+ {name:'Unsupported component',text:'Unknown content must not be silently removed by save or publish.',steps:[['save'],['publish'],['invalid'],['save'],['preview']]},
+ {name:'Sensitive replacement',text:'An image replacement starts sensitive and remains private until publication.',steps:[['component',{kind:'image',text:'Landscape image',sensitive:true,asset:1}],['save'],['publish'],['replace'],['save'],['publish']]},
+ {name:'Withdraw and delete',text:'First withdraw a public post, then permanently delete its private source.',steps:[['save'],['publish'],['delete'],['unpublish'],['delete']]}
+];
+const el=(tag,text)=>{let n=document.createElement(tag);if(text!==undefined)n.textContent=text;return n;};
+function documentView(d){let box=el('article');if(!d){box.textContent='No post to show.';return box;}box.append(el('h3',d.title),el('p',d.body));for(const n of d.nodes){let p=el('p',n.kind==='image'?(n.sensitive?'Sensitive image — pixelated placeholder':'Ordinary image')+' · '+n.text+' · version '+n.asset:n.kind+': '+n.text);if(n.kind==='image'&&n.sensitive)p.className='placeholder';box.append(p);}return box;}
+function dispatch(action,payload){current=change(current,action,payload);render();}
+function render(){
+ document.querySelector('#notice').textContent=current.note;
+ const panel=document.querySelector('#state');panel.replaceChildren();
+ for(const [label,value] of Object.entries({'Visibility':current.live?'Published':'Draft / absent','Saved version':current.version,'Your loaded version':current.base,'Unsaved changes':JSON.stringify(current.local)!==JSON.stringify(current.saved)?'Yes':'No','Components':current.local.nodes.map(n=>`${n.kind} v${n.version}${n.kind==='image'?' · '+(n.sensitive?'sensitive':'ordinary')+' · asset '+n.asset:''}: ${n.text}`).join('\n')||'None','Public title':current.live?.title||'Nothing public'})){let list=el('dl');list.append(el('dt',label),el('dd',String(value)));panel.append(list);}
+ document.querySelector('#title').value=current.local.title;document.querySelector('#body').value=current.local.body;
+ document.querySelector('#public').replaceChildren(documentView(current.live));document.querySelector('#preview').replaceChildren(documentView(current.preview));
+ document.querySelector('#scenario').textContent=scenarios[selected].text;
+ document.querySelector('#steps').replaceChildren(...scenarios[selected].steps.map(([a,p],i)=>{let b=el('button',`${i+1}. ${actions[a]||({edit:'Make a local edit',component:'Insert sensitive image',replace:'Replace image'})[a]}`);b.disabled=i!==step;b.onclick=()=>{step++;dispatch(a,p);};return b;}));
+ [...document.querySelector('#tabs').children].forEach((b,i)=>b.setAttribute('aria-selected',String(i===selected)));
+}
+for(const [a,label] of Object.entries(actions)){let b=el('button',label);b.onclick=()=>dispatch(a);document.querySelector('#actions').append(b);}
+scenarios.forEach((s,i)=>{let b=el('button',s.name);b.setAttribute('role','tab');b.onclick=()=>{selected=i;step=0;current=initial();render();};document.querySelector('#tabs').append(b);});
+for(const id of ['title','body'])document.querySelector('#'+id).addEventListener('change',()=>dispatch('edit',{title:document.querySelector('#title').value,body:document.querySelector('#body').value}));
+document.querySelectorAll('[data-action]').forEach(b=>b.onclick=()=>dispatch(b.dataset.action,{kind:document.querySelector('#component').value,text:document.querySelector('#description').value,sensitive:document.querySelector('#sensitive').checked,asset:1}));
+render();
+</script></html>
