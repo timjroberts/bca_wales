@@ -9,7 +9,7 @@ export function authority(actor, admin = true) {
   requireThat(actor && typeof actor.subject === 'string' && typeof actor.sid === 'string', 401, 'Sign in required');
   const time = now();
   return {
-    sql: `? > ? AND NOT EXISTS (SELECT 1 FROM revocations WHERE expires_at > ? AND ((kind='session' AND key=?) OR (kind='subject' AND key=? AND cutoff>=?))) AND NOT EXISTS (SELECT 1 FROM deletion_jobs WHERE subject=? AND status!='complete') ${admin ? 'AND EXISTS (SELECT 1 FROM administrators WHERE subject=?)' : ''}`,
+    sql: `? > ? AND NOT EXISTS (SELECT 1 FROM settings WHERE key='restricted' AND value='true') AND NOT EXISTS (SELECT 1 FROM revocations WHERE expires_at > ? AND ((kind='session' AND key=?) OR (kind='subject' AND key=? AND cutoff>=?))) AND NOT EXISTS (SELECT 1 FROM deletion_jobs WHERE subject=? AND status!='complete') ${admin ? 'AND EXISTS (SELECT 1 FROM administrators WHERE subject=?)' : ''}`,
     values: [actor.exp, time, time, actor.sid, actor.subject, actor.iat, actor.subject, ...(admin ? [actor.subject] : [])]
   };
 }
@@ -62,11 +62,12 @@ export async function commit(env, actor, input, condition, values, result, chang
 }
 export async function createPost(env, actor, body, key) {
   requireThat(typeof body.slug === 'string' && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(body.slug) && body.slug.length <= 100 && !['admin', 'privacy', 'guidelines'].includes(body.slug), 422, 'Choose a lowercase URL slug');
+  requireThat(body.consent === 'public-attribution-v1', 422, 'Acknowledge public author attribution');
   const input = await operationInput('create', 'posts', key, body);
   await checkAuthority(env, actor); const previous = await readOperation(env, actor, input); if (previous) return previous;
   const id = uuid(), time = now(), result = { id, slug: body.slug, version: 0 };
   return commit(env, actor, input, 'NOT EXISTS (SELECT 1 FROM slugs WHERE slug=?)', [body.slug], result, (gate, execution) => [
-    stmt(env, `INSERT INTO posts (id,slug,creator,attribution,last_editor,created_at) SELECT ?,?,?,?,?,? WHERE ${gate}`, id, body.slug, actor.subject, JSON.stringify(actor.attribution), actor.subject, time, execution),
+    stmt(env, `INSERT INTO posts (id,slug,creator,attribution,consent_version,consent_at,last_editor,created_at) SELECT ?,?,?,?,?,?,?,? WHERE ${gate}`, id, body.slug, actor.subject, JSON.stringify(actor.attribution), body.consent, time, actor.subject, time, execution),
     stmt(env, `INSERT INTO slugs (slug,post_id) SELECT ?,? WHERE ${gate}`, body.slug, id, execution)
   ]);
 }
@@ -83,12 +84,14 @@ export async function mediaForSource(env, postId, source, revision, preview = fa
   }
   const resolve = attrs => {
     const asset = media[attrs.assetId]; requireThat(asset && asset.policy_version === attrs.policyVersion, 422, 'Review replacement image policy');
+    if (asset.sensitive || attrs.sensitive) requireThat(!attrs.decorative && attrs.alt.trim() && attrs.warning.trim(), 422, 'Sensitive assets require reviewed alt text and warning');
     const base = `${preview ? '/preview/media' : '/media'}/${postId}/${revision}/${attrs.assetId}`;
     return { sensitive: !!asset.sensitive, pixel: `${base}/pixel`, display: `${base}/display` };
   };
+  const inspect = node => { if (node.type === 'image') resolve(node.attrs); (node.content || []).forEach(inspect); }; inspect(source.doc);
   return { media, resolve };
 }
-export async function saveDraft(env, actor, id, body, key) {
+async function saveDraftInternal(env, actor, id, body, key) {
   await checkAuthority(env, actor); requireThat(Number.isSafeInteger(body.version) && body.version >= 0, 422, 'Version required');
   const input = await operationInput('save', id, key, body), previous = await readOperation(env, actor, input); if (previous) return previous;
   await getPost(env, id); validateDocument(body.source);
@@ -107,7 +110,7 @@ export async function draft(env, actor, id) {
   await checkAuthority(env, actor);
   return { id, slug: post.slug, version: post.version, state: post.state, draftRevision: post.draft_revision, publicRevision: post.public_revision, source };
 }
-export async function publish(env, actor, id, body, key) {
+async function publishInternal(env, actor, id, body, key) {
   await checkAuthority(env, actor);
   requireThat(env.PUBLISH_PAUSED !== 'true' && (await first(env, "SELECT value FROM settings WHERE key='publish_paused'"))?.value !== 'true', 503, 'Publication paused by the operator');
   const input = await operationInput('publish', id, key, body), previous = await readOperation(env, actor, input); if (previous) return previous;
@@ -178,3 +181,13 @@ export async function deliverMedia(env, request, parts, actor = null) {
   if (actor) await checkAuthority(env, actor);
   return new Response(request.method === 'HEAD' ? null : bytes, { headers: { 'Content-Type': item.type, 'Content-Length': String(bytes.byteLength), 'Cache-Control': actor ? 'private, no-store' : 'no-store', 'X-Content-Type-Options': 'nosniff' } });
 }
+
+export async function withStaging(env, actor, postId, work) {
+  const id = uuid(), guard = authority(actor);
+  const started = await stmt(env, `INSERT INTO staging SELECT ?,?,?,? WHERE ${guard.sql} AND EXISTS (SELECT 1 FROM posts WHERE id=? AND deleted_at IS NULL) RETURNING id`, id, actor.subject, postId, now() + 3600, ...guard.values, postId).first();
+  if (!started) { await checkAuthority(env, actor); throw new HttpError(404, 'Not found'); }
+  try { return await work(); }
+  finally { await stmt(env, 'DELETE FROM staging WHERE id=?', id).run(); }
+}
+export async function saveDraft(env, actor, id, body, key) { return withStaging(env, actor, id, () => saveDraftInternal(env, actor, id, body, key)); }
+export async function publish(env, actor, id, body, key) { return withStaging(env, actor, id, () => publishInternal(env, actor, id, body, key)); }

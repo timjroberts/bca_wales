@@ -5,7 +5,7 @@ import { createPost, saveDraft, draft, publish, publicArticle, publicIndex, with
 
 test('private draft, explicit publication, corrections, exact retries and conflict preservation', async t => {
   const { env, actor } = await setup(t);
-  const post = await createPost(env, actor, { slug: 'hello-wales' }, key());
+  const post = await createPost(env, actor, { slug: 'hello-wales', consent: 'public-attribution-v1' }, key());
   const saveKey = key(), body = { version: 0, source: example() };
   const saved = await saveDraft(env, actor, post.id, body, saveKey);
   assert.deepEqual(await saveDraft(env, actor, post.id, body, saveKey), saved);
@@ -26,7 +26,7 @@ test('private draft, explicit publication, corrections, exact retries and confli
 });
 
 test('concurrent saves have one winner and withdrawal fences staged publish', async t => {
-  const { env, actor } = await setup(t), post = await createPost(env, actor, { slug: 'races' }, key());
+  const { env, actor } = await setup(t), post = await createPost(env, actor, { slug: 'races', consent: 'public-attribution-v1' }, key());
   const saves = await Promise.allSettled(['one','two'].map(title => saveDraft(env, actor, post.id, { version: 0, source: example(title) }, key())));
   assert.equal(saves.filter(s => s.status === 'fulfilled').length, 1);
   const saved = saves.find(s => s.status === 'fulfilled').value;
@@ -38,7 +38,7 @@ test('concurrent saves have one winner and withdrawal fences staged publish', as
 });
 
 test('administrator removal during staging denies commit and retains old publication', async t => {
-  const { env, actor } = await setup(t), post = await createPost(env, actor, { slug: 'authority' }, key());
+  const { env, actor } = await setup(t), post = await createPost(env, actor, { slug: 'authority', consent: 'public-attribution-v1' }, key());
   const saved = await saveDraft(env, actor, post.id, { version: 0, source: example() }, key());
   await publish(env, actor, post.id, { version: 1, revision: saved.revision }, key());
   const correction = await saveDraft(env, actor, post.id, { version: 2, source: example('secret') }, key());
@@ -48,7 +48,7 @@ test('administrator removal during staging denies commit and retains old publica
 });
 
 test('missing or corrupted artifacts fail closed; deletion fences publication and reserves slug', async t => {
-  const { env, actor } = await setup(t), post = await createPost(env, actor, { slug: 'deleted' }, key());
+  const { env, actor } = await setup(t), post = await createPost(env, actor, { slug: 'deleted', consent: 'public-attribution-v1' }, key());
   const saved = await saveDraft(env, actor, post.id, { version: 0, source: example() }, key());
   await publish(env, actor, post.id, { version: 1, revision: saved.revision }, key());
   const [revision] = await rows(env, 'SELECT * FROM revisions WHERE id=?', saved.revision);
@@ -57,6 +57,6 @@ test('missing or corrupted artifacts fail closed; deletion fences publication an
   await withdraw(env, actor, post.id, { version: 2 }, key());
   await withdraw(env, actor, post.id, { version: 3 }, key(), true);
   await assert.rejects(publish(env, actor, post.id, { version: 4, revision: saved.revision }, key()), { status: 404 });
-  await assert.rejects(createPost(env, actor, { slug: 'deleted' }, key()), { status: 409 });
+  await assert.rejects(createPost(env, actor, { slug: 'deleted', consent: 'public-attribution-v1' }, key()), { status: 409 });
   assert.equal((await rows(env, 'SELECT * FROM recovery_outbox')).length, 2);
 });

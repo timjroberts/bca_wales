@@ -6,7 +6,7 @@ import { digest, now } from '../src/errors.mjs';
 
 test('actual bundled Worker serves current SSR/SPA metadata, status, HEAD and canonical aliases', async t => {
   const { env, actor, mf } = await setup(t, true);
-  const post = await createPost(env, actor, { slug: 'first-slug' }, key());
+  const post = await createPost(env, actor, { slug: 'first-slug', consent: 'public-attribution-v1' }, key());
   const saved = await saveDraft(env, actor, post.id, { version: 0, source: example('Title <safe>') }, key());
   let response = await mf.dispatchFetch('https://bca.wales/blog/first-slug/'); assert.equal(response.status, 404);
   await publish(env, actor, post.id, { version: 1, revision: saved.revision }, key());
@@ -26,7 +26,7 @@ test('actual bundled Worker serves current SSR/SPA metadata, status, HEAD and ca
 });
 
 test('media is gated by current revision, manifest membership, variant and private authorization', async t => {
-  const { env, actor } = await setup(t), post = await createPost(env, actor, { slug: 'media' }, key());
+  const { env, actor } = await setup(t), post = await createPost(env, actor, { slug: 'media', consent: 'public-attribution-v1' }, key());
   const assetId = crypto.randomUUID(), bytes = new Uint8Array([137,80,78,71]), hash = await digest(bytes);
   const variant = { key: `media/${assetId}/display`, hash, size: bytes.length, type: 'image/png' };
   await env.CONTENT.put(variant.key, bytes, { customMetadata: { sha256: hash } });

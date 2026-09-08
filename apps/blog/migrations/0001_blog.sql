@@ -7,7 +7,7 @@ CREATE TABLE posts (
  id TEXT PRIMARY KEY, slug TEXT NOT NULL UNIQUE, version INTEGER NOT NULL DEFAULT 0,
  draft_revision TEXT, public_revision TEXT, public_metadata TEXT,
  state TEXT NOT NULL DEFAULT 'draft' CHECK(state IN ('draft','published')),
- creator TEXT, attribution TEXT, last_editor TEXT, created_at INTEGER NOT NULL,
+ creator TEXT, attribution TEXT, consent_version TEXT, consent_at INTEGER, last_editor TEXT, created_at INTEGER NOT NULL,
  first_published_at INTEGER, updated_at INTEGER, deleted_at INTEGER,
  CHECK((state='published' AND public_revision IS NOT NULL AND public_metadata IS NOT NULL) OR (state='draft' AND public_revision IS NULL AND public_metadata IS NULL))
 );
@@ -32,3 +32,6 @@ CREATE TABLE recovery_outbox (id TEXT PRIMARY KEY, action TEXT NOT NULL, target 
 CREATE INDEX outbox_pending ON recovery_outbox(delivered_at,created_at);
 CREATE TABLE settings (key TEXT PRIMARY KEY, value TEXT NOT NULL);
 INSERT INTO settings VALUES ('restricted','false'),('publish_paused','false');
+
+CREATE TABLE staging (id TEXT PRIMARY KEY, actor TEXT NOT NULL, post_id TEXT NOT NULL, expires_at INTEGER NOT NULL);
+CREATE INDEX staging_actor ON staging(actor,post_id);

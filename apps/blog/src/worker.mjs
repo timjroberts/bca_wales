@@ -1,7 +1,10 @@
-import { HttpError, requireThat } from './errors.mjs';
-import { first, publicArticle, publicIndex, deliverMedia } from './storage.mjs';
+import { HttpError, requireThat, readJson, readBytes } from './errors.mjs';
+import { first, publicArticle, publicIndex, deliverMedia, checkAuthority, rows, createPost, saveDraft, draft, publish, withdraw, renameSlug, preview } from './storage.mjs';
 import { pageHtml, articleHtml, indexHtml } from './html.mjs';
 import { escapeHtml } from './document.mjs';
+import { authEnabled, beginLogin, completeLogin, session, csrfToken, mutation, logout, verifySignedRequest } from './auth.mjs';
+import { listComments, commentCapabilities, submitComment, moderateComment, inspectComment, deleteComment } from './comments.mjs';
+import { flushOutbox, requestErasure, maintenance } from './recovery.mjs';
 
 export const json = (value, status = 200) => Response.json(value, { status });
 export const html = value => new Response(value, { headers: { 'Content-Type': 'text/html; charset=utf-8' } });
@@ -13,11 +16,82 @@ async function route(request, env) {
     throw new HttpError(400, 'Unexpected origin');
   }
   requireThat(env.RESTRICTED !== 'true' && (await first(env, "SELECT value FROM settings WHERE key='restricted'"))?.value !== 'true', 503, 'Blog temporarily unavailable during recovery');
-  requireThat(['GET','HEAD'].includes(request.method), 405, 'Method not allowed');
+  const reading = ['GET','HEAD'].includes(request.method);
+  if (path === '/auth/login' && request.method === 'POST') return beginLogin(request, env);
+  if (path === '/auth/callback' && request.method === 'GET') return completeLogin(request, env);
+  if (['/auth/deletion','/auth/deauthorize'].includes(path) && request.method === 'POST') {
+    requireThat(authEnabled(env), 503, 'Facebook lifecycle callback is not configured');
+    requireThat(request.headers.get('content-type')?.split(';')[0] === 'application/x-www-form-urlencoded', 415);
+    const params = new URLSearchParams(new TextDecoder().decode(await readBytes(request, 20000)));
+    requireThat(params.getAll('signed_request').length === 1, 400);
+    const subject = await verifySignedRequest(env, params.get('signed_request'));
+    const result = await requestErasure(env, subject);
+    return json({ url: `${env.ORIGIN}/deletion-status/${result.id}`, confirmation_code: result.id });
+  }
+  if (path.startsWith('/deletion-status/') && reading) {
+    const job = await first(env, 'SELECT status FROM deletion_jobs WHERE id=?', path.slice(17)); requireThat(job, 404, 'Not found');
+    return html(pageHtml(env, { title: 'Data deletion', private: true, html: `<h1>Data deletion</h1><p>${job.status === 'complete' ? 'Live data deletion is complete. Protected backups expire within 30 days.' : 'Deletion is pending. If it has been more than 24 hours, contact the BCA Wales operator.'}</p>` }));
+  }
+  if (path === '/api/session' && reading) {
+    const actor = await session(request, env, true);
+    if (!actor) return json({ authenticated: false, loginEnabled: authEnabled(env) });
+    let administrator = true; try { await checkAuthority(env, actor); } catch (error) { if (error.status !== 403) throw error; administrator = false; }
+    return json({ authenticated: true, administrator, name: actor.attribution.name, subject: actor.subject, csrf: await csrfToken(env, actor), expiresAt: actor.exp });
+  }
+  if (path === '/api/logout' && request.method === 'POST') {
+    const actor = await session(request, env); await mutation(request, env, actor);
+    const cleared = await logout(env, actor); await flushOutbox(env);
+    return new Response(null, { status: 204, headers: { 'Set-Cookie': cleared } });
+  }
+  if (path === '/api/account/delete' && request.method === 'POST') {
+    const actor = await session(request, env); await mutation(request, env, actor);
+    const body = await readJson(request, 1000); requireThat(body.confirm === 'DELETE MY CONTRIBUTIONS', 422, 'Confirm permanent deletion');
+    const result = await requestErasure(env, actor.subject); return json({ statusUrl: `/deletion-status/${result.id}` }, 202);
+  }
+  const comments = path.match(/^\/api\/blog\/posts\/([a-f0-9-]{36})\/comments(?:\/(capabilities))?$/);
+  if (comments) {
+    if (reading && !comments[2]) return json(await listComments(env, comments[1], url.searchParams.get('after')));
+    const actor = await session(request, env);
+    if (reading && comments[2]) return json(await commentCapabilities(env, actor, comments[1]));
+    requireThat(request.method === 'POST' && !comments[2], 405); await mutation(request, env, actor);
+    return json(await submitComment(env, actor, comments[1], await readJson(request, 16000), request.headers.get('idempotency-key'), request.headers.get('cf-connecting-ip')), 201);
+  }
+  const ownComment = path.match(/^\/api\/comments\/([a-f0-9-]{36})$/);
+  if (ownComment && request.method === 'DELETE') {
+    const actor = await session(request, env); await mutation(request, env, actor);
+    const result = await deleteComment(env, actor, ownComment[1], request.headers.get('idempotency-key')); await flushOutbox(env); return json(result);
+  }
+  if (path.startsWith('/api/admin/')) {
+    const actor = await session(request, env); await checkAuthority(env, actor);
+    if (!reading) await mutation(request, env, actor);
+    if (path === '/api/admin/posts') {
+      if (reading) return json(await rows(env, 'SELECT id,slug,version,state,draft_revision AS draftRevision,public_revision AS publicRevision FROM posts WHERE deleted_at IS NULL ORDER BY created_at DESC LIMIT 200'));
+      requireThat(request.method === 'POST', 405); return json(await createPost(env, actor, await readJson(request, 1000), request.headers.get('idempotency-key')), 201);
+    }
+    const post = path.match(/^\/api\/admin\/posts\/([a-f0-9-]{36})(?:\/(save|publish|unpublish|delete|slug|preview))?$/);
+    if (post) {
+      if (reading && !post[2]) return json(await draft(env, actor, post[1]));
+      requireThat(request.method === 'POST' && post[2], 405); const body = await readJson(request), key = request.headers.get('idempotency-key');
+      if (post[2] === 'preview') return json(await preview(env, actor, post[1], body.source));
+      if (post[2] === 'delete') requireThat(body.confirm === 'DELETE POST', 422, 'Confirm permanent post deletion');
+      const handler = { save: saveDraft, publish, unpublish: withdraw, delete: (e,a,id,b,k) => withdraw(e,a,id,b,k,true), slug: renameSlug }[post[2]];
+      const result = await handler(env, actor, post[1], body, key);
+      if (['unpublish','delete'].includes(post[2])) await flushOutbox(env);
+      return json(result);
+    }
+    const comment = path.match(/^\/api\/admin\/comments\/([a-f0-9-]{36})\/(inspect|moderate)$/);
+    if (comment) {
+      requireThat(request.method === 'POST', 405);
+      if (comment[2] === 'inspect') return json(await inspectComment(env, actor, comment[1]));
+      const result = await moderateComment(env, actor, comment[1], await readJson(request, 2000), request.headers.get('idempotency-key')); await flushOutbox(env); return json(result);
+    }
+    throw new HttpError(404, 'Not found');
+  }
+  if (path.startsWith('/preview/media/') && reading) return deliverMedia(env, request, path.slice(15).split('/'), await session(request, env));
+  requireThat(reading, 405, 'Method not allowed');
   if (path.startsWith('/static/') && env.ASSETS) return env.ASSETS.fetch(request);
   if (path === '/') return html(pageHtml(env, { html: '<h1>BCA Wales</h1><p>Landscape, community and recovery.</p><p><a data-nav href="/blog/">Read the blog</a> · <a href="https://explore.bca.wales">Explore the landscape</a></p>' }));
   if (path === '/api/blog/posts') return json(await publicIndex(env));
-  if (path === '/api/session') return json({ authenticated: false, loginEnabled: false });
   if (path.startsWith('/media/')) return deliverMedia(env, request, path.slice(7).split('/'));
   if (path.startsWith('/admin') || path.startsWith('/preview') || path.startsWith('/api/admin')) throw new HttpError(401, 'Sign in required');
   if (path === '/blog') return new Response(null, { status: 308, headers: { Location: '/blog/' } });
@@ -33,6 +107,7 @@ async function route(request, env) {
   throw new HttpError(404, 'Not found');
 }
 const worker = {
+  async scheduled(_event, env) { await maintenance(env); },
   async fetch(request, env) {
     let response;
     try { response = await route(request, env); }
