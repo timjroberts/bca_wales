@@ -29,8 +29,9 @@
     "stage:pages-worker": "node tooling/checks/stage-pages-worker.mjs",
     "geodata": "node tooling/geodata/bin/bca-geodata.mjs",
     "geodata:validate": "npm run geodata -- validate --registry data/launch/source-registry.json --recipe config/publication/recipe.example.json",
-    "check": "npm run lint && npm run typecheck && npm test && npm run build",
-    "audit:production": "npm audit --omit=dev --audit-level=high"
+    "check": "npm run lint && npm run typecheck && npm test && npm run build && npm run check:blog",
+    "audit:production": "npm audit --omit=dev --audit-level=high",
+    "check:blog": "npm run build --workspace @bca/blog && npm run test --workspace @bca/blog"
   },
   "devDependencies": {
     "@types/node": "22.19.19",

@@ -33,6 +33,7 @@ export function validateDocument(source) {
     const type = node.type;
     const allowed = parent === null ? ['doc'] : parent === 'doc' || parent === 'blockquote' ? blocks : parent === 'listItem' ? ['paragraph', 'bulletList', 'orderedList', 'blockquote'] : ['bulletList', 'orderedList'].includes(parent) ? ['listItem'] : ['paragraph', 'heading', 'callout'].includes(parent) ? ['text', 'hardBreak'] : [];
     requireThat(allowed.includes(type), 422, 'Unsupported node or nesting; preserve your original');
+    requireThat(node.attrs === undefined || object(node.attrs), 422, 'Invalid node attributes');
     const attrs = node.attrs || {};
     if (type === 'heading') { exact(attrs, ['level']); requireThat([2, 3].includes(attrs.level), 422, 'Only H2 and H3 are supported'); }
     else if (type === 'orderedList') { exact(attrs, ['start','type']); requireThat(attrs.type === undefined || attrs.type === null || attrs.type === '1', 422); requireThat(attrs.start === undefined || Number.isInteger(attrs.start) && attrs.start >= 1 && attrs.start <= 9999, 422); }
@@ -49,7 +50,7 @@ export function validateDocument(source) {
       requireThat(node.marks === undefined || Array.isArray(node.marks) && node.marks.length <= 3, 422);
       const seen = new Set();
       for (const mark of node.marks || []) {
-        exact(mark, ['type', 'attrs']); requireThat(['bold', 'italic', 'link'].includes(mark.type) && !seen.has(mark.type), 422, 'Unsupported mark'); seen.add(mark.type);
+        exact(mark, ['type', 'attrs']); requireThat(mark.attrs === undefined || object(mark.attrs), 422, 'Invalid mark attributes'); requireThat(['bold', 'italic', 'link'].includes(mark.type) && !seen.has(mark.type), 422, 'Unsupported mark'); seen.add(mark.type);
         if (mark.type === 'link') {
           exact(mark.attrs, ['href', 'target', 'rel', 'class']); safeUrl(mark.attrs.href);
           requireThat(mark.attrs.target === undefined || mark.attrs.target === null || mark.attrs.target === '_blank', 422);
@@ -78,11 +79,12 @@ const el = (tagName, properties = {}, children = []) => ({ type: 'element', tagN
 const txt = value => ({ type: 'text', value });
 const schema = {
   tagNames: ['p', 'h2', 'h3', 'ul', 'ol', 'li', 'blockquote', 'strong', 'em', 'a', 'br', 'aside', 'figure', 'figcaption', 'img', 'button', 'span'],
-  attributes: { '*': ['className'], a: ['href', 'target', 'rel'], ol: ['start'], img: ['src', 'alt', 'loading', 'width', 'height'], figure: ['dataAsset', 'dataPolicy', 'dataSensitive'], button: ['type', 'dataReveal', 'ariaExpanded'], aside: ['role'] },
+  attributes: { '*': ['className'], a: ['href', 'target', 'rel'], ol: ['start'], img: ['src', 'alt', 'loading', 'width', 'height'], figure: ['dataAsset', 'dataPolicy', 'dataSensitive', 'dataIndex'], button: ['type', 'dataReveal', 'ariaExpanded'], aside: ['role'] },
   protocols: { href: ['http', 'https'], src: ['https', 'http'] }
 };
 export function renderDocument(source, resolveImage) {
   validateDocument(source);
+  let imageIndex = 0;
   const render = node => {
     const children = (node.content || []).map(render);
     const a = node.attrs || {};
@@ -94,10 +96,11 @@ export function renderDocument(source, resolveImage) {
         return result;
       }
       case 'image': {
+        const index = imageIndex++;
         const media = resolveImage(a);
         requireThat(media && typeof media.sensitive === 'boolean', 422, 'Image unavailable');
         const sensitive = a.sensitive || media.sensitive;
-        if (sensitive) return el('figure', { className: ['sensitive'], dataAsset: a.assetId, dataPolicy: JSON.stringify([a.policyVersion,a.sensitive,a.warning]), dataSensitive: 'true' }, [
+        if (sensitive) return el('figure', { className: ['sensitive'], dataAsset: a.assetId, dataPolicy: JSON.stringify([a.policyVersion,a.sensitive,a.warning]), dataSensitive: 'true', dataIndex: index }, [
           el('img', { src: safeUrl(media.pixel), alt: '', loading: 'lazy', className: ['pixelated'] }),
           el('p', {}, [txt(a.warning || 'Sensitive image. Reveal only if you choose.')]),
           el('button', { type: 'button', dataReveal: a.assetId, ariaExpanded: 'false' }, [txt('Show image')]),

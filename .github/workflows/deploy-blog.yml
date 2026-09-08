@@ -1,0 +1,56 @@
+name: Deploy approved blog Worker code
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Pre-provisioned isolated target; routes and DNS are separate
+        type: choice
+        options: [staging, production]
+        required: true
+permissions:
+  contents: read
+concurrency:
+  group: blog-${{ inputs.environment }}
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    # Reuse the existing owner-reviewed production gate, with a DIFFERENT token.
+    environment: ${{ inputs.environment == 'production' && 'production' || 'blog-staging' }}
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      BCA_BLOG_D1_ID: ${{ vars.BCA_BLOG_D1_ID }}
+      BCA_BLOG_STAGING_ORIGIN: ${{ vars.BCA_BLOG_STAGING_ORIGIN }}
+      BCA_BLOG_AUTH_ENABLED: ${{ vars.BCA_BLOG_AUTH_ENABLED }}
+      BCA_BLOG_IMAGES_ENABLED: ${{ vars.BCA_BLOG_IMAGES_ENABLED }}
+      BCA_BLOG_RESTRICTED: ${{ vars.BCA_BLOG_RESTRICTED }}
+      BCA_BLOG_PUBLISH_PAUSED: ${{ vars.BCA_BLOG_PUBLISH_PAUSED }}
+      BCA_BLOG_BACKUPS_ENABLED: ${{ vars.BCA_BLOG_BACKUPS_ENABLED }}
+      BCA_BLOG_BACKUP_RETENTION_CONFIRMED: ${{ vars.BCA_BLOG_BACKUP_RETENTION_CONFIRMED }}
+      BCA_BLOG_FACEBOOK_APP_ID: ${{ vars.BCA_BLOG_FACEBOOK_APP_ID }}
+      BCA_BLOG_FACEBOOK_GRAPH_VERSION: ${{ vars.BCA_BLOG_FACEBOOK_GRAPH_VERSION }}
+      BCA_BLOG_SESSION_ACTIVE_KID: ${{ vars.BCA_BLOG_SESSION_ACTIVE_KID }}
+    steps:
+      - name: Require separately recorded release authorization
+        env:
+          APPROVED: ${{ vars.BCA_BLOG_CODE_DEPLOY_APPROVED }}
+        run: |
+          test "$APPROVED" = true
+          if [ '${{ inputs.environment }}' = production ]; then test '${{ github.ref }}' = refs/heads/main; fi
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run check:blog
+      - run: node apps/blog/tooling/configure.mjs '${{ inputs.environment }}'
+      - name: Apply reviewed migrations to the blog database only
+        run: npx wrangler d1 migrations apply 'bca-wales-blog-${{ inputs.environment }}' --remote --config 'apps/blog/wrangler.${{ inputs.environment }}.jsonc'
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.BCA_BLOG_DEPLOY_TOKEN }}
+      - name: Deploy Worker code without domain routes
+        run: npx wrangler deploy --config 'apps/blog/wrangler.${{ inputs.environment }}.jsonc'
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.BCA_BLOG_DEPLOY_TOKEN }}

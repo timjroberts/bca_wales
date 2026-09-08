@@ -3,36 +3,59 @@ import { digest, now, requireThat, uuid } from './errors.mjs';
 import { first, rows, stmt } from './storage.mjs';
 import { hmac } from './auth.mjs';
 
-export async function flushOutbox(env) {
-  const pending = await rows(env, 'SELECT * FROM recovery_outbox WHERE delivered_at IS NULL ORDER BY created_at,id LIMIT 100');
-  for (const entry of pending) {
-    const value = JSON.stringify({ id: entry.id, action: entry.action, target: entry.target, payload: JSON.parse(entry.payload), createdAt: entry.created_at });
-    const key = `journal/${entry.created_at}-${entry.id}.json`, hash = await digest(value);
-    await env.RECOVERY.put(key, value, { customMetadata: { sha256: hash, expiresAt: String(entry.created_at + 37 * 86400) } });
-    const stored = await env.RECOVERY.get(key); requireThat(stored && await digest(await stored.arrayBuffer()) === hash, 503, 'Recovery receipt pending. Please retry.');
-    await stmt(env, 'UPDATE recovery_outbox SET delivered_at=? WHERE id=?', now(), entry.id).run();
-  }
-  requireThat(!await first(env, 'SELECT 1 FROM recovery_outbox WHERE delivered_at IS NULL LIMIT 1'), 503, 'Recovery receipts pending. Please retry.');
+export const journalKey = sequence => `journal/${String(sequence).padStart(16,'0')}.json`;
+export async function journalHead(env) {
+  const object=await env.RECOVERY.get('journal-head.json');
+  return object ? { ...(await object.json()),etag:object.etag } : { sequence:0,etag:null };
 }
-export async function requestErasure(env, subject) {
-  const existing = await first(env, 'SELECT id FROM deletion_jobs WHERE subject=?', subject);
-  if (existing) { await flushOutbox(env); return { id: existing.id }; }
-  const id = base64url.encode(crypto.getRandomValues(new Uint8Array(32))), time = now();
+export async function flushOutbox(env) {
+  const pending=await rows(env,'SELECT * FROM recovery_outbox WHERE delivered_at IS NULL ORDER BY sequence LIMIT 100');
+  for(const entry of pending) {
+    const value=JSON.stringify({ sequence:entry.sequence,id:entry.id,action:entry.action,target:entry.target,payload:JSON.parse(entry.payload),createdAt:entry.created_at });
+    const hash=await digest(value),key=journalKey(entry.sequence);
+    await env.RECOVERY.put(key,value,{ customMetadata:{ sha256:hash,expiresAt:String(entry.created_at+37*86400) } });
+    const stored=await env.RECOVERY.get(key);requireThat(stored&&await digest(await stored.arrayBuffer())===hash,503,'Recovery receipt pending. Please retry.');
+    await stmt(env,'UPDATE recovery_outbox SET delivered_at=? WHERE id=?',now(),entry.id).run();
+  }
+  // Advance only through contiguous verified receipts; concurrent writers cannot
+  // regress the independent high-water mark or skip a missing journal object.
+  for(let i=0;i<200;i++) {
+    const head=await journalHead(env),next=await env.RECOVERY.get(journalKey(head.sequence+1));if(!next) break;
+    const bytes=await next.arrayBuffer();requireThat(await digest(bytes)===next.customMetadata.sha256,503,'Recovery journal integrity failure');
+    const entry=JSON.parse(new TextDecoder().decode(bytes));requireThat(entry.sequence===head.sequence+1,503,'Recovery journal gap');
+    const updated=await env.RECOVERY.put('journal-head.json',JSON.stringify({ sequence:entry.sequence,hash:await digest(bytes) }),{ onlyIf:head.etag?{ etagMatches:head.etag }:{ etagDoesNotMatch:'*' } });
+    if(!updated) continue;
+  }
+  const verifiedHead=await journalHead(env);
+  await stmt(env,"INSERT INTO settings VALUES ('journal_sequence',?) ON CONFLICT(key) DO UPDATE SET value=CAST(MAX(CAST(value AS INTEGER),CAST(excluded.value AS INTEGER)) AS TEXT)",String(verifiedHead.sequence)).run();
+  const last=await first(env,'SELECT COALESCE(MAX(sequence),0) AS sequence FROM recovery_outbox');
+  requireThat((await journalHead(env)).sequence>=last.sequence&&!await first(env,'SELECT 1 FROM recovery_outbox WHERE delivered_at IS NULL LIMIT 1'),503,'Recovery receipts pending. Please retry.');
+}
+export async function requestErasure(env, subject, requestKey = subject) {
+  const key=await digest(requestKey);
+  const receipt=await first(env,'SELECT job_id FROM deletion_requests WHERE key=?',key);
+  if(receipt) { await flushOutbox(env);return { id:receipt.job_id }; }
+  const existing=await first(env,"SELECT id FROM deletion_jobs WHERE subject=? AND status!='complete'",subject);
+  if(existing) {
+    await stmt(env,'INSERT OR IGNORE INTO deletion_requests VALUES (?,?,?)',key,existing.id,now()+37*86400).run();await flushOutbox(env);return { id:existing.id };
+  }
+  const id=base64url.encode(crypto.getRandomValues(new Uint8Array(32))),time=now();
   try {
     await env.DB.batch([
-      stmt(env, "INSERT INTO deletion_jobs (id,subject,status,created_at,expires_at) VALUES (?,?,'pending',?,?)", id, subject, time, time + 37 * 86400),
-      stmt(env, "INSERT INTO revocations VALUES ('subject',?,?,?) ON CONFLICT(kind,key) DO UPDATE SET cutoff=MAX(cutoff,excluded.cutoff),expires_at=MAX(expires_at,excluded.expires_at)", subject, time, time + 28800),
-      stmt(env, 'DELETE FROM administrators WHERE subject=?', subject),
-      stmt(env, "UPDATE posts SET public_revision=NULL,public_metadata=NULL,state='draft',version=version+1,deleted_at=CASE WHEN creator=? THEN ? ELSE deleted_at END WHERE creator=? OR id IN (SELECT post_id FROM media WHERE owner=?)", subject, time, subject, subject),
-      stmt(env, 'DELETE FROM audit WHERE target IN (SELECT id FROM comments WHERE subject=?)', subject),
-      stmt(env, 'UPDATE comments SET body=NULL,subject=NULL,attribution=NULL,consent_at=NULL,consent_version=NULL,reason=NULL,moderator=NULL,moderated_at=NULL,hidden=0,deleted_at=?,version=version+1 WHERE subject=?', time, subject),
-      stmt(env, 'INSERT INTO recovery_outbox (id,action,target,payload,created_at) VALUES (?,?,?,?,?)', uuid(), 'erase-subject', id, JSON.stringify({ subject, cutoff: time, expiresAt: time + 37 * 86400 }), time)
+      stmt(env,"INSERT INTO deletion_jobs (id,subject,status,created_at,expires_at) VALUES (?,?,'pending',?,?)",id,subject,time,time+37*86400),
+      stmt(env,'INSERT INTO deletion_requests VALUES (?,?,?)',key,id,time+37*86400),
+      stmt(env,"INSERT INTO revocations VALUES ('subject',?,?,?) ON CONFLICT(kind,key) DO UPDATE SET cutoff=MAX(cutoff,excluded.cutoff),expires_at=MAX(expires_at,excluded.expires_at)",subject,time,time+28800),
+      stmt(env,'DELETE FROM administrators WHERE subject=?',subject),
+      stmt(env,"UPDATE posts SET public_revision=NULL,public_metadata=NULL,state='draft',version=version+1,deleted_at=CASE WHEN creator=? THEN ? ELSE deleted_at END WHERE creator=? OR id IN (SELECT post_id FROM media WHERE owner=?)",subject,time,subject,subject),
+      stmt(env,'DELETE FROM audit WHERE target IN (SELECT id FROM comments WHERE subject=?)',subject),
+      stmt(env,'UPDATE comments SET body=NULL,subject=NULL,attribution=NULL,consent_at=NULL,consent_version=NULL,reason=NULL,moderator=NULL,moderated_at=NULL,hidden=0,deleted_at=?,version=version+1 WHERE subject=?',time,subject),
+      stmt(env,'INSERT INTO recovery_outbox (id,action,target,payload,created_at) VALUES (?,?,?,?,?)',uuid(),'erase-subject',id,JSON.stringify({ subject,cutoff:time,expiresAt:time+37*86400 }),time)
     ]);
-  } catch (error) {
-    const retry = await first(env, 'SELECT id FROM deletion_jobs WHERE subject=?', subject); if (!retry) throw error;
-    await flushOutbox(env); return { id: retry.id };
+  } catch(error) {
+    const retry=await first(env,'SELECT job_id FROM deletion_requests WHERE key=?',key);if(!retry) throw error;
+    await flushOutbox(env);return { id:retry.job_id };
   }
-  await flushOutbox(env); return { id };
+  await flushOutbox(env);return { id };
 }
 async function removePrefix(bucket, prefix) {
   // A bounded batch is resumable by listing the remaining prefix on the next run.
@@ -89,10 +112,11 @@ export async function maintenance(env) {
     stmt(env, 'DELETE FROM rate_attempts WHERE created_at<=?', time - 86400),
     stmt(env, 'DELETE FROM audit WHERE created_at<=?', time - 90 * 86400),
     stmt(env, 'DELETE FROM recovery_outbox WHERE delivered_at IS NOT NULL AND created_at<=?', time - 37 * 86400),
-    stmt(env, "DELETE FROM deletion_jobs WHERE status='complete' AND expires_at<=?", time)
+    stmt(env, "DELETE FROM deletion_jobs WHERE status='complete' AND expires_at<=?", time),
+    stmt(env, 'DELETE FROM deletion_requests WHERE expires_at<=?', time)
   ]);
-  const journals = await env.RECOVERY.list({ prefix: 'journal/', limit: 1000 });
-  const expired = journals.objects.filter(o => Number(o.key.split('/')[1].split('-')[0]) < time - 37 * 86400).map(o => o.key);
+  const journals = await env.RECOVERY.list({ prefix: 'journal/', limit: 1000,include:['customMetadata'] });
+  const expired = journals.objects.filter(o => Number(o.customMetadata?.expiresAt || Infinity) <= time).map(o => o.key);
   if (expired.length) await env.RECOVERY.delete(expired);
   // Old noncurrent sources expire, but current draft/public sources remain authoritative.
   const revisions = await rows(env, 'SELECT r.* FROM revisions r JOIN posts p ON p.id=r.post_id WHERE r.created_at<? AND r.id!=COALESCE(p.draft_revision,\'\') AND r.id!=COALESCE(p.public_revision,\'\') LIMIT 100', time - 30 * 86400);
@@ -112,7 +136,7 @@ export async function cleanupOrphans(env) {
     if (deleted) await removePrefix(env.CONTENT, `media/${media.id}/`);
   }
   const cursor = (await first(env, "SELECT value FROM settings WHERE key='cleanup_cursor'"))?.value;
-  const page = await env.CONTENT.list({ limit: 100, ...(cursor ? { cursor } : {}) });
+  const page = await env.CONTENT.list({ limit: 100, include:['customMetadata'], ...(cursor ? { cursor } : {}) });
   for (const object of page.objects) {
     if (object.uploaded.getTime() > (time - 86400) * 1000) continue;
     const parts = object.key.split('/');
@@ -120,6 +144,7 @@ export async function cleanupOrphans(env) {
       if (await first(env, 'SELECT 1 FROM staging WHERE post_id=?', parts[1])) continue;
       if (await first(env, 'SELECT 1 FROM revisions WHERE source_key=? OR manifest_key=?', object.key, object.key)) continue;
     } else if (parts[0] === 'media') {
+      if (object.customMetadata?.postId && await first(env, 'SELECT 1 FROM staging WHERE post_id=?', object.customMetadata.postId)) continue;
       if (await first(env, 'SELECT 1 FROM media WHERE id=?', parts[1])) continue;
     } else continue;
     await env.CONTENT.delete(object.key);

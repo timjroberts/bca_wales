@@ -30,7 +30,7 @@ test('media is gated by current revision, manifest membership, variant and priva
   const assetId = crypto.randomUUID(), bytes = new Uint8Array([137,80,78,71]), hash = await digest(bytes);
   const variant = { key: `media/${assetId}/display`, hash, size: bytes.length, type: 'image/png' };
   await env.CONTENT.put(variant.key, bytes, { customMetadata: { sha256: hash } });
-  await env.DB.prepare('INSERT INTO media (id,post_id,owner,policy_version,sensitive,manifest,created_at) VALUES (?,?,?,?,?,?,?)').bind(assetId, post.id, actor.subject, 1, 1, JSON.stringify({ display: variant, pixel: variant }), now()).run();
+  await env.DB.prepare('INSERT INTO media (id,post_id,owner,policy_version,sensitive,ready,manifest,created_at) VALUES (?,?,?,?,?,1,?,?)').bind(assetId, post.id, actor.subject, 1, 1, JSON.stringify({ display: variant, pixel: variant }), now()).run();
   const source = example(); source.doc.content.push({ type: 'image', attrs: { version: 1, assetId, policyVersion: 1, sensitive: true, warning: 'Sensitive scene', alt: 'A description', decorative: false, caption: '', credit: '' } });
   const saved = await saveDraft(env, actor, post.id, { version: 0, source }, key());
   const parts = [post.id, saved.revision, assetId, 'display'], request = new Request('https://bca.wales/media/test');

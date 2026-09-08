@@ -5,6 +5,7 @@ landscape explorer and the decision assets that preceded it.
 
 ## Production layout
 
+- `apps/blog` — independent blog Worker with private D1/R2 authority and a constrained editor;
 - `apps/web` — statically exported Next.js public application;
 - `packages/domain` — framework-independent explorer state and vocabulary;
 - `packages/publication` — release-manifest types and runtime publication model;
@@ -44,3 +45,7 @@ decision asset. Its map geometry and evidence values are illustrative and are
 not imported into the production packages or release fixtures. Its agreed
 interaction and content model is recorded in
 [Prototype the public Blorenge landscape explorer](https://github.com/timjroberts/bca_wales/issues/33).
+
+The [blog deployment/recovery runbook](docs/runbooks/blog-deployment-recovery.md)
+and [acceptance evidence](docs/validation/blog-acceptance.md) distinguish local
+implementation validation from the provider/account gates required before launch.

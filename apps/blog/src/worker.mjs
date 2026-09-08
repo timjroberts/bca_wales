@@ -4,6 +4,7 @@ import { pageHtml, articleHtml, indexHtml } from './html.mjs';
 import { escapeHtml } from './document.mjs';
 import { authEnabled, beginLogin, completeLogin, session, csrfToken, mutation, logout, verifySignedRequest } from './auth.mjs';
 import { listComments, commentCapabilities, submitComment, moderateComment, inspectComment, deleteComment } from './comments.mjs';
+import { createBackup, expireBackups } from './backup.mjs';
 import { uploadImage, imageDetails } from './media.mjs';
 import { flushOutbox, requestErasure, maintenance } from './recovery.mjs';
 
@@ -26,7 +27,7 @@ async function route(request, env) {
     const params = new URLSearchParams(new TextDecoder().decode(await readBytes(request, 20000)));
     requireThat(params.getAll('signed_request').length === 1, 400);
     const subject = await verifySignedRequest(env, params.get('signed_request'));
-    const result = await requestErasure(env, subject);
+    const result = await requestErasure(env, subject, params.get('signed_request'));
     return json({ url: `${env.ORIGIN}/deletion-status/${result.id}`, confirmation_code: result.id });
   }
   if (path.startsWith('/deletion-status/') && reading) {
@@ -47,10 +48,10 @@ async function route(request, env) {
   if (path === '/api/account/delete' && request.method === 'POST') {
     const actor = await session(request, env); await mutation(request, env, actor);
     const body = await readJson(request, 1000); requireThat(body.confirm === 'DELETE MY CONTRIBUTIONS', 422, 'Confirm permanent deletion');
-    const result = await requestErasure(env, actor.subject); return json({ statusUrl: `/deletion-status/${result.id}` }, 202);
+    const result = await requestErasure(env, actor.subject, `${actor.sid}:${request.headers.get('idempotency-key') || 'delete-contributions'}`); return json({ statusUrl: `/deletion-status/${result.id}` }, 202);
   }
   const image = path.match(/^\/api\/blog\/posts\/([a-f0-9-]{36})\/images\/([a-f0-9-]{36})\/([a-f0-9-]{36})$/);
-  if (image && reading) return json(await imageDetails(env,image[1],image[2],image[3]));
+  if (image && reading) return json(await imageDetails(env,image[1],image[2],image[3],Number(url.searchParams.get('index') || 0)));
   const comments = path.match(/^\/api\/blog\/posts\/([a-f0-9-]{36})\/comments(?:\/(capabilities))?$/);
   if (comments) {
     if (reading && !comments[2]) return json(await listComments(env, comments[1], url.searchParams.get('after')));
@@ -67,6 +68,7 @@ async function route(request, env) {
   if (path.startsWith('/api/admin/')) {
     const actor = await session(request, env); await checkAuthority(env, actor);
     if (!reading) await mutation(request, env, actor);
+    if (path === '/api/admin/health' && reading) return json({ pendingErasure:(await first(env,"SELECT COUNT(*) AS n FROM deletion_jobs WHERE status!='complete'")).n,pendingRecovery:(await first(env,'SELECT COUNT(*) AS n FROM recovery_outbox WHERE delivered_at IS NULL')).n,staleStaging:(await first(env,'SELECT COUNT(*) AS n FROM staging WHERE expires_at<?',Math.floor(Date.now()/1000))).n,lastBackup:Number((await first(env,"SELECT value FROM settings WHERE key='last_backup'"))?.value||0) });
     if (path === '/api/admin/posts') {
       if (reading) return json(await rows(env, 'SELECT id,slug,version,state,draft_revision AS draftRevision,public_revision AS publicRevision FROM posts WHERE deleted_at IS NULL ORDER BY created_at DESC LIMIT 200'));
       requireThat(request.method === 'POST', 405); return json(await createPost(env, actor, await readJson(request, 1000), request.headers.get('idempotency-key')), 201);
@@ -119,7 +121,18 @@ async function route(request, env) {
   throw new HttpError(404, 'Not found');
 }
 const worker = {
-  async scheduled(_event, env) { await maintenance(env); },
+  async scheduled(_event, env) {
+    try {
+      const result = await maintenance(env);
+      if(env.BACKUPS_ENABLED === 'true') {
+        const last = Number((await first(env, "SELECT value FROM settings WHERE key='last_backup'"))?.value || 0);
+        if(Date.now()/1000-last>=86400) await createBackup(env);
+        await expireBackups(env);
+      }
+      const stale = await first(env, 'SELECT COUNT(*) AS n FROM staging WHERE expires_at<?', Math.floor(Date.now()/1000));
+      if(result.pendingDeletion || stale.n) throw new Error('Blog maintenance needs operator attention');
+    } catch { throw new Error('Blog maintenance failed or needs attention; inspect the private operator status.'); }
+  },
   async fetch(request, env) {
     let response;
     try { response = await route(request, env); }

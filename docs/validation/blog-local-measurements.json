@@ -1,0 +1,38 @@
+{
+  "measuredAt": "2026-09-08T21:06:01.964Z",
+  "runtime": "v22.18.0",
+  "scope": "Local Node validator/renderer and bundle sizes; not hosted Worker CPU/Images or billing evidence",
+  "nodes": 4999,
+  "sourceBytes": 859794,
+  "htmlBytes": 729708,
+  "runs": 20,
+  "p50Milliseconds": 6.165374999999997,
+  "p95Milliseconds": 16.142791,
+  "bundles": [
+    {
+      "file": "worker.mjs",
+      "bytes": 134250,
+      "gzipBytes": 45589
+    },
+    {
+      "file": "static/reader-KTA3MEJ4.js",
+      "bytes": 6722,
+      "gzipBytes": 2911
+    },
+    {
+      "file": "static/reader.js",
+      "bytes": 31,
+      "gzipBytes": 51
+    },
+    {
+      "file": "static/chunks/chunk-LQACOB3G.js",
+      "bytes": 3789,
+      "gzipBytes": 1759
+    },
+    {
+      "file": "static/chunks/editor-POWNQPVF.js",
+      "bytes": 399441,
+      "gzipBytes": 127348
+    }
+  ]
+}

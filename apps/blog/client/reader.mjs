@@ -68,7 +68,7 @@ function head(article) {
 async function enhance(ticket = navigation) {
   const main = document.querySelector('main'), post = main.dataset.post;
   if (!post) return;
-  reset = mountReveals(main,{ store,post,revision:main.dataset.revision,details:(asset,revision)=>api(`/api/blog/posts/${post}/images/${revision}/${asset}`),report });
+  reset = mountReveals(main,{ store,post,revision:main.dataset.revision,details:(asset,revision,index)=>api(`/api/blog/posts/${post}/images/${revision}/${asset}?index=${index}`),report });
   await renderComments(post,ticket);
 }
 async function navigate(path, push = true, focus = true) {
