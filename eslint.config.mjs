@@ -19,6 +19,7 @@ export default defineConfig([
     "**/.next/**",
     "**/out/**",
     "**/dist/**",
+    "apps/web/public/maplibre/**",
     "**/.wrangler/**",
     "prototypes/**"
   ])

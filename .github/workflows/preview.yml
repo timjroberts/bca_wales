@@ -39,3 +39,9 @@ jobs:
       - name: Exercise the deployed evidence routes
         if: github.event.pull_request.head.repo.fork == false
         run: npm run check:preview -- "https://pr-${{ github.event.pull_request.number }}.bca-wales-explorer-preview.pages.dev"
+      - name: Install browser for map regression checks
+        if: github.event.pull_request.head.repo.fork == false
+        run: npx playwright install --with-deps chromium
+      - name: Exercise the exported map and synthetic thermal marker
+        if: github.event.pull_request.head.repo.fork == false
+        run: npm run check:map-browser -- "https://pr-${{ github.event.pull_request.number }}.bca-wales-explorer-preview.pages.dev"

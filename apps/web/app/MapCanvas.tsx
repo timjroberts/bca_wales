@@ -3,7 +3,8 @@
 import type { ContrastLevel, ExplorerState, Language } from "@bca/domain";
 import { localise } from "@bca/domain";
 import type { ExplorerRelease } from "@bca/publication";
-import maplibregl, { type GeoJSONSource, type LayerSpecification, type Map as MapLibreMap, type StyleSpecification } from "maplibre-gl";
+import * as maplibregl from "maplibre-gl";
+import { type GeoJSONSource, type LayerSpecification, type Map as MapLibreMap, type StyleSpecification } from "maplibre-gl";
 import { Protocol } from "pmtiles";
 import { useEffect, useRef } from "react";
 import type { ActiveFireFeatureCollection, ActiveFireState } from "./activeFire";
@@ -215,8 +216,9 @@ export function MapCanvas({
       pmtilesProtocolInstalled = true;
     }
 
+    maplibregl.setWorkerUrl(`/maplibre/${maplibregl.getVersion()}/maplibre-gl-worker.mjs`);
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const map = new maplibregl.Map({
+    const options: maplibregl.MapOptions = {
       container: containerRef.current,
       style: makeStyle(explorer, initialStateRef.current),
       center: [...explorer.map.center],
@@ -229,12 +231,16 @@ export function MapCanvas({
       dragRotate: false,
       pitchWithRotate: false,
       fadeDuration: reduceMotion ? 0 : 300
-    });
+    };
+    // Upstream documents undefined to retain v5 overscaling, but its optional
+    // number type does not permit that value with exactOptionalPropertyTypes.
+    Object.assign(options, { zoomLevelsToOverscale: undefined });
+    const map = new maplibregl.Map(options);
 
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
     map.addControl(new maplibregl.AttributionControl({ compact: true }), "bottom-right");
-    map.on("styleimagemissing", (event) => {
-      if (event.id !== "thermal-diamond" || map.hasImage(event.id)) return;
+    map.setMissingStyleImageResolver((id) => {
+      if (id !== "thermal-diamond" || map.hasImage(id)) return;
       const size = 18;
       const data = new Uint8Array(size * size * 4);
       for (let y = 0; y < size; y += 1) {
@@ -247,7 +253,7 @@ export function MapCanvas({
           data[offset + 3] = 255;
         }
       }
-      map.addImage(event.id, { width: size, height: size, data }, { pixelRatio: 2 });
+      map.addImage(id, { width: size, height: size, data }, { pixelRatio: 2 });
     });
     map.on("click", "thermal-centre", (event) => {
       const observations = map.queryRenderedFeatures(event.point, { layers: ["thermal-centre"] });
