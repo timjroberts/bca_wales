@@ -72,3 +72,36 @@ test('sensitive image reveal is deliberate, versioned, per-tab, reversible and k
   await page.reload();assert.equal(await page.getByRole('button',{ name:'Show image' }).count(),2);
   await page.screenshot({ path:'/tmp/bca-blog-sensitive.png',fullPage:true });
 });
+
+test('editorial presentation matches SSR and SPA, with responsive cards and readable articles', { timeout:120000 },async t=>{
+  const origin='https://localhost:8794';
+  const {env,actor,mf}=await setup(t,true,{ORIGIN:origin},{name:'blog',https:true,port:8794,assets:{directory:new URL('../dist/static',import.meta.url).pathname,binding:'ASSETS',run_worker_first:true,routerConfig:{has_user_worker:true,invoke_user_worker_ahead_of_assets:true}}});await mf.ready;
+  for(let i=0;i<4;i++) {
+    const post=await createPost(env,actor,{slug:`editorial-${i}`,consent:'public-attribution-v1'},key());
+    const source=example(i===0?'Learning to read the landscape':`A landscape, seen over time ${i}`);
+    source.excerpt='A closer look at the places we pass every day — and the questions that help us see them differently.';
+    source.doc.content.push({type:'heading',attrs:{level:2},content:[{type:'text',text:'Looking a little closer'}]},{type:'paragraph',content:[{type:'text',text:'A landscape holds traces of work, weather and the lives of people who know it well. Looking carefully is a way to begin understanding how those stories fit together.'}]});
+    const saved=await saveDraft(env,actor,post.id,{version:0,source},key());await publish(env,actor,post.id,{version:1,revision:saved.revision},key());
+    await env.DB.prepare('UPDATE posts SET first_published_at=? WHERE id=?').bind(now()-i*86400,post.id).run();
+  }
+  const browser=await chromium.launch({headless:true,...(process.env.BCA_BROWSER_EXECUTABLE?{executablePath:process.env.BCA_BROWSER_EXECUTABLE}:{})});t.after(()=>browser.close());
+  const context=await browser.newContext({ignoreHTTPSErrors:true,viewport:{width:1440,height:1000}}),page=await context.newPage();const errors=[];page.on('pageerror',error=>errors.push(error.message));
+  await page.goto(`${origin}/blog/`);const index=await page.locator('.story-index').innerHTML();
+  assert.equal(await page.locator('.story-card').count(),4);assert.equal(await page.locator('.story-grid .story-card').count(),3);
+  assert.equal(await page.locator('.story-index img').count(),0);
+  await page.screenshot({path:'/tmp/bca-blog-design-index.png',fullPage:true});
+  await page.getByRole('link',{name:'Learning to read the landscape',exact:true}).click();await page.locator('.article-body').waitFor();
+  const article=await page.locator('.editorial').innerHTML();await page.reload();assert.equal(await page.locator('.editorial').innerHTML(),article);
+  await page.screenshot({path:'/tmp/bca-blog-design-article.png',fullPage:true});
+  await page.getByRole('link',{name:'All stories',exact:true}).click();await page.locator('.story-index').waitFor();assert.equal(await page.locator('.story-index').innerHTML(),index);
+  for(const width of [320,390,768]) {
+    await page.setViewportSize({width,height:844});
+    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`index overflows at ${width}`);
+    await page.getByRole('link',{name:'Learning to read the landscape',exact:true}).click();await page.locator('.article-body').waitFor();
+    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`article overflows at ${width}`);
+    if(width===390) await page.screenshot({path:'/tmp/bca-blog-design-mobile.png',fullPage:true});
+    await page.getByRole('link',{name:'All stories',exact:true}).click();await page.locator('.story-index').waitFor();
+    if(width===390) await page.screenshot({path:'/tmp/bca-blog-design-index-mobile.png',fullPage:true});
+  }
+  assert.deepEqual(errors,[]);
+});

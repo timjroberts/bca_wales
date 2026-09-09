@@ -1,3 +1,4 @@
+import { articleHtml, indexHtml } from '../shared/presentation.mjs';
 import { api, button, element, field, getSession, login, report } from './api.mjs';
 import { RevealStore, mountReveals } from './reveals.mjs';
 let storage; try { storage = sessionStorage; } catch { report('Image choices are held in memory. Refresh may reset them.'); }
@@ -78,15 +79,11 @@ async function navigate(path, push = true, focus = true) {
     if (match[1]) {
       const article = await api(`/api/blog/posts/${match[1]}`); if (ticket !== navigation) return;
       if (article.rendererVersion !== 1) { location.assign(path); return; }
-      main.replaceChildren(); const h1 = element('h1',article.title), by = element('p'); attribution(by,article.attribution); by.append(` · Updated ${new Date(article.updatedAt*1000).toLocaleDateString('en-GB')}`);
-      const body = element('article'); body.append(h1,by); const content = element('div'); content.innerHTML = article.html; body.append(content);
-      main.append(body,element('section',undefined,{ id:'comments' })); main.dataset.post = article.id; main.dataset.revision = article.revision;
+      main.innerHTML = articleHtml(article); main.dataset.post = article.id; main.dataset.revision = article.revision;
       if (push) history.pushState({},'',`/blog/${article.slug}/`); head(article);
     } else {
       const posts = await api('/api/blog/posts'); if (ticket !== navigation) return;
-      main.replaceChildren(element('h1','BCA Wales blog')); main.dataset.post = ''; main.dataset.revision = '';
-      for (const post of posts) { const article = element('article'), h2 = element('h2'), link = element('a',post.title,{ href:`/blog/${post.slug}/` }); link.dataset.nav = ''; h2.append(link); article.append(h2,element('p',post.excerpt)); main.append(article); }
-      if (!posts.length) main.append(element('p','No posts have been published yet.'));
+      main.innerHTML = indexHtml(posts); main.dataset.post = ''; main.dataset.revision = '';
       if (push) history.pushState({},'','/blog/'); head({ title:'BCA Wales blog',excerpt:'News and updates from BCA Wales.' });
     }
     if (focus) main.focus(); await enhance(ticket);
