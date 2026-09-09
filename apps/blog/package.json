@@ -1,0 +1,25 @@
+{
+  "name": "@bca/blog",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "dev": "wrangler dev",
+    "build": "node build.mjs"
+  },
+  "dependencies": {
+    "@tiptap/core": "3.31.3",
+    "@tiptap/extension-link": "3.31.3",
+    "@tiptap/starter-kit": "3.31.3",
+    "hast-util-sanitize": "5.0.2",
+    "hast-util-to-html": "9.0.5",
+    "jose": "6.2.12"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.58.2",
+    "esbuild": "0.28.1",
+    "miniflare": "5.20260804.1-alpha",
+    "sharp": "0.35.2"
+  }
+}

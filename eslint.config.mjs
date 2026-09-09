@@ -10,6 +10,10 @@ export default defineConfig([
       next: { rootDir: "apps/web" }
     }
   },
+  {
+    files: ['apps/blog/**/*.mjs'],
+    rules: { '@next/next/no-location-assign-relative-destination': 'off' }
+  },
   globalIgnores([
     "**/node_modules/**",
     "**/.next/**",
