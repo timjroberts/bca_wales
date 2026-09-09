@@ -24,6 +24,6 @@
     "@playwright/test": "1.58.2",
     "esbuild": "0.28.1",
     "miniflare": "5.20260804.1-alpha",
-    "sharp": "0.35.2"
+    "sharp": "0.35.4"
   }
 }

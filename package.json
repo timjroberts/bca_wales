@@ -31,15 +31,21 @@
     "geodata:validate": "npm run geodata -- validate --registry data/launch/source-registry.json --recipe config/publication/recipe.example.json",
     "check": "npm run lint && npm run typecheck && npm test && npm run build && npm run check:blog",
     "audit:production": "npm audit --omit=dev --audit-level=high",
-    "check:blog": "npm run build --workspace @bca/blog && npm run test --workspace @bca/blog"
+    "check:blog": "npm run build --workspace @bca/blog && npm run test --workspace @bca/blog",
+    "check:map-browser": "node tooling/checks/check-map-browser.mjs"
   },
   "devDependencies": {
     "@types/node": "22.19.19",
     "ajv": "8.20.0",
     "ajv-formats": "3.0.1",
     "eslint": "9.39.4",
-    "eslint-config-next": "16.3.0",
+    "eslint-config-next": "16.3.4",
     "typescript": "5.9.3",
-    "wrangler": "4.121.0"
+    "wrangler": "4.121.0",
+    "@playwright/test": "1.58.2",
+    "esbuild": "0.28.1"
+  },
+  "overrides": {
+    "sharp": "0.35.4"
   }
 }

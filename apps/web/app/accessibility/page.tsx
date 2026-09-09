@@ -21,10 +21,10 @@ export default function AccessibilityPage() {
       <ul>
         <li>Full independent WCAG 2.2 AA and assistive-technology audits have not yet been completed.</li>
         <li>Some provider names, legal titles and source metadata remain in English.</li>
-        <li>The interactive map requires WebGL. Source details and summaries provide non-map equivalents for release evidence, and the operational anomaly feed has a non-map history table, but not every contextual map geometry has a complete textual equivalent.</li>
+        <li>The interactive map requires WebGL2. Source details and summaries provide non-map equivalents for release evidence, and the operational anomaly feed has a non-map history table, but not every contextual map geometry has a complete textual equivalent.</li>
       </ul>
       <p>Report an accessibility problem through the project’s <a href="https://github.com/timjroberts/bca_wales/issues/new">public contact route</a>. Do not include private or sensitive information.</p>
-      <p><small>Updated 22 August 2026. Service owner: Tim Roberts.</small></p>
+      <p><small>Updated 9 September 2026. Service owner: Tim Roberts.</small></p>
     </main>
   );
 }
