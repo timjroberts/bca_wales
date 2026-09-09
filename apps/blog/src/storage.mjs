@@ -74,7 +74,7 @@ export async function createPost(env, actor, body, key) {
 export async function mediaForSource(env, postId, source, revision, preview = false) {
   const { assets } = validateDocument(source); const media = {};
   for (const id of assets) {
-    const row = await first(env, 'SELECT * FROM media WHERE id=? AND post_id=?', id, postId); requireThat(row, 422, 'Upload incomplete or belongs to another post');
+    const row = await first(env, 'SELECT * FROM media WHERE id=? AND post_id=?', id, postId); requireThat(row?.ready === 1, 422, 'Upload incomplete or belongs to another post');
     const manifest = JSON.parse(row.manifest);
     requireThat(manifest.display && manifest.pixel, 422, 'Image processing incomplete');
     for (const variant of new Map(Object.values(manifest).map(v=>[v.key,v])).values()) {
@@ -150,7 +150,7 @@ export async function publicIndex(env) {
   return (await rows(env, "SELECT id,public_metadata,first_published_at,updated_at FROM posts WHERE state='published' AND deleted_at IS NULL ORDER BY first_published_at DESC,id LIMIT 100")).map(p => ({ id: p.id, ...JSON.parse(p.public_metadata), publishedAt: p.first_published_at, updatedAt: p.updated_at }));
 }
 export async function renameSlug(env, actor, id, body, key) {
-  requireThat(typeof body.slug === 'string' && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(body.slug) && body.slug.length <= 100, 422, 'Invalid slug');
+  requireThat(typeof body.slug === 'string' && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(body.slug) && body.slug.length <= 100 && !['admin','privacy','guidelines'].includes(body.slug), 422, 'Invalid slug');
   const input = await operationInput('rename-slug', id, key, body);
   return commit(env, actor, input, 'EXISTS (SELECT 1 FROM posts WHERE id=? AND version=? AND deleted_at IS NULL) AND NOT EXISTS (SELECT 1 FROM slugs WHERE slug=? AND post_id!=?)', [id, body.version, body.slug, id], { id, slug: body.slug, version: body.version + 1 }, (gate, execution) => [
     stmt(env, `INSERT OR IGNORE INTO slugs (slug,post_id) SELECT ?,? WHERE ${gate}`, body.slug, id, execution),

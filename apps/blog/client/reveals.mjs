@@ -2,7 +2,11 @@ export class RevealStore {
   constructor(storage, report = () => {}) {
     this.values = new Set(); this.storage = storage; this.report = report;
     try {
-      const saved = JSON.parse(storage?.getItem('bca-image-reveals-v1') || '[]');
+      const serialized = storage?.getItem('bca-image-reveals-v1') || '[]';
+      // A readable but unwritable store must not revive a choice that a previous
+      // page could not persistently hide. Fail closed before trusting its set.
+      storage?.setItem('bca-image-reveals-v1', serialized);
+      const saved = JSON.parse(serialized);
       if (Array.isArray(saved)) saved.filter(v => typeof v === 'string' && v.length <= 2000 && /^\[/.test(v)).forEach(v => this.values.add(v));
     } catch { this.storage = null; report('Image choices are held in memory. Refresh may reset them.'); }
   }
@@ -26,12 +30,12 @@ export function mountReveals(root, { store, post, revision, private: isPrivate =
     const show = async () => {
       if(loading) return; loading = true; const attempt = ++generation; button.setAttribute('aria-busy','true'); status.textContent = 'Loading image…';
       try {
-        const data = await details(asset, revision);
+        const data = await details(asset, revision, Number(figure.dataset.index));
         // Fetch after explicit/remembered reveal. A failed load never records consent.
         const response = await fetch(data.display, { cache: 'no-store', credentials: 'same-origin' }); if (!response.ok) throw new Error('Image unavailable');
         const blob = await response.blob(), url = URL.createObjectURL(blob), probe = new Image(); probe.src = url;
         try { await probe.decode(); if (attempt !== generation || !root.contains(figure)) return;
-          image.src = url; await image.decode(); image.alt = data.alt; image.classList.remove('pixelated');
+          image.src = url; await image.decode(); if(attempt !== generation || !root.contains(figure)) return; image.alt = data.alt; image.classList.remove('pixelated');
           const caption = document.createElement('figcaption'); caption.textContent = [data.caption,data.credit].filter(Boolean).join(' — '); figure.append(caption);
           shown = true; store.set(key,true); button.textContent = 'Hide image'; button.setAttribute('aria-expanded','true'); status.textContent = 'Image shown';
         } finally { URL.revokeObjectURL(url); }

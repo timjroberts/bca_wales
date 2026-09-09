@@ -86,3 +86,14 @@ test('erasure immediately fences content; cleanup waits for recovery receipts an
   assert.ok((await env.RECOVERY.list()).objects.length);
   await flushOutbox(env);
 });
+
+test('daily accepted limit and coarse IP attempts survive alternate submissions',async t=>{
+  const { env,reader,post }=await fixture(t);
+  const { hmac }=await import('../src/auth.mjs');const { base64url }=await import('jose');const { now }=await import('../src/errors.mjs');
+  const tag=`subject:${base64url.encode(await hmac(env.RATE_KEY,reader.subject))}`;
+  await env.DB.batch(Array.from({ length:30 },()=>env.DB.prepare('INSERT INTO rate_attempts VALUES (?,?,?)').bind(tag,now()-1000,key())));
+  await assert.rejects(submitComment(env,reader,post.id,comment('over daily limit'),key(),'192.0.2.100'),{ status:429 });
+  const ipTag=`ip:${base64url.encode(await hmac(env.RATE_KEY,`${Math.floor(now()/86400)}:192.0.2.101`))}`;
+  await env.DB.batch(Array.from({ length:60 },()=>env.DB.prepare('INSERT INTO rate_attempts VALUES (?,?,?)').bind(ipTag,now(),key())));
+  await assert.rejects(submitComment(env,{ ...reader,subject:'another-reader' },post.id,comment('IP backstop'),key(),'192.0.2.101'),{ status:429 });
+});

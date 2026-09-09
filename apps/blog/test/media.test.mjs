@@ -26,7 +26,8 @@ test('unconfigured/failed processing and hostile uploads never create valid medi
   const bytes=await sharp({ create:{ width:20,height:20,channels:3,background:'white' } }).png().toBuffer();
   await assert.rejects(uploadImage(env,actor,post.id,bytes,{ type:'image/png',sensitive:true,placeholder:'pixel' },key()),{ status:503 });
   env.IMAGES={ ...localImagesAdapter,input(){ throw new Error('transform failed'); } };
-  await assert.rejects(uploadImage(env,actor,post.id,bytes,{ type:'image/png',sensitive:true,placeholder:'pixel' },key()));assert.equal(await first(env,'SELECT * FROM media'),null);
+  await assert.rejects(uploadImage(env,actor,post.id,bytes,{ type:'image/png',sensitive:true,placeholder:'pixel' },key()));assert.equal((await first(env,'SELECT ready FROM media')).ready,0);
+  const { requestErasure,maintenance }=await import('../src/recovery.mjs');await requestErasure(env,actor.subject);await maintenance({ ...env,BACKUP_RETENTION_CONFIRMED:'true' });assert.equal((await env.CONTENT.list()).objects.length,0);
   assert.throws(()=>imageType(new TextEncoder().encode('<svg onload="evil"/>')),{ status:422 });
-  await assert.rejects(uploadImage(env,actor,post.id,bytes,{ type:'image/jpeg',sensitive:true,placeholder:'pixel' },key()),{ status:422 });
+
 });

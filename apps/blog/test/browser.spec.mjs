@@ -53,7 +53,7 @@ test('sensitive image reveal is deliberate, versioned, per-tab, reversible and k
       const bytes=await sharp({ create:{ width,height:Math.floor(width/2),channels:3,background:color } }).png().toBuffer(),hash=await digest(bytes),objectKey=`media/${id}/${variant}.png`;
       await env.CONTENT.put(objectKey,bytes,{ customMetadata:{ sha256:hash } });manifest[variant]={ key:objectKey,hash,size:bytes.length,type:'image/png' };
     }
-    await env.DB.prepare('INSERT INTO media (id,post_id,owner,policy_version,sensitive,manifest,created_at) VALUES (?,?,?,?,?,?,?)').bind(id,post.id,actor.subject,1,1,JSON.stringify(manifest),now()).run();
+    await env.DB.prepare('INSERT INTO media (id,post_id,owner,policy_version,sensitive,ready,manifest,created_at) VALUES (?,?,?,?,?,1,?,?)').bind(id,post.id,actor.subject,1,1,JSON.stringify(manifest),now()).run();
     source.doc.content.push({ type:'image',attrs:{ version:1,assetId:id,policyVersion:1,sensitive:true,warning:'Sensitive scene',alt:`Detailed image ${color}`,decorative:false,caption:'A descriptive caption',credit:'' } });
   }
   const saved=await saveDraft(env,actor,post.id,{ version:0,source },key());await publish(env,actor,post.id,{ version:1,revision:saved.revision },key());

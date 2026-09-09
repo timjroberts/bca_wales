@@ -120,8 +120,8 @@ export async function mountEditor({ store }) {
       const source=read(),result=await api(`/api/admin/posts/${postId}/preview`,{ method:'POST',csrf:account.csrf,body:{ source } });
       const dialog=element('dialog',undefined,{ className:'preview-dialog' }), body=element('div'); body.innerHTML=result.html;
       dialog.append(element('h2',`Private preview${dirty?' — unsaved changes':''}`),element('h1',result.title),body,button('Close preview',()=>dialog.close())); document.body.append(dialog); dialog.addEventListener('close',()=>dialog.remove()); dialog.showModal();
-      const imageAttrs={}; const visit=n=>{ if(n.type==='image') imageAttrs[n.attrs.assetId]=n.attrs; (n.content||[]).forEach(visit); }; visit(source.doc);
-      const resetPreview=mountReveals(body,{ store,post:postId,revision:'buffer',private:true,report,details:async asset=>({ ...imageAttrs[asset],display:`/preview/media/${postId}/buffer/${asset}/display` }) });
+      const imageAttrs=[]; const visit=n=>{ if(n.type==='image') imageAttrs.push(n.attrs); (n.content||[]).forEach(visit); }; visit(source.doc);
+      const resetPreview=mountReveals(body,{ store,post:postId,revision:'buffer',private:true,report,details:async (asset,_revision,index)=>({ ...imageAttrs[index],display:`/preview/media/${postId}/buffer/${asset}/display` }) });
       dialog.append(button('Reset preview reveals',()=>resetPreview()));
     } catch(error) { showError(error); }
   }),button('Publish',()=>{

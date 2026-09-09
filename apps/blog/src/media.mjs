@@ -1,5 +1,5 @@
 import { digest, now, requireThat, uuid } from './errors.mjs';
-import { checkAuthority, commit, first, getPost, objectJson, operationInput, readOperation, stmt, withStaging } from './storage.mjs';
+import { authority, checkAuthority, commit, first, getPost, objectJson, operationInput, readOperation, stmt, withStaging } from './storage.mjs';
 const signature = [137,80,78,71,13,10,26,10];
 const ascii = bytes => new TextDecoder('ascii').decode(bytes);
 function pngChunks(bytes) {
@@ -57,11 +57,13 @@ export async function uploadImage(env, actor, postId, bytes, options, key) {
     const stream = () => new Blob([bytes]).stream();
     const info = await env.IMAGES.info(stream());
     requireThat(info.format === type && Number.isInteger(info.width) && Number.isInteger(info.height) && info.width > 0 && info.height > 0 && info.width <= 8192 && info.height <= 8192 && info.width * info.height <= 24000000, 422, 'Image dimensions exceed 24 megapixels or 8192 pixels');
-    const id = uuid(), manifest = {};
-    await env.CONTENT.put(`media/${id}/original`, bytes, { customMetadata: { sha256: await digest(bytes) } });
+    const id = uuid(), manifest = {}, guard = authority(actor);
+    const pending = await stmt(env, `INSERT INTO media (id,post_id,owner,policy_version,sensitive,ready,manifest,created_at) SELECT ?,?,?,1,?,0,'{}',? WHERE ${guard.sql} AND EXISTS (SELECT 1 FROM posts WHERE id=? AND deleted_at IS NULL) RETURNING id`, id,postId,actor.subject,options.sensitive?1:0,now(),...guard.values,postId).first();
+    requireThat(pending,403,'Administrator authority changed during upload');
+    await env.CONTENT.put(`media/${id}/original`, bytes, { customMetadata: { sha256: await digest(bytes),postId } });
     const persist = async (variant, output) => {
       const clean = stripPngMetadata(output), hash = await digest(clean), objectKey = `media/${id}/${variant}.png`;
-      await env.CONTENT.put(objectKey, clean, { customMetadata: { sha256: hash }, httpMetadata: { contentType: 'image/png' } });
+      await env.CONTENT.put(objectKey, clean, { customMetadata: { sha256: hash,postId }, httpMetadata: { contentType: 'image/png' } });
       const stored = await env.CONTENT.get(objectKey); requireThat(stored && await digest(await stored.arrayBuffer()) === hash, 503, 'Processed image could not be verified');
       manifest[variant] = { key: objectKey, hash, size: clean.byteLength, type: 'image/png' };
     };
@@ -79,15 +81,16 @@ export async function uploadImage(env, actor, postId, bytes, options, key) {
     }
     await persist('pixel', pixel);
     const result = { assetId: id, policyVersion: 1, sensitive: options.sensitive, pixel: `/preview/media/${postId}/buffer/${id}/pixel`, width: info.width, height: info.height };
-    return commit(env, actor, input, "EXISTS (SELECT 1 FROM posts WHERE id=? AND deleted_at IS NULL) AND NOT EXISTS (SELECT 1 FROM settings WHERE key='publish_paused' AND value='true')", [postId], result, (gate, execution) => [stmt(env, `INSERT INTO media (id,post_id,owner,policy_version,sensitive,manifest,created_at) SELECT ?,?,?,?,?,?,? WHERE ${gate}`, id, postId, actor.subject, 1, options.sensitive ? 1 : 0, JSON.stringify(manifest), now(), execution)]);
+    return commit(env, actor, input, "EXISTS (SELECT 1 FROM posts WHERE id=? AND deleted_at IS NULL) AND NOT EXISTS (SELECT 1 FROM settings WHERE key='publish_paused' AND value='true')", [postId], result, (gate, execution) => [stmt(env, `UPDATE media SET manifest=?,ready=1 WHERE id=? AND post_id=? AND ${gate}`, JSON.stringify(manifest), id, postId, execution)]);
   });
 }
-export async function imageDetails(env, postId, revisionId, assetId) {
+export async function imageDetails(env, postId, revisionId, assetId, index = 0) {
   const post = await getPost(env, postId, true); requireThat(post.public_revision === revisionId, 404, 'Not found');
   const revision = await first(env, 'SELECT * FROM revisions WHERE id=? AND post_id=?', revisionId, postId); requireThat(revision, 503, 'Image unavailable');
   const artifact = await objectJson(env, revision.manifest_key, revision.manifest_hash), media = artifact.media[assetId]; requireThat(media, 404, 'Not found');
-  const source = await objectJson(env, revision.source_key, revision.source_hash); let attrs;
-  const visit = n => { if (n.type === 'image' && n.attrs.assetId === assetId) attrs = n.attrs; (n.content || []).forEach(visit); }; visit(source.doc);
+  const source = await objectJson(env, revision.source_key, revision.source_hash); let attrs, position = 0;
+  requireThat(Number.isSafeInteger(index) && index >= 0 && index < 30, 404, 'Not found');
+  const visit = n => { if (n.type === 'image') { if(position === index && n.attrs.assetId === assetId) attrs = n.attrs; position++; } (n.content || []).forEach(visit); }; visit(source.doc);
   requireThat(attrs, 404, 'Not found');
   return { assetId, policyVersion: media.policyVersion, sensitive: media.sensitive || attrs.sensitive, alt: attrs.alt, caption: attrs.caption, credit: attrs.credit, display: `/media/${postId}/${revisionId}/${assetId}/display` };
 }

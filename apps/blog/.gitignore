@@ -1,0 +1,8 @@
+.dev.vars*
+operator.local.json
+operator.production.json
+operator.recovery.json
+wrangler.staging.jsonc
+wrangler.production.jsonc
+playwright-report/
+test-results/
