@@ -7,7 +7,7 @@ await mkdir(`${root}dist/static`,{ recursive:true });
 const client = await build({ entryPoints: { reader:`${root}client/reader.mjs` },outdir:`${root}dist/static`,bundle:true,splitting:true,format:'esm',platform:'browser',target:'es2022',minify:true,sourcemap:false,entryNames:'[name]-[hash]',chunkNames:'chunks/[name]-[hash]',metafile:true });
 const entry = Object.entries(client.metafile.outputs).find(([,value])=>value.entryPoint?.endsWith('/reader.mjs'))[0].split('/').at(-1);
 await writeFile(`${root}dist/static/reader.js`, `import './${entry}';\n`);
-await copyFile(`${root}public/static/blog.css`,`${root}dist/static/blog.css`);
+for (const asset of ['blog.css','landscape.svg']) await copyFile(`${root}public/static/${asset}`,`${root}dist/static/${asset}`);
 const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630"><rect width="1200" height="630" fill="#f8f6ef"/><path d="M0 520L210 370 420 490 720 250 1200 490V630H0Z" fill="#d2deca"/><path d="M0 585L410 420 780 560 1050 395 1200 455V630H0Z" fill="#718871"/><text x="86" y="220" font-family="Georgia,serif" font-size="100" fill="#233e36">BCA Wales</text><text x="92" y="300" font-family="sans-serif" font-size="34" fill="#233e36">Landscape · community · recovery</text><text x="92" y="365" font-family="sans-serif" font-size="26" fill="#586b62">bca.wales/blog</text></svg>`;
 await sharp(Buffer.from(svg)).png().toFile(`${root}dist/static/share.png`);
 await build({ entryPoints:[`${root}src/worker.mjs`],outfile:`${root}dist/worker.mjs`,bundle:true,format:'esm',platform:'browser',target:'es2022',minify:true,sourcemap:false });

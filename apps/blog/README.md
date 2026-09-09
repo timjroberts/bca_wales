@@ -24,3 +24,14 @@ by isolated test drivers, never through a deployable login endpoint.
 
 No production resource identifier or secret belongs in this directory. Operator
 and deployed environment files are ignored; examples cannot deploy a live site.
+
+## Populated design preview
+
+```sh
+npm run preview --workspace @bca/blog
+```
+
+Open http://localhost:8793/blog/ to explore the editorial cards and article layout.
+The preview binds to loopback and seeds disposable, in-memory D1/R2 with clearly
+labelled sample writing. It needs no provider credentials and enables no login.
+Stop it with Ctrl+C; it does not change your regular local database.
