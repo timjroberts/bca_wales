@@ -53,7 +53,7 @@ jobs:
           persist-credentials: false
       - name: Validate immutable inputs
         run: node -e 'const assert=require("node:assert/strict"),{execFileSync}=require("node:child_process"); assert.match(process.env.CODE_COMMIT, /^[0-9a-f]{40}$/); assert.equal(execFileSync("git",["rev-parse","HEAD"],{encoding:"utf8"}).trim(), process.env.CODE_COMMIT); assert.match(process.env.RELEASE_ID, /^release-[a-z0-9][a-z0-9._-]+$/); assert.match(process.env.BUNDLE_ASSET_ID, /^[1-9][0-9]*$/); assert.match(process.env.BUNDLE_SHA256, /^[0-9a-f]{64}$/); assert.match(process.env.CANDIDATE_MANIFEST_SHA256, /^[0-9a-f]{64}$/);'
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: npm
