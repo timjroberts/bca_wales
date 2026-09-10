@@ -6,6 +6,7 @@ import { authEnabled, beginLogin, completeLogin, session, csrfToken, mutation, l
 import { listComments, commentCapabilities, submitComment, moderateComment, inspectComment, deleteComment } from './comments.mjs';
 import { createBackup, expireBackups } from './backup.mjs';
 import { uploadImage, imageDetails } from './media.mjs';
+import { privacyHtml } from './privacy.mjs';
 import { monitorHealth, recordMaintenance } from './health.mjs';
 import { flushOutbox, requestErasure, maintenance } from './recovery.mjs';
 
@@ -17,6 +18,16 @@ async function route(request, env) {
   if (url.origin !== origin.origin) {
     if (['GET','HEAD'].includes(request.method) && ['bca.wales','www.bca.wales'].includes(url.hostname) && origin.origin === 'https://bca.wales' && !/^\/(auth|api|preview|media)\//.test(path)) return new Response(null, { status: 308, headers: { Location: `${env.ORIGIN}${path}${url.search}` } });
     throw new HttpError(400, 'Unexpected origin');
+  }
+  // Public policy and its fixed stylesheet stay readable during recovery, without D1/R2 access.
+  if (['/privacy', '/privacy/', '/blog/privacy', '/blog/privacy/'].includes(path)) {
+    requireThat(['GET', 'HEAD'].includes(request.method), 405, 'Method not allowed');
+    if (path !== '/privacy') return new Response(null, { status: 308, headers: { Location: '/privacy' } });
+    return html(privacyHtml(env));
+  }
+  if (path === '/static/blog.css' && ['GET', 'HEAD'].includes(request.method) && env.ASSETS) {
+    const assetUrl = new URL(request.url); assetUrl.pathname = '/blog.css';
+    return env.ASSETS.fetch(new Request(assetUrl, request));
   }
   if (path === '/api/ops/health') return monitorHealth(request, env);
   requireThat(env.RESTRICTED !== 'true' && (await first(env, "SELECT value FROM settings WHERE key='restricted'"))?.value !== 'true', 503, 'Blog temporarily unavailable during recovery');
@@ -34,7 +45,7 @@ async function route(request, env) {
   }
   if (path.startsWith('/deletion-status/') && reading) {
     const job = await first(env, 'SELECT status FROM deletion_jobs WHERE id=?', path.slice(17)); requireThat(job, 404, 'Not found');
-    return html(pageHtml(env, { title: 'Data deletion', private: true, html: `<h1>Data deletion</h1><p>${job.status === 'complete' ? 'Live data deletion is complete. Protected backups expire within 30 days.' : 'Deletion is pending. If it has been more than 24 hours, contact the BCA Wales operator.'}</p>` }));
+    return html(pageHtml(env, { title: 'Data deletion', private: true, html: `<h1>Data deletion</h1><p>${job.status === 'complete' ? 'Live data deletion is complete. Protected backups expire within 30 days.' : 'Deletion is pending. If it has been more than 24 hours, email <a href="mailto:bca@timjroberts.com">bca@timjroberts.com</a>.'}</p>` }));
   }
   if (path === '/api/session' && reading) {
     const actor = await session(request, env, true);
@@ -108,7 +119,6 @@ async function route(request, env) {
   if (path === '/account/') return html(pageHtml(env, { title:'Your account', private:true, html:'<h1>Your account</h1><p>Loading account controls…</p><noscript>Enable JavaScript to sign in with Facebook.</noscript>' }));
   if (path === '/admin/') { const actor = await session(request,env); await checkAuthority(env,actor); return html(pageHtml(env,{ title:'Manage posts',private:true,html:'<h1>Manage posts</h1><p>Loading editor…</p>' })); }
   if (path.startsWith('/admin') || path.startsWith('/preview') || path.startsWith('/api/admin')) throw new HttpError(401, 'Sign in required');
-  if (path === '/blog/privacy/') return html(pageHtml(env,{ title:'Privacy and deletion',html:'<h1>Privacy and deletion</h1><p>You can read without signing in. Facebook login enables comments and administrator access. We use your app-scoped identifier for ownership and security, and show your Facebook name with contributions. Email is not requested. Optional Facebook profile links may be restricted by Facebook.</p><p>Drafts and hidden comment originals are private. Hidden comments remain stored so administrators can restore them. You can permanently delete your own comments or request erasure of your contributions from your account. Deauthorization starts the same process. Contact the BCA Wales operator through the existing BCA Wales contact channel if you cannot sign in; identity must be verified before erasure.</p><p>Live erasure targets 24 hours. Protected backups expire within 30 days; minimal recovery receipts last at most 37 days. Restores reconcile deletion and moderation before returning to service. Short-lived security counters expire within 24 hours. Moderation audit records expire within 90 days, or earlier upon erasure.</p><p>The encrypted sign-in cookie lasts at most eight hours. Exact image reveal choices use this tab’s session storage; restored or duplicated tabs may retain them. Reset image reveals clears them. No analytics or cross-tab tracking is added.</p>' }));
   if (path === '/blog/guidelines/') return html(pageHtml(env,{ title:'Community guidelines',html:'<h1>Community guidelines</h1><p>Comments appear immediately. Keep discussion relevant and respectful. Do not post abuse, harassment, identifying personal information, discriminatory language or spam. Administrators may hide nonconforming comments with a private reason and may restore them. Only you can permanently delete your own comments; administrators cannot restore deleted text.</p><p>Hiding changes the next authoritative read. Already displayed screens, external copies and social-network caches cannot be recalled.</p>' }));
   if (path === '/blog') return new Response(null, { status: 308, headers: { Location: '/blog/' } });
   if (path === '/blog/') return html(pageHtml(env, { html: indexHtml(await publicIndex(env)) }));

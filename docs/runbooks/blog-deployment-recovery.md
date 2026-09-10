@@ -69,7 +69,7 @@ The app uses server code exchange and inspected token app/type/subject/scopes/ex
 
 Demonstrate non-role public login and the actual access, business verification, publishing and ongoing checkup requirements. Test provider callback payloads, token/data-access expiry and code-injection defenses; PKCE support has not been established. Optional `user_link` stays disabled until approved/tested. Missing optional fields fall back to a plain name/neutral avatar. No email permission is requested and there is no authenticated-user account table.
 
-Before public authentication, replace the provisional privacy-contact wording with a real reachable BCA Wales contact channel and validate the published privacy/retention process against the actual Meta requirements. Neither local tests nor this runbook assert legal/provider certification.
+The public privacy and deletion page is `/privacy`, with `bca@timjroberts.com` as the owner-approved contact. `/privacy/` and the former `/blog/privacy/` address redirect there. The policy and its fixed stylesheet remain readable during restriction without D1/R2 access; the policy loads no application JavaScript. Configure Meta with the actual staging origin plus `/privacy` and verify reachability. Before public authentication, validate the published privacy/retention process against the actual Meta requirements. Neither local tests nor this runbook assert legal/provider certification.
 
 An authenticated person obtains their private identifier from `/account/`. Verify them out of band, then use the operator-only CLI. Every active administrator can manage every post. There is no web enrollment endpoint and no trusted role in the cookie.
 
