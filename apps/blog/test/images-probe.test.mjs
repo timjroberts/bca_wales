@@ -25,3 +25,35 @@ test('Images probe accepts hosted empty streams but rejects request payloads and
   assert.equal((await probe.fetch(request(), { ...env, PROBE_TOKEN: 'y'.repeat(43) })).status, 404);
   assert.equal(calls, previous);
 });
+
+test('probe runner preserves failure headers and stops without following redirects or recording HTML', async () => {
+  const { runProbe } = await import('../tooling/run-images-probe.mjs');
+  const records = []; let calls = 0;
+  const passed = await runProbe({ token: 'x'.repeat(43), deadline: Math.floor(Date.now() / 1000) + 60, record: async row => records.push(row), fetcher: async (_url, options) => {
+    calls++; assert.equal(options.redirect, 'manual');
+    return new Response('<html>private diagnostic body</html>', { status: 503, headers: { 'content-type': 'text/html', 'cf-ray': 'test-ray', 'cf-error-type': '1102', 'set-cookie': 'private' } });
+  } });
+  assert.equal(passed, false); assert.equal(calls, 1);
+  assert.equal(records[0].phase, 'headers'); assert.equal(records[1].status, 503);
+  assert.equal(records[1].headers['cf-error-type'], '1102');
+  assert.equal(JSON.stringify(records).includes('private'), false);
+});
+
+test('probe runner preserves HTTP status when JSON parsing fails and enforces its request ceiling', async () => {
+  const { runProbe } = await import('../tooling/run-images-probe.mjs');
+  const rows = []; let calls = 0;
+  const options = { token: 'x'.repeat(43), deadline: Math.floor(Date.now() / 1000) + 60, record: async row => rows.push(row), fetcher: async () => { calls++; return new Response('{', { status: 502, headers: { 'content-type': 'application/json' } }); } };
+  assert.equal(await runProbe(options), false); assert.equal(calls, 1); assert.equal(rows.at(-1).status, 502);
+  await assert.rejects(runProbe({ ...options, count: 31 }), /Invalid/); assert.equal(calls, 1);
+});
+
+test('probe runner records exactly its bounded number of successful requests', async () => {
+  const { runProbe } = await import('../tooling/run-images-probe.mjs');
+  const rows = []; let calls = 0;
+  const passed = await runProbe({ token: 'x'.repeat(43), count: 3, deadline: Math.floor(Date.now() / 1000) + 60, record: async row => rows.push(row), fetcher: async url => {
+    calls++; const fixture = Number(new URL(url).pathname.split('/').at(-1));
+    return Response.json({ passed: true, fixture, outputs: Array.from({ length: 4 }, () => ({ width: 1, height: 1, bytes: 68, sha256: 'a'.repeat(64) })), elapsedMilliseconds: 1 });
+  } });
+  assert.equal(passed, true); assert.equal(calls, 3);
+  assert.deepEqual(rows.filter(r => r.phase === 'complete').map(r => r.fixture), [0, 1, 2]);
+});

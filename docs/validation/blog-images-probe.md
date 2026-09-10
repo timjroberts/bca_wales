@@ -1,6 +1,6 @@
 # Restricted Images binding rehearsal
 
-Prepared for [Validate hosted blog image processing and its cost](https://github.com/timjroberts/bca_wales/issues/135). The approved hosted rehearsal ran on 10 September 2026. Basic format checks passed, but repeated-run reliability remains unproved after an unexpected HTML response. The probe is now disabled and its temporary credential removed.
+Prepared for [Validate hosted blog image processing and its cost](https://github.com/timjroberts/bca_wales/issues/135). The approved hosted rehearsal ran on 10 September 2026. Basic format checks passed, but repeated-run reliability remains unproved after a Worker resource-limit failure. The probe is now disabled and its temporary credential removed.
 
 ## Account and provider evidence
 
@@ -50,12 +50,26 @@ Eleven subsequent requests returned HTTP 200 with four outputs each. Dimensions,
 | PNG, 320 × 240 | 4 | 101–271 ms |
 | WebP, 24 MP | 3 | 2,454–2,839 ms |
 
-The next WebP attempt returned HTML instead of JSON, so the runner stopped. Its HTTP status and response headers were not captured. The cause is unknown; this is not evidence of a particular Cloudflare incident, quota exhaustion or CPU limit. The requested repeated-run check is incomplete. [Aggregate request evidence](blog-images-probe-results.json) includes the final manually recorded parsing failure and no credentials or image bytes.
+The next WebP attempt returned HTML instead of JSON, so the runner stopped. Its HTTP status and response headers were not captured. A later read-only metrics query identified the corresponding invocation as `exceededResources`; the record does not distinguish CPU from memory. It does not establish an Images quota failure or a relationship to the cron incident. The requested repeated-run check is incomplete. [Aggregate request evidence](blog-images-probe-results.json) includes the final manually recorded parsing failure and no credentials or image bytes.
 
 Cleanup deployed deadline zero as `ffbe80bd-0b51-43a3-a01d-87a37877af16`, deleted remote `PROBE_TOKEN`, and removed the private local token file. Both unauthenticated access and access with the former token returned HTTP 404. The disabled Worker remains available for a separately approved future rehearsal.
 
-Before another hosted run, the operator must persist status, content type and safe diagnostic headers before parsing JSON, including on failures. Actual account usage after this run has not been read back. The 44 completed transformations do not establish billed unique usage or the complete operating budget.
+The checked-in `run-images-probe.mjs` now persists status, content type and allowlisted diagnostic headers before parsing JSON. It stops on failure, limits response size and request count, refuses redirects, and records no arbitrary error page or credential. Actual account usage after this run has not been read back. The 44 completed transformations do not establish billed unique usage or the complete operating budget.
 
 ## What remains after this first probe
 
 The successful requests demonstrate basic provider format compatibility, 24 MP processing and checked output contracts for these fixtures. They do not establish repeated-request reliability. It does not clear the complete image launch gate. Still required: input near 10 MiB, high-entropy output limits, >24 MP and >8192-pixel rejection, malformed and animated inputs, metadata-rich output inspection with an independent decoder, the complete upload/storage/publication path, 30 distinct images in a post, and hosted CPU/memory evidence. Wall time and absence of an error are not direct memory measurements. Keep upload/publication paused until the full gate is demonstrated.
+
+## Resource diagnosis and follow-up
+
+A read-only GraphQL query for this Worker and the original run window found one `exceededResources` invocation at **2026-09-10 17:27:29 UTC**, matching the interrupted sequence. [Original invocation metrics](blog-images-probe-metrics.json) retain the query, retrieval time and raw CPU quantiles. This is evidence of a Worker resource limit, with CPU versus memory still unresolved. Successful invocations do not prove headroom: Cloudflare documents limited flexibility for occasional CPU overruns. [Worker limits](https://developers.cloudflare.com/workers/platform/limits/)
+
+The probe's large `Uint8Array.from(atob(...), mapper)` fixture decoder creates avoidable iterator work. A local ten-iteration comparison at 1,640,954 bytes measured 62–72 ms for that decoder and 2–5 ms for a preallocated byte loop. The probe now uses the latter. These are local timings, not hosted CPU measurements. Actual blog uploads already arrive as bytes, so this change affects the harness only.
+
+The approved follow-up deployed `3c53dccb-b0d0-4c15-b99c-52d599578b0f` with a fresh token and deadline **18:14:19 UTC**. Its first request returned HTTP 404, and the runner stopped. [Follow-up request diagnostics](blog-images-probe-followup-results.json) preserve the HTTP status, content type and Ray ID. Inspection of that version confirmed both secret binding and intended deadline were present.
+
+Cleanup deployed deadline zero as `d5d6479d-7472-4816-bdeb-652df42fd445` and deleted the remote secret. An immediate former-token check nevertheless returned HTTP 200, showing the enabled version remained reachable during propagation. That check could process the JPEG fixture; its output was discarded and is not counted as validated output evidence. The initial 404 followed by this 200 is evidence of propagation between closed/enabled versions. The follow-up therefore made two authenticated requests to a processing path, not a completed repetition test. [Follow-up metrics](blog-images-probe-followup-metrics.json) are retained but do not isolate a reliable before/after CPU comparison.
+
+Subsequent unauthenticated and former-token checks of `/probe/closed` both returned HTTP 404, and the local token was removed. This invalid fixture path cannot invoke Images: it returns 400 when authentication is active and 404 when closed. Use it for future readiness/closure checks, allowing bounded propagation time before image processing and after disabling. A deployment command succeeding is insufficient proof of edge readiness or shutdown. Reserve control requests within the overall request budget and stop if readiness is not established; do not spend the processing allowance retrying failures.
+
+The Worker remains disabled. No paid features, staging access controls or production settings changed. A future repetition run should use the corrected decoder, saved HTTP diagnostics and non-processing readiness checks. The full launch gate remains open.

@@ -1,0 +1,42 @@
+{
+  "retrievedAt": "2026-09-10T17:46:02.116Z",
+  "query": "query { viewer { accounts(filter: {accountTag: \"df78f32621a1c7805380c7df56a56b0e\"}) { workersInvocationsAdaptive(limit: 100, filter: {scriptName: \"bca-wales-blog-images-probe\", datetime_geq: \"2026-09-10T17:43:00Z\", datetime_leq: \"2026-09-10T17:48:00Z\"}) { sum { requests errors } quantiles { cpuTimeP50 cpuTimeP99 } dimensions { datetime status } } } } }",
+  "data": {
+    "viewer": {
+      "accounts": [
+        {
+          "workersInvocationsAdaptive": [
+            {
+              "dimensions": {
+                "datetime": "2026-09-10T17:45:08Z",
+                "status": "success"
+              },
+              "quantiles": {
+                "cpuTimeP50": 895,
+                "cpuTimeP99": 226499
+              },
+              "sum": {
+                "errors": 0,
+                "requests": 2
+              }
+            },
+            {
+              "dimensions": {
+                "datetime": "2026-09-10T17:44:43Z",
+                "status": "success"
+              },
+              "quantiles": {
+                "cpuTimeP50": 1386,
+                "cpuTimeP99": 1386
+              },
+              "sum": {
+                "errors": 0,
+                "requests": 1
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

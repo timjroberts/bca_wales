@@ -1,0 +1,16 @@
+[
+  {
+    "request": 1,
+    "fixture": 0,
+    "startedAt": "2026-09-10T17:44:43.438Z",
+    "passed": false,
+    "status": 404,
+    "headers": {
+      "content-type": "application/json",
+      "cf-ray": "a3903e08fbbc9589-LHR"
+    },
+    "error": "Probe reported failure or invalid output",
+    "wallMilliseconds": 234,
+    "phase": "complete"
+  }
+]

@@ -20,7 +20,10 @@ const probe = {
     const start = Date.now();
     try {
       const fixture = fixtures[Number(match[1])];
-      const bytes = Uint8Array.from(atob(fixture.base64), c => c.charCodeAt(0));
+      // Avoid the iterator's large intermediate allocation for embedded fixtures.
+      // Production uploads already arrive as bytes and do not do this decoding.
+      const binary = atob(fixture.base64), bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
       const stream = () => new Blob([bytes]).stream();
       if (bytes.length > 10 * 1024 * 1024 || imageType(bytes) !== fixture.type) throw Error();
       const info = await env.IMAGES.info(stream());
