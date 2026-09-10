@@ -69,27 +69,38 @@ test('the test displays a real session and logout revokes it with CSRF protectio
   await assert.rejects(session(request('/staging/login', { headers: { Cookie } }), testEnv), { status: 401 });
 });
 
-test('the provider callback preserves session cookies and returns to the fenced test page', async t => {
-  const { env } = await setup(t, false, config());
-  t.mock.method(globalThis, 'fetch', async url => {
-    assert.match(url, /^https:\/\/graph.facebook.com\/v26.0\//);
-    if (url.includes('/oauth/access_token')) return Response.json({ access_token: 'synthetic-token' });
-    if (url.includes('/debug_token')) return Response.json({ data: { is_valid: true, app_id: env.FACEBOOK_APP_ID, type: 'USER', user_id: '987', scopes: ['public_profile'], expires_at: now() + 600, data_access_expires_at: now() + 1200 } });
+test('bundled provider fetch preserves callback cookies and rejects credential-bearing redirects', async t => {
+  let redirect = false, calls = 0;
+  const { env, mf } = await setup(t, true, config(), { outboundService: async request => {
+    calls++;
+    assert.match(request.url, /^https:\/\/graph.facebook.com\/v26.0\//);
+    if (redirect) return new Response(null, { status: 302, headers: { Location: 'https://untrusted.example/collect' } });
+    if (request.url.includes('/oauth/access_token')) return Response.json({ access_token: 'synthetic-token' });
+    if (request.url.includes('/debug_token')) return Response.json({ data: { is_valid: true, app_id: env.FACEBOOK_APP_ID, type: 'USER', user_id: '987', scopes: ['public_profile'], expires_at: now() + 600, data_access_expires_at: now() + 1200 } });
     return Response.json({ id: '987', name: 'Synthetic role user' });
-  });
-  const start = await worker.fetch(request('/auth/login', { method: 'POST', headers: { Cookie: admission, Origin: origin, 'X-BCA-Login': '1' } }), env);
+  } });
+  const send = (path, options) => mf.dispatchFetch(`${origin}${path}`, { ...options, redirect: 'manual' });
+  const begin = () => send('/auth/login', { method: 'POST', headers: { Cookie: admission, Origin: origin, 'X-BCA-Login': '1' } });
+  const start = await begin();
   const state = new URL((await start.json()).url).searchParams.get('state');
   const callback = `/auth/callback?state=${state}&code=synthetic-code`;
   const headers = { Cookie: `${admission}; ${start.headers.get('set-cookie').split(';')[0]}` };
-  assert.equal((await worker.fetch(request(callback, { headers: { Cookie: admission } }), env)).status, 401);
-  const response = await worker.fetch(request(callback, { headers }), env);
+  assert.equal((await send(callback, { headers: { Cookie: admission } })).status, 401);
+  assert.equal(calls, 0);
+  const response = await send(callback, { headers });
   assert.equal(response.status, 303); assert.equal(response.headers.get('location'), '/staging/login');
   const cookies = response.headers.getSetCookie();
   assert.equal(cookies.length, 2);
   assert.ok(cookies.some(value => value.startsWith('__Host-bca-oauth=;')));
   const sessionCookie = cookies.find(value => value.startsWith('__Host-bca-session='));
   assert.ok(sessionCookie);
-  const page = await worker.fetch(request('/staging/login', { headers: { Cookie: `${admission}; ${sessionCookie.split(';')[0]}` } }), env);
+  const page = await send('/staging/login', { headers: { Cookie: `${admission}; ${sessionCookie.split(';')[0]}` } });
   assert.match(await page.text(), /Signed in as <strong>Synthetic role user<\/strong>/);
-  assert.equal((await worker.fetch(request(callback, { headers }), env)).status, 401);
+  assert.equal((await send(callback, { headers })).status, 401);
+  assert.equal(calls, 3);
+  redirect = true;
+  const another = await begin();
+  const nextState = new URL((await another.json()).url).searchParams.get('state');
+  assert.equal((await send(`/auth/callback?state=${nextState}&code=synthetic-code`, { headers: { Cookie: `${admission}; ${another.headers.get('set-cookie').split(';')[0]}` } })).status, 401);
+  assert.equal(calls, 4, 'the redirect destination must never receive a request');
 });
