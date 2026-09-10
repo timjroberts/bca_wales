@@ -14,8 +14,8 @@ export function remoteEnvironment(config,secrets=process.env,fetcher=fetch) {
   const endpoint=`https://${config.accountId}${config.jurisdiction==='eu'?'.eu':''}.r2.cloudflarestorage.com`;
   const s3=new S3Client({ region:'auto',endpoint,credentials:{ accessKeyId:secrets.BCA_BLOG_R2_ACCESS_KEY_ID||'',secretAccessKey:secrets.BCA_BLOG_R2_SECRET_ACCESS_KEY||'' },requestChecksumCalculation:'WHEN_REQUIRED',responseChecksumValidation:'WHEN_REQUIRED' });
   const query=async queries=>{
-    const response=await fetcher(`https://api.cloudflare.com/client/v4/accounts/${config.accountId}/d1/database/${config.databaseId}/query`,{ method:'POST',headers:{ Authorization:`Bearer ${secrets.BCA_BLOG_D1_TOKEN}`,'Content-Type':'application/json' },body:JSON.stringify(queries),signal:AbortSignal.timeout(60000) });
-    requireThat(response.ok,503,`D1 operator request failed (${response.status})`);const data=await response.json();requireThat(data.success&&Array.isArray(data.result),503,'D1 operator query failed');return data.result;
+    const response=await fetcher(`https://api.cloudflare.com/client/v4/accounts/${config.accountId}/d1/database/${config.databaseId}/query`,{ method:'POST',headers:{ Authorization:`Bearer ${secrets.BCA_BLOG_D1_TOKEN}`,'Content-Type':'application/json' },body:JSON.stringify(Array.isArray(queries)?{ batch:queries }:queries),signal:AbortSignal.timeout(60000) });
+    requireThat(response.ok,503,`D1 operator request failed (${response.status})`);const data=await response.json();requireThat(data.success&&Array.isArray(data.result)&&data.result.every(result=>result.success!==false),503,'D1 operator query failed');return data.result;
   };
   const DB={ prepare(sql) { const item={ sql,params:[],bind(...params){ return { ...this,params }; },async first(){ return (await query({ sql:this.sql,params:this.params }))[0].results[0]||null; },async all(){ return (await query({ sql:this.sql,params:this.params }))[0]; },async run(){ return this.all(); } };return item; },async batch(items){ return query(items.map(item=>({ sql:item.sql,params:item.params }))); } };
   const bucket=name=>({
