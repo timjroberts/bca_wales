@@ -6,6 +6,7 @@ import { authEnabled, beginLogin, completeLogin, session, csrfToken, mutation, l
 import { listComments, commentCapabilities, submitComment, moderateComment, inspectComment, deleteComment } from './comments.mjs';
 import { createBackup, expireBackups } from './backup.mjs';
 import { uploadImage, imageDetails } from './media.mjs';
+import { monitorHealth, recordMaintenance } from './health.mjs';
 import { flushOutbox, requestErasure, maintenance } from './recovery.mjs';
 
 export const json = (value, status = 200) => Response.json(value, { status });
@@ -17,6 +18,7 @@ async function route(request, env) {
     if (['GET','HEAD'].includes(request.method) && ['bca.wales','www.bca.wales'].includes(url.hostname) && origin.origin === 'https://bca.wales' && !/^\/(auth|api|preview|media)\//.test(path)) return new Response(null, { status: 308, headers: { Location: `${env.ORIGIN}${path}${url.search}` } });
     throw new HttpError(400, 'Unexpected origin');
   }
+  if (path === '/api/ops/health') return monitorHealth(request, env);
   requireThat(env.RESTRICTED !== 'true' && (await first(env, "SELECT value FROM settings WHERE key='restricted'"))?.value !== 'true', 503, 'Blog temporarily unavailable during recovery');
   const reading = ['GET','HEAD'].includes(request.method);
   if (path === '/auth/login' && request.method === 'POST') return beginLogin(request, env);
@@ -131,7 +133,11 @@ const worker = {
       }
       const stale = await first(env, 'SELECT COUNT(*) AS n FROM staging WHERE expires_at<?', Math.floor(Date.now()/1000));
       if(result.pendingDeletion || stale.n) throw new Error('Blog maintenance needs operator attention');
-    } catch { throw new Error('Blog maintenance failed or needs attention; inspect the private operator status.'); }
+      await recordMaintenance(env, 'success');
+    } catch {
+      try { await recordMaintenance(env, 'failure'); } catch { /* A failed database write is detected by the stale success marker. */ }
+      throw new Error('Blog maintenance failed or needs attention; inspect the private operator status.');
+    }
   },
   async fetch(request, env) {
     let response;
