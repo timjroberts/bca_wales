@@ -76,7 +76,9 @@ export async function beginLogin(request, env) {
   return new Response(JSON.stringify({ url: redirect.href }), { headers: { 'Content-Type': 'application/json', 'Set-Cookie': cookie(TX_COOKIE, tx, 600) } });
 }
 async function providerJson(fetcher, url, options = {}) {
-  const response = await fetcher(url, { ...options, redirect: 'error', signal: AbortSignal.timeout(10000) });
+  // workerd rejects redirect:'error'. Manual mode plus the status check below
+  // rejects redirects without forwarding provider credentials to another URL.
+  const response = await fetcher(url, { ...options, redirect: 'manual', signal: AbortSignal.timeout(10000) });
   requireThat(response.ok, 401, 'Facebook could not verify this login');
   const bytes = await readBytes(response, 65536); let data;
   try { data = JSON.parse(new TextDecoder().decode(bytes)); } catch { throw new HttpError(401, 'Invalid provider response'); }
