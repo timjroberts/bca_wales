@@ -3,6 +3,7 @@ import { first } from './storage.mjs';
 import { digest, now, readBytes, requireThat } from './errors.mjs';
 import { escapeHtml } from './document.mjs';
 import { pageHtml } from './html.mjs';
+import { flushOutbox } from './recovery.mjs';
 
 const path = '/staging/login';
 const cookieName = '__Host-bca-staging-test';
@@ -66,7 +67,8 @@ export async function stagingLogin(request, env) {
   }
   if (url.pathname === '/staging/logout') {
     const actor = await session(request, testEnv); await mutation(request, testEnv, actor);
-    return new Response(null, { status: 204, headers: { 'Set-Cookie': await logout(testEnv, actor) } });
+    const cleared = await logout(testEnv, actor); await flushOutbox(env);
+    return new Response(null, { status: 204, headers: { 'Set-Cookie': cleared } });
   }
   const actor = await session(request, testEnv, true);
   const controls = actor

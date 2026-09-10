@@ -2,12 +2,14 @@ import { HttpError, requireThat, readJson, readBytes } from './errors.mjs';
 import { first, publicArticle, publicIndex, deliverMedia, checkAuthority, rows, createPost, saveDraft, draft, publish, withdraw, renameSlug, preview } from './storage.mjs';
 import { pageHtml, articleHtml, indexHtml } from './html.mjs';
 import { escapeHtml } from './document.mjs';
-import { authEnabled, beginLogin, completeLogin, session, csrfToken, mutation, logout, verifySignedRequest } from './auth.mjs';
+import { authEnabled, beginLogin, completeLogin, session, csrfToken, mutation, logout } from './auth.mjs';
 import { listComments, commentCapabilities, submitComment, moderateComment, inspectComment, deleteComment } from './comments.mjs';
 import { createBackup, expireBackups } from './backup.mjs';
 import { uploadImage, imageDetails } from './media.mjs';
 import { privacyHtml } from './privacy.mjs';
 import { stagingLogin } from './staging-login.mjs';
+import { stagingLifecycle } from './staging-lifecycle.mjs';
+import { lifecycleCallback, facebookLifecycle } from './lifecycle.mjs';
 import { monitorHealth, recordMaintenance } from './health.mjs';
 import { flushOutbox, requestErasure, maintenance } from './recovery.mjs';
 
@@ -33,23 +35,13 @@ async function route(request, env) {
   if (path === '/api/ops/health') return monitorHealth(request, env);
   const testResponse = await stagingLogin(request, env);
   if (testResponse) return testResponse;
+  const lifecycleTestResponse = await stagingLifecycle(request, env);
+  if (lifecycleTestResponse) return lifecycleTestResponse;
   requireThat(env.RESTRICTED !== 'true' && (await first(env, "SELECT value FROM settings WHERE key='restricted'"))?.value !== 'true', 503, 'Blog temporarily unavailable during recovery');
   const reading = ['GET','HEAD'].includes(request.method);
   if (path === '/auth/login' && request.method === 'POST') return beginLogin(request, env);
   if (path === '/auth/callback' && request.method === 'GET') return completeLogin(request, env);
-  if (['/auth/deletion','/auth/deauthorize'].includes(path) && request.method === 'POST') {
-    requireThat(authEnabled(env), 503, 'Facebook lifecycle callback is not configured');
-    requireThat(request.headers.get('content-type')?.split(';')[0] === 'application/x-www-form-urlencoded', 415);
-    const params = new URLSearchParams(new TextDecoder().decode(await readBytes(request, 20000)));
-    requireThat(params.getAll('signed_request').length === 1, 400);
-    const subject = await verifySignedRequest(env, params.get('signed_request'));
-    const result = await requestErasure(env, subject, params.get('signed_request'));
-    return json({ url: `${env.ORIGIN}/deletion-status/${result.id}`, confirmation_code: result.id });
-  }
-  if (path.startsWith('/deletion-status/') && reading) {
-    const job = await first(env, 'SELECT status FROM deletion_jobs WHERE id=?', path.slice(17)); requireThat(job, 404, 'Not found');
-    return html(pageHtml(env, { title: 'Data deletion', private: true, html: `<h1>Data deletion</h1><p>${job.status === 'complete' ? 'Live data deletion is complete. Protected backups expire within 30 days.' : 'Deletion is pending. If it has been more than 24 hours, email <a href="mailto:bca@timjroberts.com">bca@timjroberts.com</a>.'}</p>` }));
-  }
+  if (lifecycleCallback(path) || path.startsWith('/deletion-status/')) return facebookLifecycle(request, env);
   if (path === '/api/session' && reading) {
     const actor = await session(request, env, true);
     if (!actor) return json({ authenticated: false, loginEnabled: authEnabled(env) });
