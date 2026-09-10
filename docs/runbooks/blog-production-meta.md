@@ -4,7 +4,7 @@ Preparation for [Prepare the production Meta app and domain configuration](https
 
 ## App ownership and separation
 
-Use a separate **BCA Wales** Meta app for production, connected to the existing **BCA Wales** portfolio. App contact and privacy contact: **bca@timjroberts.com**. Keep **BCA Wales Staging** (app ID `1274604161387297`) for the completed role-user and lifecycle rehearsals. Staging credentials and identities must not become production credentials or administrator grants.
+The separate **BCA Wales** production app was created and verified in the dashboard on 10 September 2026: app ID `2069042727047389`, connected to the existing **BCA Wales** portfolio (`1997038300844373`). App contact and privacy contact: **bca@timjroberts.com**. Keep **BCA Wales Staging** (app ID `1274604161387297`) for the completed role-user and lifecycle rehearsals. Staging credentials and identities must not become production credentials or administrator grants.
 
 The owner will complete portfolio verification using the association's available bank details. Portfolio verification and production App Review are separate gates. Do not submit staging for review as a substitute for production review.
 
@@ -12,7 +12,7 @@ The owner will complete portfolio verification using the association's available
 
 The canonical production origin is fixed by `apps/blog/tooling/configure.mjs` to `https://bca.wales`.
 
-| Meta setting | Intended production value |
+| Meta setting | Saved production value |
 | --- | --- |
 | App name | BCA Wales |
 | Contact email | bca@timjroberts.com |
@@ -25,15 +25,19 @@ The canonical production origin is fixed by `apps/blog/tooling/configure.mjs` to
 | App category | Community and government |
 | Requested permission | public_profile |
 
-The approved icon source and 1024×1024 export are `apps/blog/branding/meta-app-icon.svg` and `meta-app-icon.png`. This table is the intended configuration; persisted dashboard settings must be checked and recorded in the task. Do not infer them from the table.
+The approved icon source and 1024×1024 export are `apps/blog/branding/meta-app-icon.svg` and `meta-app-icon.png`. The icon was uploaded to the production app and its preview inspected. Domain, privacy, website, category and deletion callback settings were read back after reload. OAuth and deauthorization settings also survived navigation away and back; Meta's exact-URI validator accepted the callback. This validates dashboard configuration only, not live endpoint delivery. The permissions page shows public_profile ready for testing; email and user_link remain unadded.
 
-Use strict HTTPS redirect matching and server-side login. Do not request email or optional user_link. Record the production app ID and its actual Graph API version after creation. Store its app secret privately; never reuse the staging secret or put it in this document. Terms of service must point to a real approved policy if supplied, not Meta's default URL.
+Both all-calls and app-role Graph API versions are **v26.0**. Client/Web OAuth are enabled; HTTPS and strict redirect matching are enforced. Embedded-browser, device and JavaScript SDK login remain disabled. The app remains unpublished. Its secret has not been revealed or installed in a production runtime.
+
+The optional Terms of Service field restores `https://www.facebook.com/` after clearing, saving and reloading. This is an unresolved dashboard default, not an approved BCA terms policy. Resolve the field or supply an actual approved policy before review. No review was submitted.
 
 ## Domain readiness
 
 On 10 September 2026, read-only HEAD requests to both apex and www returned HTTP 200. Subsequent GET requests returned HTTP 525 at the apex and a JavaScript redirect to `/lander` at www. These inconsistent responses do not establish working production hosting or callback endpoints.
 
-The existing Wrangler credential returned HTTP 403 when listing the `bca.wales` zone. DNS records, Worker routes and cache rules therefore remain uninspected in this preparation step. Inspect them through authorized dashboard access before proposing exact mutations; do not expand token permissions just to complete this document.
+The existing Wrangler credential returned HTTP 403 when listing the `bca.wales` zone. Subsequent read-only dashboard inspection confirmed two proxied apex A records, `13.248.213.45` and `76.223.67.189`, both with Auto TTL; www is a proxied CNAME to `bca.wales`, also Auto TTL. The Workers Routes page reports no configured routes. These DNS destinations are the current rollback baseline; the origin service's ownership has not been established.
+
+The Page Rules page reports 0 of 3 used and no data. The caching page reports no Cache Rules and no Cache Response Rules. The general Rules overview displayed templates; it did not establish that all other rule types are absent. Redirect rules and other origin/transform settings still need an explicit cutover review.
 
 Before cutover:
 
