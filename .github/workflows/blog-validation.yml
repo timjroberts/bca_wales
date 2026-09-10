@@ -22,7 +22,7 @@ jobs:
       - run: npx playwright install --with-deps chromium
         working-directory: apps/blog
       - run: npm run test:browser --workspace @bca/blog
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: blog-local-browser-acceptance

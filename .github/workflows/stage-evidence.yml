@@ -78,7 +78,7 @@ jobs:
           echo "manifest_sha256=$final_sha256" >> "$GITHUB_OUTPUT"
           echo "Final release manifest SHA-256: $final_sha256" >> "$GITHUB_STEP_SUMMARY"
       - name: Retain the exact staged release for later atomic promotion
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: staged-evidence-${{ inputs.release_id }}
           path: staged-release/${{ inputs.release_id }}
