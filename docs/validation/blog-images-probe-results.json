@@ -1,0 +1,443 @@
+[
+  {
+    "request": 1,
+    "status": 400,
+    "wallMilliseconds": 115,
+    "error": "Invalid request"
+  },
+  {
+    "request": 2,
+    "status": 200,
+    "passed": true,
+    "fixture": 0,
+    "input": {
+      "format": "image/jpeg",
+      "width": 6000,
+      "height": 4000,
+      "bytes": 1640954
+    },
+    "outputs": [
+      {
+        "width": 640,
+        "height": 426,
+        "bytes": 266063,
+        "sha256": "938f77ede8c92fd746f0cb77b58545fbaee4cc978794078e4a88878e7613c198"
+      },
+      {
+        "width": 1280,
+        "height": 853,
+        "bytes": 1231424,
+        "sha256": "58bf89a0acc28c43b9bb3580b1995b0c652d49b527abf9d38259c8e715216d7e"
+      },
+      {
+        "width": 1920,
+        "height": 1280,
+        "bytes": 2800092,
+        "sha256": "9548f89ac527331564b6e131dafa70982aee8ca3e755b7826527493671e0e01e"
+      },
+      {
+        "width": 16,
+        "height": 10,
+        "bytes": 197,
+        "sha256": "9976d76e82e849597806d4eb55a445f06c1d3156c668eede91b62f0ad0aa5d6b"
+      }
+    ],
+    "elapsedMilliseconds": 2031
+  },
+  {
+    "request": 3,
+    "status": 200,
+    "passed": true,
+    "fixture": 1,
+    "input": {
+      "format": "image/png",
+      "width": 320,
+      "height": 240,
+      "bytes": 214560
+    },
+    "outputs": [
+      {
+        "width": 320,
+        "height": 240,
+        "bytes": 2243,
+        "sha256": "70773403fa6228f2de05b051b4a27793fcdace629c900fae9867e91d41ad664f"
+      },
+      {
+        "width": 320,
+        "height": 240,
+        "bytes": 2243,
+        "sha256": "70773403fa6228f2de05b051b4a27793fcdace629c900fae9867e91d41ad664f"
+      },
+      {
+        "width": 320,
+        "height": 240,
+        "bytes": 2243,
+        "sha256": "70773403fa6228f2de05b051b4a27793fcdace629c900fae9867e91d41ad664f"
+      },
+      {
+        "width": 16,
+        "height": 12,
+        "bytes": 264,
+        "sha256": "0ae3a12637a9bbd3b6106b218412819f4a6003739e61d9d518f9254be8f67574"
+      }
+    ],
+    "elapsedMilliseconds": 271
+  },
+  {
+    "request": 4,
+    "status": 200,
+    "passed": true,
+    "fixture": 2,
+    "input": {
+      "format": "image/webp",
+      "width": 6000,
+      "height": 4000,
+      "bytes": 595210
+    },
+    "outputs": [
+      {
+        "width": 640,
+        "height": 426,
+        "bytes": 333592,
+        "sha256": "d515e43b2b1faff4035ea463224af388325b66c540af7370d1992583366aef03"
+      },
+      {
+        "width": 1280,
+        "height": 853,
+        "bytes": 1327643,
+        "sha256": "083ee0a3f9e88705387ef2694d31fd508ab508fd0167b4acd92b58d1f2603a43"
+      },
+      {
+        "width": 1920,
+        "height": 1280,
+        "bytes": 2908955,
+        "sha256": "64bde497f3994e28cafd8a8989f50af92bc74b268d5ab5850eb0b18c72ef6aed"
+      },
+      {
+        "width": 16,
+        "height": 10,
+        "bytes": 196,
+        "sha256": "c5920537291f79deec6b36d31557ec8805000f482555e70ee0b6f896a599b53c"
+      }
+    ],
+    "elapsedMilliseconds": 2839
+  },
+  {
+    "request": 5,
+    "status": 200,
+    "passed": true,
+    "fixture": 0,
+    "input": {
+      "format": "image/jpeg",
+      "width": 6000,
+      "height": 4000,
+      "bytes": 1640954
+    },
+    "outputs": [
+      {
+        "width": 640,
+        "height": 426,
+        "bytes": 266063,
+        "sha256": "938f77ede8c92fd746f0cb77b58545fbaee4cc978794078e4a88878e7613c198"
+      },
+      {
+        "width": 1280,
+        "height": 853,
+        "bytes": 1231424,
+        "sha256": "58bf89a0acc28c43b9bb3580b1995b0c652d49b527abf9d38259c8e715216d7e"
+      },
+      {
+        "width": 1920,
+        "height": 1280,
+        "bytes": 2800092,
+        "sha256": "9548f89ac527331564b6e131dafa70982aee8ca3e755b7826527493671e0e01e"
+      },
+      {
+        "width": 16,
+        "height": 10,
+        "bytes": 197,
+        "sha256": "9976d76e82e849597806d4eb55a445f06c1d3156c668eede91b62f0ad0aa5d6b"
+      }
+    ],
+    "elapsedMilliseconds": 1477
+  },
+  {
+    "request": 6,
+    "status": 200,
+    "passed": true,
+    "fixture": 1,
+    "input": {
+      "format": "image/png",
+      "width": 320,
+      "height": 240,
+      "bytes": 214560
+    },
+    "outputs": [
+      {
+        "width": 320,
+        "height": 240,
+        "bytes": 2243,
+        "sha256": "70773403fa6228f2de05b051b4a27793fcdace629c900fae9867e91d41ad664f"
+      },
+      {
+        "width": 320,
+        "height": 240,
+        "bytes": 2243,
+        "sha256": "70773403fa6228f2de05b051b4a27793fcdace629c900fae9867e91d41ad664f"
+      },
+      {
+        "width": 320,
+        "height": 240,
+        "bytes": 2243,
+        "sha256": "70773403fa6228f2de05b051b4a27793fcdace629c900fae9867e91d41ad664f"
+      },
+      {
+        "width": 16,
+        "height": 12,
+        "bytes": 264,
+        "sha256": "0ae3a12637a9bbd3b6106b218412819f4a6003739e61d9d518f9254be8f67574"
+      }
+    ],
+    "elapsedMilliseconds": 134
+  },
+  {
+    "request": 7,
+    "status": 200,
+    "passed": true,
+    "fixture": 2,
+    "input": {
+      "format": "image/webp",
+      "width": 6000,
+      "height": 4000,
+      "bytes": 595210
+    },
+    "outputs": [
+      {
+        "width": 640,
+        "height": 426,
+        "bytes": 333592,
+        "sha256": "d515e43b2b1faff4035ea463224af388325b66c540af7370d1992583366aef03"
+      },
+      {
+        "width": 1280,
+        "height": 853,
+        "bytes": 1327643,
+        "sha256": "083ee0a3f9e88705387ef2694d31fd508ab508fd0167b4acd92b58d1f2603a43"
+      },
+      {
+        "width": 1920,
+        "height": 1280,
+        "bytes": 2908955,
+        "sha256": "64bde497f3994e28cafd8a8989f50af92bc74b268d5ab5850eb0b18c72ef6aed"
+      },
+      {
+        "width": 16,
+        "height": 10,
+        "bytes": 196,
+        "sha256": "c5920537291f79deec6b36d31557ec8805000f482555e70ee0b6f896a599b53c"
+      }
+    ],
+    "elapsedMilliseconds": 2683
+  },
+  {
+    "request": 8,
+    "status": 200,
+    "passed": true,
+    "fixture": 0,
+    "input": {
+      "format": "image/jpeg",
+      "width": 6000,
+      "height": 4000,
+      "bytes": 1640954
+    },
+    "outputs": [
+      {
+        "width": 640,
+        "height": 426,
+        "bytes": 266063,
+        "sha256": "938f77ede8c92fd746f0cb77b58545fbaee4cc978794078e4a88878e7613c198"
+      },
+      {
+        "width": 1280,
+        "height": 853,
+        "bytes": 1231424,
+        "sha256": "58bf89a0acc28c43b9bb3580b1995b0c652d49b527abf9d38259c8e715216d7e"
+      },
+      {
+        "width": 1920,
+        "height": 1280,
+        "bytes": 2800092,
+        "sha256": "9548f89ac527331564b6e131dafa70982aee8ca3e755b7826527493671e0e01e"
+      },
+      {
+        "width": 16,
+        "height": 10,
+        "bytes": 197,
+        "sha256": "9976d76e82e849597806d4eb55a445f06c1d3156c668eede91b62f0ad0aa5d6b"
+      }
+    ],
+    "elapsedMilliseconds": 1359
+  },
+  {
+    "request": 9,
+    "status": 200,
+    "passed": true,
+    "fixture": 1,
+    "input": {
+      "format": "image/png",
+      "width": 320,
+      "height": 240,
+      "bytes": 214560
+    },
+    "outputs": [
+      {
+        "width": 320,
+        "height": 240,
+        "bytes": 2243,
+        "sha256": "70773403fa6228f2de05b051b4a27793fcdace629c900fae9867e91d41ad664f"
+      },
+      {
+        "width": 320,
+        "height": 240,
+        "bytes": 2243,
+        "sha256": "70773403fa6228f2de05b051b4a27793fcdace629c900fae9867e91d41ad664f"
+      },
+      {
+        "width": 320,
+        "height": 240,
+        "bytes": 2243,
+        "sha256": "70773403fa6228f2de05b051b4a27793fcdace629c900fae9867e91d41ad664f"
+      },
+      {
+        "width": 16,
+        "height": 12,
+        "bytes": 264,
+        "sha256": "0ae3a12637a9bbd3b6106b218412819f4a6003739e61d9d518f9254be8f67574"
+      }
+    ],
+    "elapsedMilliseconds": 112
+  },
+  {
+    "request": 10,
+    "status": 200,
+    "passed": true,
+    "fixture": 2,
+    "input": {
+      "format": "image/webp",
+      "width": 6000,
+      "height": 4000,
+      "bytes": 595210
+    },
+    "outputs": [
+      {
+        "width": 640,
+        "height": 426,
+        "bytes": 333592,
+        "sha256": "d515e43b2b1faff4035ea463224af388325b66c540af7370d1992583366aef03"
+      },
+      {
+        "width": 1280,
+        "height": 853,
+        "bytes": 1327643,
+        "sha256": "083ee0a3f9e88705387ef2694d31fd508ab508fd0167b4acd92b58d1f2603a43"
+      },
+      {
+        "width": 1920,
+        "height": 1280,
+        "bytes": 2908955,
+        "sha256": "64bde497f3994e28cafd8a8989f50af92bc74b268d5ab5850eb0b18c72ef6aed"
+      },
+      {
+        "width": 16,
+        "height": 10,
+        "bytes": 196,
+        "sha256": "c5920537291f79deec6b36d31557ec8805000f482555e70ee0b6f896a599b53c"
+      }
+    ],
+    "elapsedMilliseconds": 2454
+  },
+  {
+    "request": 11,
+    "status": 200,
+    "passed": true,
+    "fixture": 0,
+    "input": {
+      "format": "image/jpeg",
+      "width": 6000,
+      "height": 4000,
+      "bytes": 1640954
+    },
+    "outputs": [
+      {
+        "width": 640,
+        "height": 426,
+        "bytes": 266063,
+        "sha256": "938f77ede8c92fd746f0cb77b58545fbaee4cc978794078e4a88878e7613c198"
+      },
+      {
+        "width": 1280,
+        "height": 853,
+        "bytes": 1231424,
+        "sha256": "58bf89a0acc28c43b9bb3580b1995b0c652d49b527abf9d38259c8e715216d7e"
+      },
+      {
+        "width": 1920,
+        "height": 1280,
+        "bytes": 2800092,
+        "sha256": "9548f89ac527331564b6e131dafa70982aee8ca3e755b7826527493671e0e01e"
+      },
+      {
+        "width": 16,
+        "height": 10,
+        "bytes": 197,
+        "sha256": "9976d76e82e849597806d4eb55a445f06c1d3156c668eede91b62f0ad0aa5d6b"
+      }
+    ],
+    "elapsedMilliseconds": 1368
+  },
+  {
+    "request": 12,
+    "status": 200,
+    "passed": true,
+    "fixture": 1,
+    "input": {
+      "format": "image/png",
+      "width": 320,
+      "height": 240,
+      "bytes": 214560
+    },
+    "outputs": [
+      {
+        "width": 320,
+        "height": 240,
+        "bytes": 2243,
+        "sha256": "70773403fa6228f2de05b051b4a27793fcdace629c900fae9867e91d41ad664f"
+      },
+      {
+        "width": 320,
+        "height": 240,
+        "bytes": 2243,
+        "sha256": "70773403fa6228f2de05b051b4a27793fcdace629c900fae9867e91d41ad664f"
+      },
+      {
+        "width": 320,
+        "height": 240,
+        "bytes": 2243,
+        "sha256": "70773403fa6228f2de05b051b4a27793fcdace629c900fae9867e91d41ad664f"
+      },
+      {
+        "width": 16,
+        "height": 12,
+        "bytes": 264,
+        "sha256": "0ae3a12637a9bbd3b6106b218412819f4a6003739e61d9d518f9254be8f67574"
+      }
+    ],
+    "elapsedMilliseconds": 101
+  },
+  {
+    "request": 13,
+    "fixture": 2,
+    "passed": false,
+    "error": "Non-JSON HTML response; runner stopped. HTTP status was not captured."
+  }
+]

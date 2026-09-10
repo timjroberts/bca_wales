@@ -9,7 +9,14 @@ const probe = {
     if (!Number.isSafeInteger(deadline) || deadline <= time || deadline > time + 1800 || !/^[A-Za-z0-9_-]{43}$/.test(env.PROBE_TOKEN || '') || request.headers.get('authorization') !== `Bearer ${env.PROBE_TOKEN}`) return reply({ error: 'Unavailable' }, 404);
     const url = new URL(request.url);
     const match = /^\/probe\/([0-2])$/.exec(url.pathname);
-    if (request.method !== 'POST' || !match || url.search || request.body !== null) return reply({ error: 'Invalid request' }, 400);
+    if (request.method !== 'POST' || !match || url.search) return reply({ error: 'Invalid request' }, 400);
+    // Hosted HTTP represents an empty POST as a stream, unlike Node's Request.
+    if (request.body) {
+      const reader = request.body.getReader();
+      const first = await reader.read();
+      await reader.cancel();
+      if (!first.done) return reply({ error: 'Invalid request' }, 400);
+    }
     const start = Date.now();
     try {
       const fixture = fixtures[Number(match[1])];
