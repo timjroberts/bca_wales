@@ -1,0 +1,168 @@
+{
+  "retrievedAt": "2026-09-10T17:43:35.851Z",
+  "query": "query { viewer { accounts(filter: {accountTag: \"df78f32621a1c7805380c7df56a56b0e\"}) { workersInvocationsAdaptive(limit: 100, filter: {scriptName: \"bca-wales-blog-images-probe\", datetime_geq: \"2026-09-10T17:20:00Z\", datetime_leq: \"2026-09-10T17:40:00Z\"}) { sum { requests errors } quantiles { cpuTimeP50 cpuTimeP99 } dimensions { datetime status } } } } }",
+  "data": {
+    "viewer": {
+      "accounts": [
+        {
+          "workersInvocationsAdaptive": [
+            {
+              "dimensions": {
+                "datetime": "2026-09-10T17:25:49Z",
+                "status": "success"
+              },
+              "quantiles": {
+                "cpuTimeP50": 1251,
+                "cpuTimeP99": 1524
+              },
+              "sum": {
+                "errors": 0,
+                "requests": 2
+              }
+            },
+            {
+              "dimensions": {
+                "datetime": "2026-09-10T17:27:13Z",
+                "status": "success"
+              },
+              "quantiles": {
+                "cpuTimeP50": 320461,
+                "cpuTimeP99": 320461
+              },
+              "sum": {
+                "errors": 0,
+                "requests": 1
+              }
+            },
+            {
+              "dimensions": {
+                "datetime": "2026-09-10T17:27:20Z",
+                "status": "success"
+              },
+              "quantiles": {
+                "cpuTimeP50": 57489,
+                "cpuTimeP99": 57489
+              },
+              "sum": {
+                "errors": 0,
+                "requests": 1
+              }
+            },
+            {
+              "dimensions": {
+                "datetime": "2026-09-10T17:27:16Z",
+                "status": "success"
+              },
+              "quantiles": {
+                "cpuTimeP50": 159831,
+                "cpuTimeP99": 159831
+              },
+              "sum": {
+                "errors": 0,
+                "requests": 1
+              }
+            },
+            {
+              "dimensions": {
+                "datetime": "2026-09-10T17:27:19Z",
+                "status": "success"
+              },
+              "quantiles": {
+                "cpuTimeP50": 358628,
+                "cpuTimeP99": 358628
+              },
+              "sum": {
+                "errors": 0,
+                "requests": 1
+              }
+            },
+            {
+              "dimensions": {
+                "datetime": "2026-09-10T17:27:23Z",
+                "status": "success"
+              },
+              "quantiles": {
+                "cpuTimeP50": 312453,
+                "cpuTimeP99": 312453
+              },
+              "sum": {
+                "errors": 0,
+                "requests": 1
+              }
+            },
+            {
+              "dimensions": {
+                "datetime": "2026-09-10T17:27:25Z",
+                "status": "success"
+              },
+              "quantiles": {
+                "cpuTimeP50": 49403,
+                "cpuTimeP99": 165129
+              },
+              "sum": {
+                "errors": 0,
+                "requests": 2
+              }
+            },
+            {
+              "dimensions": {
+                "datetime": "2026-09-10T17:28:37Z",
+                "status": "success"
+              },
+              "quantiles": {
+                "cpuTimeP50": 609,
+                "cpuTimeP99": 852
+              },
+              "sum": {
+                "errors": 0,
+                "requests": 2
+              }
+            },
+            {
+              "dimensions": {
+                "datetime": "2026-09-10T17:27:15Z",
+                "status": "success"
+              },
+              "quantiles": {
+                "cpuTimeP50": 64322,
+                "cpuTimeP99": 64322
+              },
+              "sum": {
+                "errors": 0,
+                "requests": 1
+              }
+            },
+            {
+              "dimensions": {
+                "datetime": "2026-09-10T17:27:28Z",
+                "status": "success"
+              },
+              "quantiles": {
+                "cpuTimeP50": 353958,
+                "cpuTimeP99": 353958
+              },
+              "sum": {
+                "errors": 0,
+                "requests": 1
+              }
+            },
+            {
+              "dimensions": {
+                "datetime": "2026-09-10T17:27:29Z",
+                "status": "exceededResources"
+              },
+              "quantiles": {
+                "cpuTimeP50": 71960,
+                "cpuTimeP99": 71960
+              },
+              "sum": {
+                "errors": 1,
+                "requests": 1
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

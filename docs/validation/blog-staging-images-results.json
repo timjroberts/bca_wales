@@ -1,0 +1,139 @@
+{
+  "startedAt": "2026-09-10T17:57:37.856Z",
+  "slug": "image-e2e-1789063057856",
+  "scope": "Three synthetic images; real HTTP routes, D1, private R2 and Images; synthetic session, no Facebook login or browser editor test",
+  "steps": [
+    {
+      "step": "ready",
+      "at": "2026-09-10T17:58:03.543Z"
+    },
+    {
+      "step": "temporary-administrator-and-public-isolation",
+      "at": "2026-09-10T17:58:04.557Z"
+    },
+    {
+      "step": "post-created",
+      "at": "2026-09-10T17:58:05.259Z",
+      "postId": "a39e6ab1-5bac-421a-94eb-db6dc2833b88"
+    },
+    {
+      "step": "upload-and-private-storage-verified",
+      "at": "2026-09-10T17:58:09.513Z",
+      "format": "jpeg",
+      "inputBytes": 9771,
+      "assetId": "79de19de-812d-47bc-8f3c-5844caef5697",
+      "variants": [
+        {
+          "variant": "640",
+          "width": 640,
+          "height": 426,
+          "bytes": 50760
+        },
+        {
+          "variant": "1280",
+          "width": 1200,
+          "height": 800,
+          "bytes": 49834
+        },
+        {
+          "variant": "1920",
+          "width": 1200,
+          "height": 800,
+          "bytes": 49834
+        },
+        {
+          "variant": "pixel",
+          "width": 16,
+          "height": 10,
+          "bytes": 165
+        }
+      ]
+    },
+    {
+      "step": "upload-and-private-storage-verified",
+      "at": "2026-09-10T17:58:12.984Z",
+      "format": "png",
+      "inputBytes": 48193,
+      "assetId": "98127404-4836-49b2-89bd-11ac07861f26",
+      "variants": [
+        {
+          "variant": "640",
+          "width": 640,
+          "height": 426,
+          "bytes": 1873
+        },
+        {
+          "variant": "1280",
+          "width": 1200,
+          "height": 800,
+          "bytes": 4710
+        },
+        {
+          "variant": "1920",
+          "width": 1200,
+          "height": 800,
+          "bytes": 4710
+        },
+        {
+          "variant": "pixel",
+          "width": 16,
+          "height": 10,
+          "bytes": 118
+        }
+      ]
+    },
+    {
+      "step": "upload-and-private-storage-verified",
+      "at": "2026-09-10T17:58:16.660Z",
+      "format": "webp",
+      "inputBytes": 6608,
+      "assetId": "f5f489f0-346e-4dcb-ad13-60444eae813f",
+      "variants": [
+        {
+          "variant": "640",
+          "width": 640,
+          "height": 426,
+          "bytes": 85458
+        },
+        {
+          "variant": "1280",
+          "width": 1200,
+          "height": 800,
+          "bytes": 75918
+        },
+        {
+          "variant": "1920",
+          "width": 1200,
+          "height": 800,
+          "bytes": 75918
+        },
+        {
+          "variant": "pixel",
+          "width": 16,
+          "height": 10,
+          "bytes": 167
+        }
+      ]
+    },
+    {
+      "step": "publication-and-reader-delivery-verified",
+      "at": "2026-09-10T17:58:23.212Z"
+    },
+    {
+      "step": "withdrawal-verified",
+      "at": "2026-09-10T17:58:25.678Z"
+    },
+    {
+      "step": "content-and-administrator-erasure-complete",
+      "at": "2026-09-10T17:58:32.172Z"
+    },
+    {
+      "step": "restricted-paused-and-gate-removed",
+      "at": "2026-09-10T17:58:56.995Z"
+    }
+  ],
+  "passed": true,
+  "cleanupErrors": [],
+  "finishedAt": "2026-09-10T17:58:56.995Z",
+  "requests": 20
+}
