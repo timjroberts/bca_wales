@@ -35,13 +35,13 @@ The optional Terms of Service field restores `https://www.facebook.com/` after c
 
 On 10 September 2026, read-only HEAD requests to both apex and www returned HTTP 200. Subsequent GET requests returned HTTP 525 at the apex and a JavaScript redirect to `/lander` at www. These inconsistent responses do not establish working production hosting or callback endpoints.
 
-The existing Wrangler credential returned HTTP 403 when listing the `bca.wales` zone. Subsequent read-only dashboard inspection confirmed two proxied apex A records, `13.248.213.45` and `76.223.67.189`, both with Auto TTL; www is a proxied CNAME to `bca.wales`, also Auto TTL. The Workers Routes page reports no configured routes. These DNS destinations are the current rollback baseline; the origin service's ownership has not been established.
+The existing Wrangler credential returned HTTP 403 when listing the `bca.wales` zone. Subsequent read-only dashboard inspection confirmed two proxied apex A records, `13.248.213.45` and `76.223.67.189`, both with Auto TTL; www is a proxied CNAME to `bca.wales`, also Auto TTL. The Workers Routes page reports no configured routes. These DNS destinations are the current rollback baseline. The owner subsequently confirmed the domain is unused apart from the explorer; there is no active apex/www service to preserve.
 
 The Page Rules page reports 0 of 3 used and no data. The caching page reports no Cache Rules and no Cache Response Rules. The general Rules overview displayed templates; it did not establish that all other rule types are absent. Redirect rules and other origin/transform settings still need an explicit cutover review.
 
-Before cutover:
+The [domain cutover proposal](blog-domain-cutover.md) records the inspected TLS settings, exact-host binding plan, restricted acceptance checks and rollback. Before executing that separately approved proposal:
 
-1. Identify the current apex/www hosting owner and capture existing DNS, routes, redirects and cache rules for rollback.
+1. Refresh the captured DNS/rule baseline and check for changes since the owner's confirmation that apex/www are unused.
 2. Resolve the current origin/TLS conflict and choose an explicit www-to-apex redirect. Preserve `explore.bca.wales`, `assets.bca.wales`, their Pages project and evidence resources.
 3. Review cache behavior so HTML, authentication, API, preview and media requests cannot bypass the blog Worker. Keep private responses uncacheable.
 4. Obtain separate approval for the exact DNS/route changes. Then validate canonical redirects, HTTPS, `/privacy`, static assets and restricted responses using GET requests, not HEAD alone.
