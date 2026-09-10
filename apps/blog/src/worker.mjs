@@ -7,6 +7,7 @@ import { listComments, commentCapabilities, submitComment, moderateComment, insp
 import { createBackup, expireBackups } from './backup.mjs';
 import { uploadImage, imageDetails } from './media.mjs';
 import { privacyHtml } from './privacy.mjs';
+import { stagingLogin } from './staging-login.mjs';
 import { monitorHealth, recordMaintenance } from './health.mjs';
 import { flushOutbox, requestErasure, maintenance } from './recovery.mjs';
 
@@ -30,6 +31,8 @@ async function route(request, env) {
     return env.ASSETS.fetch(new Request(assetUrl, request));
   }
   if (path === '/api/ops/health') return monitorHealth(request, env);
+  const testResponse = await stagingLogin(request, env);
+  if (testResponse) return testResponse;
   requireThat(env.RESTRICTED !== 'true' && (await first(env, "SELECT value FROM settings WHERE key='restricted'"))?.value !== 'true', 503, 'Blog temporarily unavailable during recovery');
   const reading = ['GET','HEAD'].includes(request.method);
   if (path === '/auth/login' && request.method === 'POST') return beginLogin(request, env);
