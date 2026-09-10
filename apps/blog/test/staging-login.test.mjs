@@ -67,6 +67,8 @@ test('the test displays a real session and logout revokes it with CSRF protectio
   assert.equal((await worker.fetch(request('/staging/logout', { method: 'POST', headers: { Cookie, Origin: origin } }), env)).status, 403);
   assert.equal((await worker.fetch(request('/staging/logout', { method: 'POST', headers: { Cookie, Origin: origin, 'X-CSRF-Token': await csrfToken(testEnv, issued.actor) } }), env)).status, 204);
   await assert.rejects(session(request('/staging/login', { headers: { Cookie } }), testEnv), { status: 401 });
+  assert.equal((await env.DB.prepare('SELECT COUNT(*) AS n FROM recovery_outbox WHERE delivered_at IS NULL').first()).n, 0);
+  assert.ok(await env.RECOVERY.get('journal-head.json'));
 });
 
 test('bundled provider fetch preserves callback cookies and rejects credential-bearing redirects', async t => {
