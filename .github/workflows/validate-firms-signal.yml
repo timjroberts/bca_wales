@@ -54,7 +54,7 @@ jobs:
       - name: Summarise validation
         run: sed -n '1,160p' .firms-validation/evidence/report.md >> "$GITHUB_STEP_SUMMARY"
       - name: Retain exact validation evidence
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: firms-signal-validation
           path: .firms-validation/

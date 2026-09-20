@@ -55,7 +55,7 @@ jobs:
         run: node tooling/checks/write-deployment-record.mjs "${{ github.sha }}" "${{ inputs.release_id }}" "${{ inputs.manifest_sha256 }}" > launch-acceptance-candidate.json
       - run: node tooling/checks/validate-launch-record.mjs launch-acceptance-candidate.json
       - name: Retain launch acceptance candidate
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: launch-acceptance-${{ github.sha }}
           path: launch-acceptance-candidate.json
