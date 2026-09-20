@@ -158,6 +158,12 @@ node apps/blog/tooling/operator.mjs pause apps/blog/operator.local.json --remote
 
 Pausing does not disable deletion/moderation. Billing alerts are not a provider-enforced spending cap. Include Images transformations (four per uploaded image in the initial pipeline), R2 operations/storage/backups, D1, Worker usage, taxes and currency movement. Actual plan/quotas/costs were not established by local testing. Paid activation and exceeding the envelope require approval.
 
+## Production watchdog activation
+
+The same `monitor-blog.yml` schedule checks production in an independent job when repository variable `BCA_BLOG_PRODUCTION_MONITOR_ENABLED=true`. Before activation, install a new production-only `MONITOR_TOKEN` on the production Worker and the matching narrow repository secret `BLOG_PRODUCTION_MONITOR_TOKEN`. The job uses `https://bca.wales/api/ops/health`; it receives no deployment, database, recovery or author credentials. It deliberately does not use the protected deployment environment, so routine scheduled health checks do not require deployment approval.
+
+Keep the activation variable false or absent until the production domain and authenticated endpoint are ready. Then enable it, dispatch the workflow, and record both jobs' results. A staging pass or skipped production job is not production-health evidence. The existing owner notification delivery evidence applies to GitHub Actions, but verify production failures and recovery separately. Disabling this variable silences production monitoring and must be recorded as an operational gap, never as a repair.
+
 ## Optional comments and manually approved authors
 
 The association has chosen to keep comments disabled initially. `COMMENTS_ENABLED` defaults to `false`; only the exact string `true` enables comments. Set deployment/environment variable `BCA_BLOG_COMMENTS_ENABLED` for the configuration generator and GitHub deployment workflow. Local Wrangler configuration also defaults off. An omitted flag stays off on deployment.
