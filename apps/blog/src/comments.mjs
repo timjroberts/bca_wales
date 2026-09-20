@@ -4,12 +4,16 @@ import { now, requireThat, uuid } from './errors.mjs';
 import { hmac } from './auth.mjs';
 import { authority, checkAuthority, commit, first, getPost, operationInput, readOperation, rows, stmt } from './storage.mjs';
 
+export const commentsEnabled = env => env.COMMENTS_ENABLED === 'true';
+export function requireComments(env) { requireThat(commentsEnabled(env), 404, 'Not found'); }
+
 export function publicComment(row) {
   if (row.deleted_at !== null) return { id: row.id, status: 'deleted', message: 'Comment deleted' };
   if (row.hidden) return { id: row.id, status: 'hidden', message: 'Comment hidden' };
   return { id: row.id, status: 'visible', body: row.body, attribution: JSON.parse(row.attribution), createdAt: row.created_at };
 }
 export async function listComments(env, postId, cursor) {
+  requireComments(env);
   await getPost(env, postId, true);
   let after = { created_at: 0, id: '' };
   if (cursor) { after = await first(env, 'SELECT created_at,id FROM comments WHERE post_id=? AND id=?', postId, cursor); requireThat(after, 400, 'Invalid comment cursor'); }
@@ -17,6 +21,7 @@ export async function listComments(env, postId, cursor) {
   return { comments: page.slice(0, 50).map(publicComment), next: page.length > 50 ? page[49].id : null };
 }
 export async function commentCapabilities(env, actor, postId) {
+  requireComments(env);
   await checkAuthority(env, actor, false); await getPost(env, postId, true);
   return { deletable: (await rows(env, 'SELECT id FROM comments WHERE post_id=? AND subject=? AND deleted_at IS NULL', postId, actor.subject)).map(c => c.id) };
 }
@@ -30,6 +35,7 @@ async function checkRate(env, tag) {
   requireThat(counts.recent < 5 && counts.daily < 30, 429, 'Comment limit reached. Please try later.');
 }
 export async function submitComment(env, actor, postId, body, key, ip) {
+  requireComments(env);
   await checkAuthority(env, actor, false);
   const input = await operationInput('comment', postId, key, body), previous = await readOperation(env, actor, input);
   if (previous) {
@@ -61,6 +67,7 @@ export async function submitComment(env, actor, postId, body, key, ip) {
 }
 const reasons = ['abuse/harassment','identifying personal information','discriminatory language','spam','other'];
 export async function moderateComment(env, actor, id, body, key) {
+  requireComments(env);
   requireThat(['hide','restore'].includes(body.action) && Number.isSafeInteger(body.version), 422, 'Invalid moderation action');
   let reason = null;
   if (body.action === 'hide') {
@@ -75,6 +82,7 @@ export async function moderateComment(env, actor, id, body, key) {
   ], { journal: { id, hidden: body.action === 'hide', version: body.version + 1 } });
 }
 export async function inspectComment(env, actor, id) {
+  requireComments(env);
   const input = await operationInput('inspect-comment', id, uuid(), {});
   // The body read is in the SAME guarded transaction as the deliberate access audit.
   const guard = authority(actor), auditId = uuid(), time = now();
