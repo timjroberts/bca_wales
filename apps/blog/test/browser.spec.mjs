@@ -35,7 +35,7 @@ test('browser editor round-trip, private corrections, conflict rescue, reader na
   await page.getByRole('button',{ name:'Save draft',exact:true }).click();await page.getByText(/Conflict: your local work is preserved/).waitFor();assert.equal(await page.getByLabel('Title',{ exact:true }).inputValue(),'My unsaved title');
   await page.setViewportSize({ width:390,height:844 });await page.getByRole('button',{ name:'Callout',exact:true }).click();await page.getByRole('dialog').waitFor();assert.ok(await page.getByRole('button',{ name:'Apply callout' }).isVisible());await page.keyboard.press('Escape');
   await page.screenshot({ path:'/tmp/bca-blog-editor-mobile.png',fullPage:true });
-  await reader.getByRole('link',{ name:'Blog',exact:true }).first().click();await reader.getByRole('heading',{ name:'BCA Wales blog' }).waitFor();assert.match(reader.url(),/\/blog\/$/);await reader.getByRole('link',{ name:'Browser post',exact:true }).click();await reader.getByRole('heading',{ name:'Browser post',exact:true }).waitFor();
+  await reader.getByRole('link',{ name:'Blog',exact:true }).first().click();await reader.getByRole('heading',{ name:'Blorenge Commoners Association blog' }).waitFor();assert.match(reader.url(),/\/blog\/$/);await reader.getByRole('link',{ name:'Browser post',exact:true }).click();await reader.getByRole('heading',{ name:'Browser post',exact:true }).waitFor();
   await reader.screenshot({ path:'/tmp/bca-blog-reader.png',fullPage:true });
   assert.deepEqual(errors,[]);await writeFile('/tmp/bca-blog-browser-validation.json',JSON.stringify({ normalizedRoundTrip:true,privateCorrections:true,conflictBufferPreserved:true,mobileDialog:true,spaNavigation:true,errors },null,2));
 });

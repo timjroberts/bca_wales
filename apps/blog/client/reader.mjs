@@ -5,7 +5,7 @@ let storage; try { storage = sessionStorage; } catch { report('Image choices are
 const store = new RevealStore(storage, report); let reset = () => {}, navigation = 0;
 const buffers = new Map();
 function attribution(target, data) {
-  const name = data?.name || 'BCA Wales contributor';
+  const name = data?.name || 'Blorenge Commoners Association contributor';
   if (data?.link) target.append(element('a', name, { href: data.link, target: '_blank', rel: 'noopener noreferrer', ariaLabel: `${name} on Facebook (opens a new tab; access may be restricted)` })); else target.append(element('span', name));
 }
 async function renderComments(post, ticket) {
@@ -62,7 +62,7 @@ async function renderComments(post, ticket) {
   }); section.append(form);
 }
 function head(article) {
-  document.title = `${article.title} · BCA Wales`;
+  document.title = `${article.title} · Blorenge Commoners Association`;
   for (const [selector,value] of [['meta[name="description"]',article.excerpt],['meta[property="og:title"]',article.title],['meta[property="og:description"]',article.excerpt],['meta[property="og:url"]',location.href],['meta[property="og:type"]',article.id?'article':'website']]) document.querySelector(selector)?.setAttribute('content',value);
   document.querySelector('link[rel="canonical"]')?.setAttribute('href',location.origin + location.pathname);
 }
@@ -84,7 +84,7 @@ async function navigate(path, push = true, focus = true) {
     } else {
       const posts = await api('/api/blog/posts'); if (ticket !== navigation) return;
       main.innerHTML = indexHtml(posts); main.dataset.post = ''; main.dataset.revision = '';
-      if (push) history.pushState({},'','/blog/'); head({ title:'BCA Wales blog',excerpt:'News and updates from BCA Wales.' });
+      if (push) history.pushState({},'','/blog/'); head({ title:'Blorenge Commoners Association blog',excerpt:'News and updates from Blorenge Commoners Association.' });
     }
     if (focus) main.focus(); await enhance(ticket);
   } catch(error) {

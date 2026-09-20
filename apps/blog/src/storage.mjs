@@ -121,7 +121,7 @@ async function publishInternal(env, actor, id, body, key) {
   const source = await objectJson(env, revision.source_key, revision.source_hash);
   const { media, resolve } = await mediaForSource(env, id, source, revision.id);
   const html = renderDocument(source, resolve);
-  const metadata = { title: source.title, excerpt: source.excerpt || 'News and updates from BCA Wales.', attribution: JSON.parse(post.attribution), slug: post.slug };
+  const metadata = { title: source.title, excerpt: source.excerpt || 'News and updates from Blorenge Commoners Association.', attribution: JSON.parse(post.attribution), slug: post.slug };
   // Public SPA payload contains sanitized HTML, never the canonical draft tree or subjects.
   const artifact = { rendererVersion: RENDERER_VERSION, html, metadata, media: Object.fromEntries(Object.entries(media).map(([assetId, m]) => [assetId, { policyVersion: m.policy_version, sensitive: !!m.sensitive, variants: m.manifest }])) };
   const manifestKey = `posts/${id}/${revision.id}/render-${uuid()}.json`, hash = await stage(env, manifestKey, artifact), time = now();

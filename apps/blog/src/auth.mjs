@@ -31,7 +31,7 @@ export async function mutation(request, env, actor) {
 }
 export function attribution(data, allowLink = false) {
   const name = typeof data.name === 'string' ? [...data.name.replace(/[\u0000-\u001f\u007f]/g, '')].slice(0, 100).join('') : '';
-  const result = { name: name.trim() || 'BCA Wales contributor' };
+  const result = { name: name.trim() || 'Blorenge Commoners Association contributor' };
   if (allowLink && typeof data.link === 'string' && data.link.length <= 1000) {
     try { const url = new URL(data.link); if (url.protocol === 'https:' && ['www.facebook.com','facebook.com'].includes(url.hostname) && !url.username && !url.password && !/[\s\\]/.test(data.link)) result.link = url.href; } catch { /* Optional provider field. */ }
   }
