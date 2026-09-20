@@ -6,7 +6,7 @@ import { submitComment, listComments, moderateComment, inspectComment, deleteCom
 import { requestErasure, maintenance, flushOutbox } from '../src/recovery.mjs';
 
 async function fixture(t) {
-  const context = await setup(t, false, authConfig());
+  const context = await setup(t, false, { ...authConfig(), COMMENTS_ENABLED: 'true' });
   const { env, actor } = context;
   const post = await createPost(env, actor, { slug: 'comments', consent: 'public-attribution-v1' }, key());
   const saved = await saveDraft(env, actor, post.id, { version: 0, source: example() }, key());

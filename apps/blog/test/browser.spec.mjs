@@ -105,3 +105,26 @@ test('editorial presentation matches SSR and SPA, with responsive cards and read
   }
   assert.deepEqual(errors,[]);
 });
+
+for (const enabled of [false, true]) test(`reader comments ${enabled ? 'enabled' : 'disabled'} on direct loads and client navigation`, { timeout:120000 }, async t => {
+  const origin = `https://localhost:${enabled ? 8796 : 8795}`;
+  const { env, actor, mf } = await setup(t, true, { ORIGIN: origin, COMMENTS_ENABLED: String(enabled) }, { name:'blog', https:true, port:enabled ? 8796 : 8795, assets:{ directory:new URL('../dist/static',import.meta.url).pathname,binding:'ASSETS',run_worker_first:true,routerConfig:{has_user_worker:true,invoke_user_worker_ahead_of_assets:true} } }); await mf.ready;
+  const post = await createPost(env, actor, { slug:'flag-browser',consent:'public-attribution-v1' }, key());
+  const saved = await saveDraft(env, actor, post.id, { version:0,source:example('Flag browser article') }, key());
+  await publish(env, actor, post.id, { version:1,revision:saved.revision }, key());
+  const browser = await chromium.launch({ headless:true,...(process.env.BCA_BROWSER_EXECUTABLE ? { executablePath:process.env.BCA_BROWSER_EXECUTABLE } : {}) }); t.after(() => browser.close());
+  const page = await browser.newPage({ ignoreHTTPSErrors:true }); const commentRequests = [], errors = [];
+  page.on('request', request => { if (request.url().includes('/comments')) commentRequests.push(request.url()); });
+  page.on('pageerror', error => errors.push(error.message));
+  await page.goto(`${origin}/blog/flag-browser/`);
+  const check = async () => {
+    assert.equal(await page.locator('#comments').count(), enabled ? 1 : 0);
+    assert.equal(await page.locator('.discussion-link').count(), enabled ? 1 : 0);
+    if (enabled) await page.getByRole('button', { name:'Sign in with Facebook',exact:true }).waitFor();
+    else assert.equal(await page.getByRole('button', { name:'Sign in with Facebook',exact:true }).count(), 0);
+  };
+  await check();
+  await page.getByRole('link', { name:'All stories',exact:true }).click(); await page.locator('.story-index').waitFor();
+  await page.getByRole('link', { name:'Flag browser article',exact:true }).click(); await page.locator('.article-body').waitFor(); await check();
+  assert.equal(commentRequests.length > 0, enabled); assert.deepEqual(errors, []);
+});

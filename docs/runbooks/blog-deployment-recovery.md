@@ -157,3 +157,13 @@ node apps/blog/tooling/operator.mjs pause apps/blog/operator.local.json --remote
 ```
 
 Pausing does not disable deletion/moderation. Billing alerts are not a provider-enforced spending cap. Include Images transformations (four per uploaded image in the initial pipeline), R2 operations/storage/backups, D1, Worker usage, taxes and currency movement. Actual plan/quotas/costs were not established by local testing. Paid activation and exceeding the envelope require approval.
+
+## Optional comments and manually approved authors
+
+The association has chosen to keep comments disabled initially. `COMMENTS_ENABLED` defaults to `false`; only the exact string `true` enables comments. Set deployment/environment variable `BCA_BLOG_COMMENTS_ENABLED` for the configuration generator and GitHub deployment workflow. Local Wrangler configuration also defaults off. An omitted flag stays off on deployment.
+
+With comments off, direct article pages and client navigation omit the discussion link, comments section and comment sign-in prompt. Listing, capabilities, submission, inspection/moderation and community-guidelines routes return 404. Existing comment records are retained and become visible again if enabled later; this is not a data-deletion operation. Owner deletion and account erasure remain available with their existing identity/CSRF controls.
+
+Authoring remains independent: `AUTH_ENABLED` controls sign-in and the private administrator allowlist controls writing, editing, publishing and moderation authority. Continue to approve authors manually through `operator.mjs grant-admin` using the verified app-scoped subject. This flag does not grant Meta app roles or blog administrator access.
+
+To enable comments later, obtain the association's approval, complete the applicable Meta requirements for public login, set `BCA_BLOG_COMMENTS_ENABLED=true` in the chosen deployment environment, and deploy the reviewed configuration. Review any retained comments before reopening. To disable again, set it to `false` and redeploy; already displayed pages cannot be recalled, but subsequent requests use the current flag. This implementation does not itself deploy or open public login.

@@ -11,6 +11,7 @@
   "vars": {
     "ORIGIN": "http://localhost:8787",
     "AUTH_ENABLED": "false",
+    "COMMENTS_ENABLED": "false",
     "RESTRICTED": "false",
     "PUBLISH_PAUSED": "false"
   },

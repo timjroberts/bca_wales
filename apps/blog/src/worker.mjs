@@ -3,7 +3,7 @@ import { first, publicArticle, publicIndex, deliverMedia, checkAuthority, rows, 
 import { pageHtml, articleHtml, indexHtml } from './html.mjs';
 import { escapeHtml } from './document.mjs';
 import { authEnabled, beginLogin, completeLogin, session, csrfToken, mutation, logout } from './auth.mjs';
-import { listComments, commentCapabilities, submitComment, moderateComment, inspectComment, deleteComment } from './comments.mjs';
+import { commentsEnabled, requireComments, listComments, commentCapabilities, submitComment, moderateComment, inspectComment, deleteComment } from './comments.mjs';
 import { createBackup, expireBackups } from './backup.mjs';
 import { uploadImage, imageDetails } from './media.mjs';
 import { privacyHtml } from './privacy.mjs';
@@ -62,6 +62,7 @@ async function route(request, env) {
   if (image && reading) return json(await imageDetails(env,image[1],image[2],image[3],Number(url.searchParams.get('index') || 0)));
   const comments = path.match(/^\/api\/blog\/posts\/([a-f0-9-]{36})\/comments(?:\/(capabilities))?$/);
   if (comments) {
+    requireComments(env);
     if (reading && !comments[2]) return json(await listComments(env, comments[1], url.searchParams.get('after')));
     const actor = await session(request, env);
     if (reading && comments[2]) return json(await commentCapabilities(env, actor, comments[1]));
@@ -73,6 +74,7 @@ async function route(request, env) {
     const actor = await session(request, env); await mutation(request, env, actor);
     const result = await deleteComment(env, actor, ownComment[1], request.headers.get('idempotency-key')); await flushOutbox(env); return json(result);
   }
+  if (/^\/api\/admin\/comments\//.test(path)) requireComments(env);
   if (path.startsWith('/api/admin/')) {
     const actor = await session(request, env); await checkAuthority(env, actor);
     if (!reading) await mutation(request, env, actor);
@@ -99,6 +101,7 @@ async function route(request, env) {
     }
     const comment = path.match(/^\/api\/admin\/comments\/([a-f0-9-]{36})\/(inspect|moderate)$/);
     if (comment) {
+      requireComments(env);
       requireThat(request.method === 'POST', 405);
       if (comment[2] === 'inspect') return json(await inspectComment(env, actor, comment[1]));
       const result = await moderateComment(env, actor, comment[1], await readJson(request, 2000), request.headers.get('idempotency-key')); await flushOutbox(env); return json(result);
@@ -114,12 +117,13 @@ async function route(request, env) {
   if (path === '/account/') return html(pageHtml(env, { title:'Your account', private:true, html:'<h1>Your account</h1><p>Loading account controls…</p><noscript>Enable JavaScript to sign in with Facebook.</noscript>' }));
   if (path === '/admin/') { const actor = await session(request,env); await checkAuthority(env,actor); return html(pageHtml(env,{ title:'Manage posts',private:true,html:'<h1>Manage posts</h1><p>Loading editor…</p>' })); }
   if (path.startsWith('/admin') || path.startsWith('/preview') || path.startsWith('/api/admin')) throw new HttpError(401, 'Sign in required');
+  if (path === '/blog/guidelines/') requireComments(env);
   if (path === '/blog/guidelines/') return html(pageHtml(env,{ title:'Community guidelines',html:'<h1>Community guidelines</h1><p>Comments appear immediately. Keep discussion relevant and respectful. Do not post abuse, harassment, identifying personal information, discriminatory language or spam. Administrators may hide nonconforming comments with a private reason and may restore them. Only you can permanently delete your own comments; administrators cannot restore deleted text.</p><p>Hiding changes the next authoritative read. Already displayed screens, external copies and social-network caches cannot be recalled.</p>' }));
   if (path === '/blog') return new Response(null, { status: 308, headers: { Location: '/blog/' } });
   if (path === '/blog/') return html(pageHtml(env, { html: indexHtml(await publicIndex(env)) }));
   const match = path.match(/^\/(api\/blog\/posts|blog)\/([a-z0-9-]+)\/?$/);
   if (match) {
-    const article = await publicArticle(env, match[2]);
+    const article = { ...await publicArticle(env, match[2]), commentsEnabled: commentsEnabled(env) };
     if (article.redirect) return new Response(null, { status: 308, headers: { Location: match[1].startsWith('api') ? `/api/blog/posts/${article.redirect.split('/')[2]}` : article.redirect } });
     if (match[1] === 'api/blog/posts') return json(article);
     if (!path.endsWith('/')) return new Response(null, { status: 308, headers: { Location: `${path}/` } });

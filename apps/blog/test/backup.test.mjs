@@ -7,7 +7,7 @@ import { createBackup,restoreBackup,replayEvent } from '../src/backup.mjs';
 import { flushOutbox,journalHead,journalKey,requestErasure,maintenance } from '../src/recovery.mjs';
 
 test('paired restore replays independent deletion/moderation/withdrawal and remains restricted',async t=>{
-  const { env,actor }=await setup(t,false,authConfig()),post=await createPost(env,actor,{ slug:'backup',consent:'public-attribution-v1' },key());
+  const { env,actor }=await setup(t,false,{ ...authConfig(), COMMENTS_ENABLED:'true' }),post=await createPost(env,actor,{ slug:'backup',consent:'public-attribution-v1' },key());
   const saved=await saveDraft(env,actor,post.id,{ version:0,source:example() },key());await publish(env,actor,post.id,{ version:1,revision:saved.revision },key());
   const comment=await submitComment(env,actor,post.id,{ text:'Must never resurrect',consent:'public-attribution-v1' },key(),'192.0.2.8');
   const backup=await createBackup(env);
@@ -15,7 +15,7 @@ test('paired restore replays independent deletion/moderation/withdrawal and rema
   await deleteComment(env,actor,comment.id,key());await flushOutbox(env);
   await withdraw(env,actor,post.id,{ version:2 },key());await flushOutbox(env);
   const head=await journalHead(env);assert.equal(head.sequence,3);
-  const { env:restored }=await setup(t,false,authConfig());restored.RECOVERY=env.RECOVERY;restored.RESTRICTED='true';
+  const { env:restored }=await setup(t,false,{ ...authConfig(), COMMENTS_ENABLED:'true' });restored.RECOVERY=env.RECOVERY;restored.RESTRICTED='true';
   const result=await restoreBackup(restored,{ ...backup,expectedJournalSequence:head.sequence,journalComplete:true });assert.equal(result.replayed,3);assert.equal(result.restricted,true);
   assert.equal((await first(restored,"SELECT value FROM settings WHERE key='restricted'")).value,'true');
   assert.equal(await first(restored,'SELECT * FROM administrators'),null);
@@ -34,7 +34,7 @@ test('journal gaps or unconfirmed completeness block restore before authority re
   assert.equal((await first(env,'SELECT version FROM posts WHERE id=?',post.id)).version,1);
 });
 test('new erasure request after completion creates a fresh job while callback replay stays idempotent',async t=>{
-  const { env,actor }=await setup(t,false,authConfig());
+  const { env,actor }=await setup(t,false,{ ...authConfig(), COMMENTS_ENABLED:'true' });
   const original=await requestErasure(env,actor.subject,'request-1');await maintenance(env);
   assert.equal((await first(env,'SELECT status FROM deletion_jobs WHERE id=?',original.id)).status,'complete');
   const replay=await requestErasure(env,actor.subject,'request-1');assert.equal(replay.id,original.id);
