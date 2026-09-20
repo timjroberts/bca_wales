@@ -1,4 +1,4 @@
-name: Monitor blog staging
+name: Monitor blog health
 
 on:
   schedule:
@@ -9,7 +9,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: blog-staging-monitor
+  group: blog-health-monitor
   cancel-in-progress: false
 
 jobs:
@@ -28,3 +28,20 @@ jobs:
         env:
           BLOG_HEALTH_URL: https://bca-wales-blog-staging.tim-f78.workers.dev/api/ops/health
           BLOG_MONITOR_TOKEN: ${{ secrets.BLOG_STAGING_MONITOR_TOKEN }}
+
+  check-production:
+    if: ${{ vars.BCA_BLOG_PRODUCTION_MONITOR_ENABLED == 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - name: Check production maintenance and backup freshness
+        run: node apps/blog/tooling/monitor.mjs
+        env:
+          BLOG_HEALTH_URL: https://bca.wales/api/ops/health
+          BLOG_MONITOR_TOKEN: ${{ secrets.BLOG_PRODUCTION_MONITOR_TOKEN }}
