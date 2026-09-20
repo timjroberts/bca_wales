@@ -6,7 +6,7 @@ const origin='http://localhost:8793';
 const mf=new Miniflare(convertV4MiniflareOptions({ name:'blog-preview',host:'127.0.0.1',port:8793,modules:true,scriptPath:new URL('../dist/worker.mjs',import.meta.url).pathname,compatibilityDate:'2026-08-01',bindings:{ ORIGIN:origin,AUTH_ENABLED:'false' },d1Databases:['DB'],r2Buckets:['CONTENT','RECOVERY'],assets:{ directory:new URL('../dist/static',import.meta.url).pathname,binding:'ASSETS',run_worker_first:true,routerConfig:{ has_user_worker:true,invoke_user_worker_ahead_of_assets:true } } }));
 const env={ DB:await mf.getD1Database('DB'),CONTENT:await mf.getR2Bucket('CONTENT'),RECOVERY:await mf.getR2Bucket('RECOVERY'),ORIGIN:origin,AUTH_ENABLED:'false' };
 await env.DB.exec((await readFile(new URL('../migrations/0001_blog.sql',import.meta.url),'utf8')).replace(/\n/g,' '));
-const time=Math.floor(Date.now()/1000),actor={ subject:'local-preview',sid:crypto.randomUUID(),iat:time,exp:time+28800,attribution:{ name:'BCA Wales · Preview author' } };
+const time=Math.floor(Date.now()/1000),actor={ subject:'local-preview',sid:crypto.randomUUID(),iat:time,exp:time+28800,attribution:{ name:'Blorenge Commoners Association · Preview author' } };
 await env.DB.prepare('INSERT INTO administrators VALUES (?,?)').bind(actor.subject,time).run();
 const stories=[
   ['reading-the-landscape','Learning to read the landscape','A closer look at the places we pass every day — and the questions that help us see them differently.'],
@@ -18,7 +18,7 @@ const text=value=>({ type:'text',text:value }),paragraph=value=>({ type:'paragra
 for (const [index,[slug,title,excerpt]] of stories.entries()) {
   const post=await createPost(env,actor,{ slug,consent:'public-attribution-v1' },crypto.randomUUID());
   const source={ schemaVersion:1,title,excerpt,doc:{ type:'doc',content:[
-    { type:'callout',attrs:{ version:1,tone:'note' },content:[text('Design preview — this is sample writing, not a published BCA Wales report.')] },
+    { type:'callout',attrs:{ version:1,tone:'note' },content:[text('Design preview — this is sample writing, not a published Blorenge Commoners Association report.')] },
     paragraph('A landscape is more than the view in front of us. It holds traces of work, weather and the lives of people who know it well. Looking carefully is a way to begin understanding how those stories fit together.'),
     { type:'heading',attrs:{ level:2 },content:[text('Start with what you notice')] },
     paragraph('Follow a path twice and you will rarely see exactly the same place. Light catches a different edge. Water finds a new route. Something that seemed unremarkable becomes a question worth asking.'),

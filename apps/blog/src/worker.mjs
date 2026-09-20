@@ -111,7 +111,7 @@ async function route(request, env) {
   if (path.startsWith('/preview/media/') && reading) return deliverMedia(env, request, path.slice(15).split('/'), await session(request, env));
   requireThat(reading, 405, 'Method not allowed');
   if (path.startsWith('/static/') && env.ASSETS) { const assetUrl = new URL(request.url); assetUrl.pathname = path.slice(7); return env.ASSETS.fetch(new Request(assetUrl, request)); }
-  if (path === '/') return html(pageHtml(env, { html: '<h1>BCA Wales</h1><p>Landscape, community and recovery.</p><p><a data-nav href="/blog/">Read the blog</a> · <a href="https://explore.bca.wales">Explore the landscape</a></p>' }));
+  if (path === '/') return html(pageHtml(env, { html: '<h1>Blorenge Commoners Association</h1><p>Landscape, community and recovery.</p><p><a data-nav href="/blog/">Read the blog</a> · <a href="https://explore.bca.wales">Explore the landscape</a></p>' }));
   if (path === '/api/blog/posts') return json(await publicIndex(env));
   if (path.startsWith('/media/')) return deliverMedia(env, request, path.slice(7).split('/'));
   if (path === '/account/') return html(pageHtml(env, { title:'Your account', private:true, html:'<h1>Your account</h1><p>Loading account controls…</p><noscript>Enable JavaScript to sign in with Facebook.</noscript>' }));

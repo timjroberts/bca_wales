@@ -6,9 +6,9 @@ import { mountReveals } from './reveals.mjs';
 let editor, dirty = false, saved, account, pending = null;
 const empty = () => ({ schemaVersion:1,title:'Untitled post',excerpt:'',doc:{ type:'doc',content:[{ type:'paragraph' }] } });
 export async function mountAccount() {
-  const main = document.querySelector('main'); account = await getSession(); main.replaceChildren(element('h1','Your BCA Wales account'));
+  const main = document.querySelector('main'); account = await getSession(); main.replaceChildren(element('h1','Your Blorenge Commoners Association account'));
   if (!account.authenticated) { main.append(element('p',account.expired ? 'Your session expired. Sign in again.' : 'Use Facebook to comment or manage posts.'),button('Sign in with Facebook',login)); return; }
-  main.append(element('p',`Signed in as ${account.name}.`),element('p',`Your private administrator enrollment identifier: ${account.subject}`),element('p','Only share this identifier privately with the BCA Wales operator. Signing in does not enroll you as an administrator.'));
+  main.append(element('p',`Signed in as ${account.name}.`),element('p',`Your private administrator enrollment identifier: ${account.subject}`),element('p','Only share this identifier privately with the Blorenge Commoners Association operator. Signing in does not enroll you as an administrator.'));
   if (account.administrator) main.append(element('a','Manage posts',{ href:'/admin/' }));
   main.append(button('Sign out',async()=>{ try { await api('/api/logout',{ method:'POST',csrf:account.csrf }); location.assign('/account/'); } catch(error) { report(error.message); } }));
   main.append(button('Delete my contributions',()=>{
@@ -126,7 +126,7 @@ export async function mountEditor({ store }) {
     } catch(error) { showError(error); }
   }),button('Publish',()=>{
     if(busy || dirty || !saved.draftRevision) { report('Save your draft first, then deliberately publish.'); return; }
-    const dialog=element('dialog'); dialog.append(element('h2',saved.state==='published'?'Publish changes':'Publish post'),element('p',saved.source.title),element('p',saved.source.excerpt||'News and updates from BCA Wales.'),element('img',undefined,{ src:'/static/share.png',alt:'Neutral BCA Wales sharing card',width:400 }),element('p','This saved revision becomes public immediately. All images use the neutral social card. Review the title and summary for safe sharing.'));
+    const dialog=element('dialog'); dialog.append(element('h2',saved.state==='published'?'Publish changes':'Publish post'),element('p',saved.source.title),element('p',saved.source.excerpt||'News and updates from Blorenge Commoners Association.'),element('img',undefined,{ src:'/static/share.png',alt:'Neutral Blorenge Commoners Association sharing card',width:400 }),element('p','This saved revision becomes public immediately. All images use the neutral social card. Review the title and summary for safe sharing.'));
     const reviewed={ version:saved.version,revision:saved.draftRevision };
     const publishKey=crypto.randomUUID(); dialog.append(button('Confirm publication',async()=>{ try { if(dirty || busy || saved.version!==reviewed.version) throw new Error('The draft changed. Close this panel and review publication again.'); const result=await api(`/api/admin/posts/${postId}/publish`,{ method:'POST',csrf:account.csrf,key:publishKey,body:reviewed }); saved={ ...saved,version:result.version,publicRevision:result.revision,state:'published' }; status.textContent='Published'; dialog.close(); } catch(error) { showError(error); } }),button('Cancel',()=>dialog.close())); document.body.append(dialog); dialog.addEventListener('close',()=>dialog.remove()); dialog.showModal();
   }),button('Download local private draft',()=>rescue(read())),button('Load latest saved draft',()=>{ if(!dirty||confirm('Discard the local buffer and load the latest saved draft? Download your local draft first if you need it.')) { dirty=false; location.reload(); } }),button('Unpublish',async()=>{
