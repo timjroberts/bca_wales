@@ -21,7 +21,7 @@ export function safeUrl(value) {
 }
 export function validateDocument(source) {
   requireThat(new TextEncoder().encode(JSON.stringify(source)).length <= 1048576, 413, 'Document too large');
-  exact(source, ['schemaVersion', 'title', 'excerpt', 'doc']);
+  exact(source, ['schemaVersion', 'title', 'excerpt', 'doc', 'sharingImage']);
   requireThat(source.schemaVersion === 1, 422, 'Unsupported document version; export your original');
   bounded(source.title, 160, 1); requireThat(source.title.trim().length, 422, 'Title required'); bounded(source.excerpt, 300);
   let count = 0; const assets = [];
@@ -72,6 +72,13 @@ export function validateDocument(source) {
     }
   }
   visit(source.doc, null, 0);
+  if (source.sharingImage !== undefined) {
+    const sharing = source.sharingImage;
+    exact(sharing, ['assetId', 'policyVersion', 'alt', 'consent']);
+    requireThat(typeof sharing.assetId === 'string' && /^[a-f0-9-]{36}$/.test(sharing.assetId) && Number.isSafeInteger(sharing.policyVersion) && sharing.policyVersion >= 1, 422, 'Invalid sharing image');
+    bounded(sharing.alt, 500, 1); requireThat(sharing.alt.trim() && sharing.consent === 'public-sharing-v1', 422, 'Confirm a safe public sharing image and describe it');
+    assets.push(sharing.assetId); requireThat(assets.length <= 30, 422, 'At most 30 images including the sharing image');
+  }
   return { source, assets: [...new Set(assets)] };
 }
 

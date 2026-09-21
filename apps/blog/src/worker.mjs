@@ -83,10 +83,12 @@ async function route(request, env) {
       if (reading) return json(await rows(env, 'SELECT id,slug,version,state,draft_revision AS draftRevision,public_revision AS publicRevision FROM posts WHERE deleted_at IS NULL ORDER BY created_at DESC LIMIT 200'));
       requireThat(request.method === 'POST', 405); return json(await createPost(env, actor, await readJson(request, 1000), request.headers.get('idempotency-key')), 201);
     }
-    const upload = path.match(/^\/api\/admin\/posts\/([a-f0-9-]{36})\/images$/);
+    const upload = path.match(/^\/api\/admin\/posts\/([a-f0-9-]{36})\/(images|sharing-image)$/);
     if (upload && request.method === 'POST') {
-      requireThat(['true','false'].includes(request.headers.get('x-image-sensitive')), 422, 'Review sensitivity');
-      return json(await uploadImage(env, actor, upload[1], await readBytes(request, 10*1024*1024), { type:request.headers.get('content-type'),sensitive:request.headers.get('x-image-sensitive') === 'true',placeholder:request.headers.get('x-image-placeholder') || 'pixel' }, request.headers.get('idempotency-key')),201);
+      const sharing = upload[2] === 'sharing-image';
+      if (sharing) requireThat(request.headers.get('x-sharing-consent') === 'public-sharing-v1', 422, 'Confirm safe public sharing');
+      else requireThat(['true','false'].includes(request.headers.get('x-image-sensitive')), 422, 'Review sensitivity');
+      return json(await uploadImage(env, actor, upload[1], await readBytes(request, 10*1024*1024), { type:request.headers.get('content-type'),sensitive:sharing ? false : request.headers.get('x-image-sensitive') === 'true',placeholder:sharing ? 'neutral' : request.headers.get('x-image-placeholder') || 'pixel',...(sharing ? { sharing:true,sharingConsent:'public-sharing-v1' } : {}) }, request.headers.get('idempotency-key')),201);
     }
     const post = path.match(/^\/api\/admin\/posts\/([a-f0-9-]{36})(?:\/(save|publish|unpublish|delete|slug|preview))?$/);
     if (post) {

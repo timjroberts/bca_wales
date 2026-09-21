@@ -128,3 +128,38 @@ for (const enabled of [false, true]) test(`reader comments ${enabled ? 'enabled'
   await page.getByRole('link', { name:'Flag browser article',exact:true }).click(); await page.locator('.article-body').waitFor(); await check();
   assert.equal(commentRequests.length > 0, enabled); assert.deepEqual(errors, []);
 });
+
+test('author chooses and reviews a sharing crop; saved selection stays private and navigation resets metadata',{ timeout:120000 },async t=>{
+  const sharp=(await import('sharp')).default,{ uploadImage }=await import('../src/media.mjs'),{ localImagesAdapter }=await import('./images-adapter.mjs');
+  const origin='https://localhost:8797';
+  const {env,mf}=await setup(t,true,{...authConfig(),ORIGIN:origin,COMMENTS_ENABLED:'false'},{name:'blog',https:true,port:8797,assets:{directory:new URL('../dist/static',import.meta.url).pathname,binding:'ASSETS',run_worker_first:true,routerConfig:{has_user_worker:true,invoke_user_worker_ahead_of_assets:true}}});await mf.ready;
+  const issued=await issueSession(env,{id:'987',name:'Local test author'},now()+10000),actor=issued.actor;await env.DB.prepare('INSERT INTO administrators VALUES (?,?)').bind(actor.subject,now()).run();
+  const post=await createPost(env,actor,{slug:'sharing-browser',consent:'public-attribution-v1'},key());
+  const bytes=await sharp({create:{width:1400,height:1000,channels:3,background:'#518448'}}).png().toBuffer();env.IMAGES=localImagesAdapter;
+  const asset=await uploadImage(env,actor,post.id,bytes,{type:'image/png',sensitive:false,placeholder:'neutral',sharing:true,sharingConsent:'public-sharing-v1'},key());
+  const browser=await chromium.launch({headless:true,...(process.env.BCA_BROWSER_EXECUTABLE?{executablePath:process.env.BCA_BROWSER_EXECUTABLE}:{})});t.after(()=>browser.close());
+  const context=await browser.newContext({ignoreHTTPSErrors:true});await context.addCookies([{name:'__Host-bca-session',value:issued.token,url:origin,secure:true,httpOnly:true,sameSite:'Lax'}]);const page=await context.newPage(),errors=[];page.on('pageerror',error=>errors.push(error.message));
+  // Local UI transport fixture; processing, authentication and storage are tested separately.
+  await page.route('**/sharing-image',async route=>{assert.equal(route.request().headers()['x-sharing-consent'],'public-sharing-v1');await route.fulfill({status:201,contentType:'application/json',body:JSON.stringify(asset)});});
+  await page.goto(`${origin}/admin/?post=${post.id}`);await page.getByLabel('Title',{exact:true}).fill('Sharing browser');await page.getByRole('textbox',{name:'Post body'}).fill('A post with a safe sharing image.');
+  await page.getByRole('button',{name:'Choose sharing image',exact:true}).click();const dialog=page.getByRole('dialog');
+  await dialog.getByRole('button',{name:'Use this sharing image',exact:true}).click();await dialog.getByText(/Complete the upload/).waitFor();
+  await dialog.getByLabel('Sharing image file (maximum 10 MiB)',{exact:true}).setInputFiles({name:'common.png',mimeType:'image/png',buffer:bytes});
+  await dialog.getByLabel('Sharing image description',{exact:true}).fill('Green common land');
+  assert.equal(await dialog.getByRole('checkbox').isChecked(),false);
+  await dialog.getByRole('button',{name:'Upload sharing image / retry'}).click();await dialog.getByText(/Choose an image, describe it/).waitFor();
+  await dialog.getByRole('checkbox').check();await dialog.getByRole('button',{name:'Upload sharing image / retry'}).click();await dialog.getByText('Review the cropped image before using it.').waitFor();
+  await dialog.locator('img').evaluate(img=>img.decode());assert.equal(await dialog.locator('img').evaluate(img=>img.naturalWidth),1200);
+  await page.setViewportSize({width:390,height:844});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));await dialog.getByRole('button',{name:'Use this sharing image',exact:true}).scrollIntoViewIfNeeded();await page.screenshot({path:'/tmp/bca-blog-sharing-dialog.png'});
+  await dialog.getByRole('button',{name:'Use this sharing image',exact:true}).click();await page.getByRole('button',{name:'Save draft',exact:true}).click();await page.getByText(/Saved at/).waitFor();
+  await page.reload();await page.getByText(/Custom image selected/).waitFor();
+  const publicPage=await browser.newPage({ignoreHTTPSErrors:true});assert.equal((await publicPage.goto(`${origin}/blog/sharing-browser/`)).status(),404);
+  await page.getByRole('button',{name:'Publish',exact:true}).click();await page.getByRole('dialog').locator('img').evaluate(img=>img.decode());assert.match(await page.getByRole('dialog').locator('img').getAttribute('src'),/\/share$/);
+  await page.getByRole('button',{name:'Confirm publication',exact:true}).click();await page.getByText('Published',{exact:true}).waitFor();
+  await publicPage.goto(`${origin}/blog/sharing-browser/`);const image=()=>publicPage.locator('meta[property="og:image"]').getAttribute('content');const selected=await image();assert.match(selected,/\/share$/);
+  await publicPage.getByRole('link',{name:'All stories',exact:true}).click();await publicPage.locator('.story-index').waitFor();assert.equal(await image(),`${origin}/static/share.png`);
+  await publicPage.getByRole('link',{name:'Sharing browser',exact:true}).click();await publicPage.locator('.article-body').waitFor();assert.equal(await image(),selected);
+  await page.getByRole('button',{name:'Use association card',exact:true}).click();await page.getByRole('button',{name:'Save draft',exact:true}).click();await page.getByText(/Saved at/).waitFor();await publicPage.reload();assert.equal(await image(),selected);
+  await page.getByRole('button',{name:'Publish',exact:true}).click();assert.equal(await page.getByRole('dialog').locator('img').getAttribute('src'),'/static/share.png');await page.getByRole('button',{name:'Confirm publication',exact:true}).click();await page.getByText('Published',{exact:true}).waitFor();
+  await publicPage.reload();assert.equal(await image(),`${origin}/static/share.png`);assert.equal((await publicPage.request.get(selected)).status(),404);assert.deepEqual(errors,[]);
+});

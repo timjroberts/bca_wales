@@ -1,3 +1,4 @@
+import { sharingCard } from '../shared/sharing.mjs';
 import { articleHtml, indexHtml } from '../shared/presentation.mjs';
 import { api, button, element, field, getSession, login, report } from './api.mjs';
 import { RevealStore, mountReveals } from './reveals.mjs';
@@ -62,8 +63,10 @@ async function renderComments(post, ticket) {
   }); section.append(form);
 }
 function head(article) {
+  const card = sharingCard(article, location.origin);
   document.title = `${article.title} · Blorenge Commoners Association`;
   for (const [selector,value] of [['meta[name="description"]',article.excerpt],['meta[property="og:title"]',article.title],['meta[property="og:description"]',article.excerpt],['meta[property="og:url"]',location.href],['meta[property="og:type"]',article.id?'article':'website']]) document.querySelector(selector)?.setAttribute('content',value);
+  for (const [property,value] of Object.entries({ 'og:image':card.url,'og:image:width':card.width,'og:image:height':card.height,'og:image:type':card.type,'og:image:alt':card.alt })) document.querySelector(`meta[property="${property}"]`)?.setAttribute('content',String(value));
   document.querySelector('link[rel="canonical"]')?.setAttribute('href',location.origin + location.pathname);
 }
 async function enhance(ticket = navigation) {
@@ -89,6 +92,7 @@ async function navigate(path, push = true, focus = true) {
     if (focus) main.focus(); await enhance(ticket);
   } catch(error) {
     if (ticket !== navigation) return;
+    head({ title:error.status === 404 ? 'Post unavailable' : 'Temporarily unavailable',excerpt:'' });
     // Fail closed instead of leaving a previously fetched article/comment on screen.
     main.replaceChildren(element('h1',error.status === 404 ? 'Post unavailable' : 'Temporarily unavailable'),element('p',error.message),button('Retry',()=>navigate(path,false))); main.dataset.post = ''; report(error.message);
   }

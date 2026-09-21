@@ -1,3 +1,4 @@
+import { sharingImageEditor } from './sharing-image.mjs';
 import { Editor } from '@tiptap/core';
 import { extensions, imageDefaults } from './editor-schema.mjs';
 import { validateDocument, safeUrl } from '../src/document.mjs';
@@ -42,8 +43,9 @@ export async function mountEditor({ store }) {
   const toolbar = element('div',undefined,{ className:'toolbar' }); toolbar.setAttribute('aria-label','Text formatting');
   const surface = element('div',undefined,{ className:'editor-surface' }), status = element('p','Saved draft',{ className:'save-state' }); status.setAttribute('role','status');
   main.append(field('Title',title),field('Safe sharing summary (no sensitive details)',excerpt),toolbar,surface,status);
-  const read = () => ({ schemaVersion:1,title:title.value,excerpt:excerpt.value,doc:editor.getJSON() });
+  const read = () => ({ schemaVersion:1,title:title.value,excerpt:excerpt.value,doc:editor.getJSON(),...(sharing.read() ? { sharingImage:sharing.read() } : {}) });
   const changed = () => { dirty = true; pending = null; status.textContent = 'Unsaved changes'; };
+  const sharing = sharingImageEditor({ postId,csrf:account.csrf,original:original.sharingImage,changed }); main.append(sharing.element);
   const showError = error => { status.textContent = error.status === 409 ? 'Conflict: your local work is preserved. Download it before loading the newer draft.' : `Save failed: ${error.message}`; report(error.message); };
   let componentDialog;
   function editComponent(type, attrs = {}) {
@@ -126,7 +128,7 @@ export async function mountEditor({ store }) {
     } catch(error) { showError(error); }
   }),button('Publish',()=>{
     if(busy || dirty || !saved.draftRevision) { report('Save your draft first, then deliberately publish.'); return; }
-    const dialog=element('dialog'); dialog.append(element('h2',saved.state==='published'?'Publish changes':'Publish post'),element('p',saved.source.title),element('p',saved.source.excerpt||'News and updates from Blorenge Commoners Association.'),element('img',undefined,{ src:'/static/share.png',alt:'Neutral Blorenge Commoners Association sharing card',width:400 }),element('p','This saved revision becomes public immediately. All images use the neutral social card. Review the title and summary for safe sharing.'));
+    const dialog=element('dialog'); dialog.append(element('h2',saved.state==='published'?'Publish changes':'Publish post'),element('p',saved.source.title),element('p',saved.source.excerpt||'News and updates from Blorenge Commoners Association.'),element('img',undefined,{ src:saved.source.sharingImage ? `/preview/media/${postId}/buffer/${saved.source.sharingImage.assetId}/share` : '/static/share.png',alt:saved.source.sharingImage?.alt || 'Blorenge Commoners Association sharing card',width:400 }),element('p','This saved revision becomes public immediately. Review the sharing image, title and summary. Social networks may retain copies after replacement or deletion.'));
     const reviewed={ version:saved.version,revision:saved.draftRevision };
     const publishKey=crypto.randomUUID(); dialog.append(button('Confirm publication',async()=>{ try { if(dirty || busy || saved.version!==reviewed.version) throw new Error('The draft changed. Close this panel and review publication again.'); const result=await api(`/api/admin/posts/${postId}/publish`,{ method:'POST',csrf:account.csrf,key:publishKey,body:reviewed }); saved={ ...saved,version:result.version,publicRevision:result.revision,state:'published' }; status.textContent='Published'; dialog.close(); } catch(error) { showError(error); } }),button('Cancel',()=>dialog.close())); document.body.append(dialog); dialog.addEventListener('close',()=>dialog.remove()); dialog.showModal();
   }),button('Download local private draft',()=>rescue(read())),button('Load latest saved draft',()=>{ if(!dirty||confirm('Discard the local buffer and load the latest saved draft? Download your local draft first if you need it.')) { dirty=false; location.reload(); } }),button('Unpublish',async()=>{
