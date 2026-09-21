@@ -51,6 +51,7 @@ export async function uploadImage(env, actor, postId, bytes, options, key) {
   requireThat(bytes.length > 0 && bytes.length <= 10 * 1024 * 1024, 413, 'Image must be at most 10 MiB');
   const type = imageType(bytes); requireThat(type === options.type, 422, 'Image bytes do not match the declared type');
   requireThat(typeof options.sensitive === 'boolean' && ['pixel','neutral'].includes(options.placeholder), 422, 'Review image sensitivity');
+  requireThat(options.sharing === undefined || options.sharing === true && options.sensitive === false && options.sharingConsent === 'public-sharing-v1', 422, 'Confirm that the sharing image is safe for unrestricted public sharing');
   const input = await operationInput('upload', postId, key, { hash: await digest(bytes), ...options });
   const previous = await readOperation(env, actor, input); if (previous) return previous;
   return withStaging(env, actor, postId, async () => {
@@ -73,6 +74,13 @@ export async function uploadImage(env, actor, postId, bytes, options, key) {
       const result = new Uint8Array(await response.arrayBuffer()); requireThat(result.length <= 10 * 1024 * 1024, 422, 'Display image too large'); await persist(String(width), result);
     }
     manifest.display = manifest['1920'];
+    if (options.sharing) {
+      const output = await env.IMAGES.input(stream()).transform({ width: 1200, height: 630, fit: 'cover' }).output({ format: 'image/png', anim: false });
+      const response = output.response(); requireThat(response.ok, 503, 'Sharing image processing failed');
+      const bytes = new Uint8Array(await response.arrayBuffer()); requireThat(bytes.length <= 10 * 1024 * 1024, 422, 'Sharing image too large');
+      const info = await env.IMAGES.info(new Blob([bytes]).stream()); requireThat(info.width === 1200 && info.height === 630, 503, 'Sharing image dimensions unavailable');
+      await persist('share', bytes);
+    }
     let pixel = neutral;
     if (options.placeholder === 'pixel') {
       const output = await env.IMAGES.input(stream()).transform({ width: 16, height: 16, fit: 'scale-down' }).output({ format: 'image/png', anim: false });

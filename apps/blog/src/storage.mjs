@@ -85,11 +85,16 @@ export async function mediaForSource(env, postId, source, revision, preview = fa
   }
   const resolve = attrs => {
     const asset = media[attrs.assetId]; requireThat(asset && asset.policy_version === attrs.policyVersion, 422, 'Review replacement image policy');
+    if (source.sharingImage?.assetId === attrs.assetId) requireThat(!attrs.sensitive, 422, 'A sensitive body image cannot be a sharing image');
     if (asset.sensitive || attrs.sensitive) requireThat(!attrs.decorative && attrs.alt.trim() && attrs.warning.trim(), 422, 'Sensitive assets require reviewed alt text and warning');
     const base = `${preview ? '/preview/media' : '/media'}/${postId}/${revision}/${attrs.assetId}`;
     return { sensitive: !!asset.sensitive, pixel: `${base}/pixel`, display: `${base}/display` };
   };
   const inspect = node => { if (node.type === 'image') resolve(node.attrs); (node.content || []).forEach(inspect); }; inspect(source.doc);
+  if (source.sharingImage) {
+    const sharing = source.sharingImage, asset = media[sharing.assetId];
+    requireThat(asset && !asset.sensitive && asset.policy_version === sharing.policyVersion && asset.manifest.share, 422, 'Upload and review a non-sensitive sharing image');
+  }
   return { media, resolve };
 }
 async function saveDraftInternal(env, actor, id, body, key) {
@@ -121,9 +126,12 @@ async function publishInternal(env, actor, id, body, key) {
   const source = await objectJson(env, revision.source_key, revision.source_hash);
   const { media, resolve } = await mediaForSource(env, id, source, revision.id);
   const html = renderDocument(source, resolve);
-  const metadata = { title: source.title, excerpt: source.excerpt || 'News and updates from Blorenge Commoners Association.', attribution: JSON.parse(post.attribution), slug: post.slug };
+  const metadata = { title: source.title, excerpt: source.excerpt || 'News and updates from Blorenge Commoners Association.', attribution: JSON.parse(post.attribution), slug: post.slug, ...(source.sharingImage ? { sharingImage: { assetId: source.sharingImage.assetId, url: `/media/${id}/${revision.id}/${source.sharingImage.assetId}/share`, alt: source.sharingImage.alt, width: 1200, height: 630, type: 'image/png' } } : {}) };
+  const bodyAssets = new Set();
+  const collect = node => { if (node.type === 'image') bodyAssets.add(node.attrs.assetId); (node.content || []).forEach(collect); }; collect(source.doc);
+  // Sharing-only uploads expose only the reviewed crop, not their other derivatives.
   // Public SPA payload contains sanitized HTML, never the canonical draft tree or subjects.
-  const artifact = { rendererVersion: RENDERER_VERSION, html, metadata, media: Object.fromEntries(Object.entries(media).map(([assetId, m]) => [assetId, { policyVersion: m.policy_version, sensitive: !!m.sensitive, variants: m.manifest }])) };
+  const artifact = { rendererVersion: RENDERER_VERSION, html, metadata, media: Object.fromEntries(Object.entries(media).map(([assetId, m]) => [assetId, { policyVersion: m.policy_version, sensitive: !!m.sensitive, variants: bodyAssets.has(assetId) ? m.manifest : { share: m.manifest.share } }])) };
   const manifestKey = `posts/${id}/${revision.id}/render-${uuid()}.json`, hash = await stage(env, manifestKey, artifact), time = now();
   const result = { id, revision: revision.id, version: body.version + 1, state: 'published' };
   return commit(env, actor, input, "EXISTS (SELECT 1 FROM posts WHERE id=? AND version=? AND draft_revision=? AND deleted_at IS NULL) AND NOT EXISTS (SELECT 1 FROM settings WHERE key='publish_paused' AND value='true')", [id, body.version, revision.id], result, (gate, execution) => [
@@ -165,7 +173,7 @@ export async function preview(env, actor, id, source) {
 }
 export async function deliverMedia(env, request, parts, actor = null) {
   const [postId, revisionId, assetId, variant] = parts;
-  requireThat(parts.length === 4 && ['pixel', 'display', '640', '1280', '1920'].includes(variant), 404, 'Not found');
+  requireThat(parts.length === 4 && ['pixel', 'display', '640', '1280', '1920', 'share'].includes(variant), 404, 'Not found');
   requireThat(!request.headers.has('range'), 416, 'Image ranges are not supported');
   let manifest;
   if (actor) {
@@ -174,12 +182,15 @@ export async function deliverMedia(env, request, parts, actor = null) {
   } else {
     const post = await getPost(env, postId, true); requireThat(post.public_revision === revisionId, 404, 'Not found');
     const revision = await first(env, 'SELECT * FROM revisions WHERE id=? AND post_id=?', revisionId, postId); requireThat(revision?.manifest_key, 503, 'Content temporarily unavailable');
-    const artifact = await objectJson(env, revision.manifest_key, revision.manifest_hash); manifest = artifact.media[assetId]?.variants; requireThat(manifest, 404, 'Not found');
+    const artifact = await objectJson(env, revision.manifest_key, revision.manifest_hash);
+    if (variant === 'share') requireThat(artifact.metadata.sharingImage?.assetId === assetId && !artifact.media[assetId]?.sensitive, 404, 'Not found');
+    manifest = artifact.media[assetId]?.variants; requireThat(manifest, 404, 'Not found');
   }
   const item = manifest[variant]; requireThat(item, 404, 'Not found');
   const object = await env.CONTENT.get(item.key); requireThat(object, 503, 'Image temporarily unavailable');
   const bytes = await object.arrayBuffer(); requireThat(bytes.byteLength === item.size && await digest(bytes) === item.hash, 503, 'Image temporarily unavailable');
   if (actor) await checkAuthority(env, actor);
+  else requireThat((await getPost(env, postId, true)).public_revision === revisionId, 404, 'Not found');
   return new Response(request.method === 'HEAD' ? null : bytes, { headers: { 'Content-Type': item.type, 'Content-Length': String(bytes.byteLength), 'Cache-Control': actor ? 'private, no-store' : 'no-store', 'X-Content-Type-Options': 'nosniff' } });
 }
 
