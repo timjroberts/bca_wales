@@ -148,12 +148,13 @@ external source is proposed. No analytics or client-side telemetry is enabled.
 
 ## Monitoring and hand-off
 
-The `Monitor production` workflow runs every six hours and checks the
-homepage, retired evidence route, service-information routes, security headers,
-current pointer, immutable manifest and a representative PMTiles checksum. A
-failed workflow run is the operational alert. Tim Roberts owns
-release approval, Cloudflare, GitHub production access, incident response and
-the within-one-working-day restoration target.
+The `Monitor production` workflow is disabled. When enabled, it runs every six
+hours and checks the homepage, retired evidence route, service-information
+routes, security headers, current pointer, immutable manifest and a
+representative PMTiles checksum. A failed workflow run is the operational alert
+while it is enabled. Tim Roberts owns release approval, Cloudflare, GitHub
+production access, incident response and the within-one-working-day restoration
+target.
 
 Routine factual updates follow the evidence publication runbook. Application
 changes follow the protected site workflow and do not move the evidence
